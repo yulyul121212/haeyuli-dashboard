@@ -957,10 +957,12 @@ const ASSETS = {"pickle": {"smile": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAA
       u.lang = 'en-US';
       u.rate = 0.7; u.pitch = 1.15;
       S.speaking = true;
+      S.speakId = (S.speakId || 0) + 1;
+      var myId = S.speakId;
       S.spokenLines.push(t); if (S.spokenLines.length > 3) S.spokenLines.shift();
       stageTalking(true);
-      u.onend = function () { stageTalking(false); S.speaking = false; S.speechEndAt = Date.now(); };
-      u.onerror = function () { stageTalking(false); S.speaking = false; S.speechEndAt = Date.now(); };
+      u.onend = function () { stageTalking(false); if (S.speakId === myId) { S.speaking = false; S.speechEndAt = Date.now(); } };
+      u.onerror = function () { stageTalking(false); if (S.speakId === myId) { S.speaking = false; S.speechEndAt = Date.now(); } };
       window.speechSynthesis.cancel();
       window.speechSynthesis.speak(u);
     } catch (e) {}
