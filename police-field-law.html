@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="day" data-fs="md">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=5">
+<meta name="theme-color" content="#12233d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="현장 법조문">
+<title>현장 법조문 — 지구대·파출소</title>
+<style>
+:root{
+  --bg:#eef1f5; --panel:#ffffff; --panel2:#f6f8fb; --ink:#111a24; --ink2:#4a5768; --line:#dde3ea;
+  --brand:#12386b; --brand2:#1c5aa6; --accent:#c8102e;
+  --fine:#0b6b3a; --finebg:#e6f5ec;
+  --pen:#8a2c00; --penbg:#fdeee4;
+  --tob:#6a3fa0; --tobbg:#f1e9fb;
+  --warn:#a1121c; --warnbg:#fdeaea;
+  --info:#0b5a86; --infobg:#e5f2f9;
+  --soon:#8a5a00; --soonbg:#fff3d6;
+  --star:#c99700;
+  --fs:16px; --fs-s:13px; --fs-t:17px; --fs-b:20px;
+}
+html[data-fs="md"]{--fs:16px;--fs-s:13px;--fs-t:17.5px;--fs-b:20px}
+html[data-fs="lg"]{--fs:18.5px;--fs-s:15px;--fs-t:20.5px;--fs-b:24px}
+html[data-fs="xl"]{--fs:21px;--fs-s:17px;--fs-t:23.5px;--fs-b:28px}
+html[data-theme="night"]{
+  --bg:#080d14; --panel:#0f1722; --panel2:#141d2a; --ink:#e8eef6; --ink2:#9fb0c4; --line:#243244;
+  --brand:#0a1524; --brand2:#2f7fd0;
+  --fine:#66d79b; --finebg:#10301f;
+  --pen:#ffab7a; --penbg:#33190c;
+  --tob:#c9a6ff; --tobbg:#231533;
+  --warn:#ff8b93; --warnbg:#3a1015;
+  --info:#7cc8ee; --infobg:#0c2634;
+  --soon:#ffd479; --soonbg:#332708;
+  --star:#ffc93c;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+  font-size:var(--fs); line-height:1.5;
+  overscroll-behavior-y:none;
+}
+#app{max-width:560px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;background:var(--bg)}
+/* ---------- header ---------- */
+header.top{position:sticky;top:0;z-index:40;background:var(--brand);color:#fff;
+  padding:calc(env(safe-area-inset-top) + 8px) 12px 8px;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+.hrow{display:flex;align-items:center;gap:8px}
+.brand{font-size:var(--fs-t);font-weight:800;letter-spacing:-.3px;flex:1;min-width:0}
+.brand small{display:block;font-size:11px;font-weight:500;opacity:.78;letter-spacing:0}
+.iconbtn{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;
+  border-radius:10px;height:34px;min-width:40px;padding:0 9px;font-size:var(--fs-s);font-weight:700;cursor:pointer}
+.iconbtn:active{background:rgba(255,255,255,.25)}
+.searchbox{display:flex;align-items:center;gap:6px;margin-top:8px;background:#fff;border-radius:12px;padding:0 10px;height:44px}
+html[data-theme="night"] .searchbox{background:#1b2636}
+.searchbox svg{flex:0 0 20px;opacity:.5;color:#333}
+html[data-theme="night"] .searchbox svg{color:#cfe}
+#q{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font-size:var(--fs);outline:none;font-family:inherit}
+#q::placeholder{color:#8b97a6;font-size:var(--fs-s)}
+#clearQ{display:none;border:0;background:#dfe4ec;color:#3a4757;border-radius:50%;width:24px;height:24px;font-size:14px;line-height:1;cursor:pointer}
+html[data-theme="night"] #clearQ{background:#2a394d;color:#cfe}
+#clearQ.on{display:block}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:8px 0 2px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;border:1px solid rgba(255,255,255,.32);background:rgba(255,255,255,.08);color:#eaf1fa;
+  border-radius:999px;padding:6px 12px;font-size:var(--fs-s);font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit}
+.chip.on{background:#fff;color:var(--brand);border-color:#fff}
+/* ---------- list ---------- */
+main{flex:1;padding:10px 10px 96px}
+.sechead{display:flex;align-items:baseline;gap:8px;margin:2px 4px 8px}
+.sechead h2{font-size:var(--fs-s);font-weight:800;color:var(--ink2);margin:0;letter-spacing:.2px}
+.sechead .cnt{font-size:11px;color:var(--ink2);opacity:.75}
+.note{margin:0 2px 10px;padding:9px 11px;border-radius:10px;font-size:var(--fs-s);line-height:1.45;
+  background:var(--infobg);color:var(--ink);border:1px solid var(--line)}
+.note b{color:var(--info)}
+.card{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--brand2);
+  border-radius:13px;padding:11px 12px 10px;margin-bottom:9px;cursor:pointer;position:relative}
+.card:active{transform:scale(.995);background:var(--panel2)}
+.card[data-tab="경범죄"]{border-left-color:#c8102e}
+.card[data-tab="형법"]{border-left-color:#12386b}
+.card[data-tab="형소법"]{border-left-color:#0b6b6b}
+.card[data-tab="교통"]{border-left-color:#b06a00}
+.card[data-tab="최신"]{border-left-color:#6a3fa0}
+.ctop{display:flex;align-items:flex-start;gap:8px}
+.cname{font-size:var(--fs-t);font-weight:800;letter-spacing:-.3px;flex:1;min-width:0;word-break:keep-all}
+.cart{font-size:var(--fs-s);color:var(--ink2);font-weight:600;margin-top:1px}
+.star{flex:0 0 auto;border:0;background:transparent;font-size:22px;line-height:1;cursor:pointer;color:#c3ccd8;padding:0 2px}
+.star.on{color:var(--star)}
+.badges{display:flex;flex-wrap:wrap;gap:4px;margin:7px 0 0}
+.b{font-size:var(--fs-s);font-weight:800;padding:2px 7px;border-radius:6px;line-height:1.5;white-space:nowrap}
+.b.f{background:var(--finebg);color:var(--fine);border:1px solid color-mix(in srgb,var(--fine) 35%,transparent)}
+.b.p{background:var(--penbg);color:var(--pen);border:1px solid color-mix(in srgb,var(--pen) 35%,transparent)}
+.b.t{background:var(--tobbg);color:var(--tob);border:1px solid color-mix(in srgb,var(--tob) 35%,transparent)}
+.b.x{background:var(--warnbg);color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent)}
+.b.a{background:var(--infobg);color:var(--info);border:1px solid color-mix(in srgb,var(--info) 35%,transparent)}
+.b.n{background:var(--finebg);color:var(--fine);border:1px solid color-mix(in srgb,var(--fine) 35%,transparent)}
+.b.s{background:var(--soonbg);color:var(--soon);border:1px solid color-mix(in srgb,var(--soon) 45%,transparent)}
+.sum{font-size:var(--fs-s);color:var(--ink2);margin-top:7px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tagline{font-size:11px;color:var(--ink2);opacity:.85;margin-top:6px}
+.empty{text-align:center;color:var(--ink2);padding:48px 16px;font-size:var(--fs-s);line-height:1.7}
+.empty b{display:block;font-size:var(--fs-t);color:var(--ink);margin-bottom:6px}
+/* ---------- tabbar ---------- */
+nav.tabbar{position:fixed;bottom:0;left:0;right:0;z-index:50;
+  background:color-mix(in srgb,var(--panel) 94%,transparent);backdrop-filter:blur(12px);
+  border-top:1px solid var(--line);display:flex;
+  padding-bottom:env(safe-area-inset-bottom)}
+nav.tabbar .inner{max-width:560px;margin:0 auto;display:flex;width:100%}
+.tabbtn{flex:1;border:0;background:transparent;color:var(--ink2);font-family:inherit;
+  padding:7px 1px 6px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;position:relative}
+.tabbtn .ic{font-size:19px;line-height:1}
+.tabbtn .lb{font-size:10.5px;font-weight:700;letter-spacing:-.3px;white-space:nowrap}
+.tabbtn.on{color:var(--brand2)}
+html[data-theme="night"] .tabbtn.on{color:#7cc0ff}
+.tabbtn.on .ic{transform:translateY(-1px)}
+.tabbtn .dot{position:absolute;top:3px;right:calc(50% - 17px);background:var(--accent);color:#fff;
+  font-size:9px;font-weight:800;border-radius:9px;padding:0 4px;height:14px;line-height:14px;display:none}
+.tabbtn .dot.on{display:block}
+/* ---------- modal ---------- */
+.sheet{position:fixed;inset:0;z-index:80;display:none;background:rgba(6,10,16,.55)}
+.sheet.on{display:block}
+.sheetbody{position:absolute;left:0;right:0;bottom:0;max-height:92dvh;overflow-y:auto;
+  background:var(--panel);border-radius:18px 18px 0 0;padding:0 0 calc(env(safe-area-inset-bottom) + 18px);
+  box-shadow:0 -8px 30px rgba(0,0,0,.35);animation:up .18s ease-out}
+@keyframes up{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}
+.sheet .handle{position:sticky;top:0;background:var(--panel);padding:8px 0 4px;text-align:center;z-index:2;pointer-events:none}
+.sheet .handle i{display:inline-block;width:38px;height:4px;border-radius:4px;background:var(--line)}
+.sheet .inner{padding:0 16px}
+.sheet h3{font-size:calc(var(--fs-b));margin:6px 0 2px;letter-spacing:-.5px;line-height:1.35;word-break:keep-all}
+.sheet .meta{font-size:var(--fs-s);color:var(--ink2);font-weight:600;margin-bottom:10px}
+.sheet .closer{position:absolute;right:10px;top:8px;z-index:6;border:0;background:var(--panel2);color:var(--ink2);
+  width:34px;height:34px;border-radius:50%;font-size:16px;cursor:pointer}
+.block{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px 13px;margin:10px 0}
+.block h4{margin:0 0 6px;font-size:var(--fs-s);color:var(--ink2);font-weight:800;letter-spacing:.3px}
+.block p{margin:0;font-size:var(--fs);line-height:1.62;white-space:pre-wrap;word-break:keep-all}
+.block.quote{border-left:3px solid var(--brand2)}
+.block.tip{border-left:3px solid var(--fine);background:var(--finebg)}
+.block.tip h4{color:var(--fine)}
+.block.warn{border-left:3px solid var(--warn);background:var(--warnbg)}
+.block.warn h4{color:var(--warn)}
+.block.warn b{color:var(--warn)}
+.btnrow{display:flex;gap:8px;margin-top:12px}
+.btnrow button{flex:1;border:1px solid var(--line);background:var(--panel);color:var(--ink);
+  font-family:inherit;font-size:var(--fs-s);font-weight:800;padding:11px 8px;border-radius:11px;cursor:pointer}
+.btnrow button.pri{background:var(--brand2);color:#fff;border-color:transparent}
+.btnrow button:active{opacity:.85}
+.foot{margin:16px 0 4px;font-size:11px;color:var(--ink2);line-height:1.6;border-top:1px solid var(--line);padding-top:10px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 78px);transform:translateX(-50%) translateY(10px);
+  background:#111c2b;color:#fff;font-size:var(--fs-s);font-weight:700;padding:9px 16px;border-radius:22px;
+  opacity:0;pointer-events:none;transition:.2s;z-index:120;max-width:88vw;text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+/* miranda */
+.miranda{background:#0b1420;color:#fff;border-radius:14px;padding:16px;margin:10px 0}
+html[data-theme="day"] .miranda{background:#101c2c}
+.miranda .who{font-size:var(--fs-s);font-weight:800;color:#ffd479;letter-spacing:.3px;margin-bottom:8px}
+.miranda .big{font-size:calc(var(--fs-b));font-weight:800;line-height:1.62;letter-spacing:-.2px;word-break:keep-all}
+.miranda .big em{font-style:normal;color:#ffd479}
+.miranda .sub{margin-top:12px;font-size:var(--fs-s);line-height:1.6;color:#c7d4e4}
+.miranda .mitems{margin-top:10px;border-top:1px solid rgba(255,255,255,.16);padding-top:8px}
+.miranda .mitems p{margin:0 0 9px;font-size:var(--fs-t);line-height:1.6;font-weight:600;color:#eef4fb;word-break:keep-all}
+/* checklist */
+.ckrow{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px dashed var(--line);cursor:pointer}
+.ckrow:last-of-type{border-bottom:0}
+.ckrow input{position:absolute;opacity:0;width:0;height:0}
+.ckbox{flex:0 0 22px;width:22px;height:22px;border-radius:6px;border:2px solid var(--line);background:var(--panel);margin-top:1px;position:relative;transition:.12s}
+.ckrow input:checked + .ckbox{background:var(--brand2);border-color:var(--brand2)}
+.ckrow input:checked + .ckbox::after{content:"✓";position:absolute;inset:0;color:#fff;font-size:15px;font-weight:900;line-height:19px;text-align:center}
+.cklabel{flex:1;font-size:var(--fs-s);line-height:1.5;font-weight:600;word-break:keep-all}
+.cklabel .hi{font-style:normal;font-size:10px;font-weight:800;color:#fff;background:var(--accent);border-radius:4px;padding:1px 4px;margin-left:3px;vertical-align:1px}
+.ckadvbox{margin:2px 0 8px 31px;padding:7px 10px;border-left:3px solid var(--brand2);background:var(--infobg);
+  font-size:var(--fs-s);line-height:1.5;color:var(--ink);border-radius:0 8px 8px 0}
+.block b{color:var(--brand2)}
+html[data-theme="night"] .block b{color:#7cc0ff}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="hrow">
+      <div class="brand">⚖️ 현장 법조문<small id="basis">기준일 2026-11-24 · 국가법령정보센터 확인</small></div>
+      <button class="iconbtn" id="themeBtn" title="주간/야간">🌙 야간</button>
+      <button class="iconbtn" id="fsBtn" title="글자 크기">가</button>
+    </div>
+    <div class="searchbox">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="q" type="search" inputmode="search" autocomplete="off" placeholder="통합검색: 노상방뇨 · 미란다 · 50만원 · 킥보드 · 가폭">
+      <button id="clearQ" aria-label="지우기">✕</button>
+    </div>
+    <div class="chips" id="chips"></div>
+  </header>
+  <main id="list"></main>
+  <nav class="tabbar">
+    <div class="inner" id="tabbar"></div>
+  </nav>
+</div>
+<div class="sheet" id="sheet"><div class="sheetbody" id="sheetbody"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const DATA = [
+/* ================= 경범죄 처벌법 ================= */
+{id:"kb0",tab:"경범죄",cat:"총칙",name:"범칙자 요건 (통고처분 대상)",art:"경범죄 처벌법 제6조 제2항",
+ badges:[["a","통고처분 기준"]],
+ sum:"상습범·구류적절·피해자 있음·18세 미만은 범칙자가 아니어서 통고처분 불가",
+ tip:"현장 판단: ①상습 ②동기·수단·결과상 구류가 적절 ③피해자가 있는 행위 ④18세 미만 — 하나라도 해당하면 통고처분 대신 즉결심판 청구 검토.",
+ text:"제6조(정의) ② 이 장에서 “범칙자”란 범칙행위를 한 사람으로서 다음 각 호의 어느 하나에 해당하지 아니하는 사람을 말한다.\n1. 범칙행위를 상습적으로 하는 사람\n2. 죄를 지은 동기나 수단 및 결과를 헤아려볼 때 구류처분을 하는 것이 적절하다고 인정되는 사람\n3. 피해자가 있는 행위를 한 사람\n4. 18세 미만인 사람\n③ 이 장에서 “범칙금”이란 범칙자가 제7조에 따른 통고처분에 따라 국고 또는 제주특별자치도의 금고에 납부하여야 할 금전을 말한다.",
+ ref:"경범죄 처벌법 [시행 2026.10.2.] [법률 제22014호]"},
+{id:"kb1",tab:"경범죄",cat:"총칙",name:"통고처분 · 범칙금 납부",art:"경범죄 처벌법 제7조~제9조",
+ badges:[["f","납부기간 10일"],["p","불이행 시 20% 가산 → 즉결심판"]],
+ sum:"범칙금 통고 → 10일 내 납부(불이행 시 20% 가산, 20일 내) → 그래도 미납 시 즉결심판",
+ tip:"통고처분서 수령을 거부하거나 주거·신원이 불확실하면 통고 불가(제7조①단서). 즉결심판 청구 전까지 50% 가산 납부하면 청구 취소.",
+ text:"제7조(통고처분) ① 경찰서장, 해양경찰서장, 제주특별자치도지사 또는 철도특별사법경찰대장은 범칙자로 인정되는 사람에 대하여 그 이유를 명백히 나타낸 서면으로 범칙금을 부과하고 이를 납부할 것을 통고할 수 있다. 다만, 다음 각 호의 어느 하나에 해당하는 사람에게는 통고하지 아니한다.\n1. 통고처분서 받기를 거부한 사람\n2. 주거 또는 신원이 확실하지 아니한 사람\n3. 그 밖에 통고처분을 하기가 매우 어려운 사람\n② 제1항에 따라 통고할 범칙금의 액수는 범칙행위의 종류에 따라 대통령령으로 정한다.\n\n제8조(범칙금의 납부) ① 통고처분서를 받은 사람은 받은 날부터 10일 이내에 지정 은행·우체국 등에 납부하여야 한다.\n② 납부기간에 납부하지 아니한 사람은 그 다음 날부터 20일 이내에 통고받은 범칙금에 그 금액의 100분의 20을 더한 금액을 납부하여야 한다.\n③ 제1항 또는 제2항에 따라 범칙금을 납부한 사람은 그 범칙행위에 대하여 다시 처벌받지 아니한다.\n\n제9조(통고처분 불이행자 등의 처리) ① 경찰서장 등은 다음 각 호의 어느 하나에 해당하는 사람에 대하여는 지체 없이 즉결심판을 청구하여야 한다. 다만, 즉결심판이 청구되기 전까지 통고받은 범칙금에 그 금액의 100분의 50을 더한 금액을 납부한 사람에 대하여는 그러하지 아니하다.\n1. 제7조제1항 각 호의 어느 하나에 해당하는 사람\n2. 제8조제2항에 따른 납부기간에 범칙금을 납부하지 아니한 사람",
+ ref:"경범죄 처벌법 [시행 2026.10.2.] 제7조~제9조"},
+{id:"kb2",tab:"경범죄",cat:"총칙",name:"통고처분 제외 — 관공서 주취소란·거짓신고",art:"경범죄 처벌법 제3조 제3항",
+ badges:[["p","60만원 이하 벌금·구류·과료"],["x","통고처분 불가"]],
+ sum:"제3조 제3항은 시행령 별표(범칙행위)에 없어 범칙금 통고 대상이 아님 → 즉결심판",
+ tip:"거짓신고(③2)와 관공서 주취소란(③1)은 범칙금이 없다. 112 허위신고는 형법상 무고(제156조)와 구별해 적용.",
+ text:"제3조(경범죄의 종류) ③ 다음 각 호의 어느 하나에 해당하는 사람은 60만원 이하의 벌금, 구류 또는 과료(科料)의 형으로 처벌한다.\n1. (관공서에서의 주취소란) 술에 취한 채로 관공서에서 몹시 거친 말과 행동으로 주정하거나 시끄럽게 한 사람\n2. (거짓신고) 있지 아니한 범죄나 재해 사실을 공무원에게 거짓으로 신고한 사람\n\n※ 제6조 제1항의 “범칙행위”는 제3조 제1항 각 호 및 제2항 각 호로 한정되므로 제3항은 통고처분 대상이 아니다(시행령 별표에도 없음).",
+ ref:"경범죄 처벌법 [시행 2026.10.2.] 제3조③·제6조①"},
+
+{id:"kb10",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"빈집 등에의 침입",art:"제3조 제1항 제1호",
+ badges:[["f","범칙금 8만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"사람이 살지 않고 관리하지 않는 집·울타리·건조물·배·자동차 안에 정당한 이유 없이 들어감",
+ tip:"정당한 이유(수색·구조·임대차 분쟁) 확인. 관리자가 있으면 주거침입(형법 제319조)로 처리.", text:"1. (빈집 등에의 침입) 다른 사람이 살지 아니하고 관리하지 아니하는 집 또는 그 울타리ㆍ건조물(建造物)ㆍ배ㆍ자동차 안에 정당한 이유 없이 들어간 사람",ref:"경범죄 처벌법 제3조①1 / 시행령 별표 8만원"},
+{id:"kb11",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"흉기의 은닉·휴대",art:"제3조 제1항 제2호",
+ badges:[["f","범칙금 8만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"칼·쇠몽둥이·쇠톱 등 생명·신체에 중대한 위해를 끼칠 연장·기구를 정당한 이유 없이 숨겨서 휴대",
+ tip:"드러내어 소지하면 형법 제116조의3(공공장소 흉기소지) 검토. 흉기 사용 의도·전과·주취 확인 후 통고 여부 결정.",
+ text:"2. (흉기의 은닉휴대) 칼ㆍ쇠몽둥이ㆍ쇠톱 등 사람의 생명 또는 신체에 중대한 위해를 끼치거나 집이나 그 밖의 건조물에 침입하는 데에 사용될 수 있는 연장이나 기구를 정당한 이유 없이 숨겨서 지니고 다니는 사람",
+ ref:"경범죄 처벌법 제3조①2 / 시행령 별표 8만원"},
+{id:"kb12",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"폭행 등 예비(공모)",art:"제3조 제1항 제3호",
+ badges:[["f","범칙금 8만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"타인 신체에 위해를 끼칠 것을 공모하여 예비행위를 한 사람이 있는 경우 그 공모자",
+ tip:"실제 폭행에 이르면 형법 제260조·제261조. 폭력행위처벌법상 공동폭행 해당 여부도 함께 검토.",
+ text:"3. (폭행 등 예비) 다른 사람의 신체에 위해를 끼칠 것을 공모(共謀)하여 예비행위를 한 사람이 있는 경우 그 공모를 한 사람\n※ 제4호는 2013.5.22. 삭제.",ref:"경범죄 처벌법 제3조①3"},
+{id:"kb13",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"시체 현장변경 등",art:"제3조 제1항 제5호",
+ badges:[["f","범칙금 8만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"사산아를 감추거나 정당한 이유 없이 변사체·사산아가 있는 현장을 바꾸어 놓음",
+ tip:"변사 사건은 즉시 형사과·과학수사 접수. 현장 보존이 최우선이며 통고보다 수사가 우선.",
+ text:"5. (시체 현장변경 등) 사산아(死産兒)를 감추거나 정당한 이유 없이 변사체 또는 사산아가 있는 현장을 바꾸어 놓은 사람",ref:"경범죄 처벌법 제3조①5 / 시행령 별표 8만원"},
+{id:"kb14",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"도움이 필요한 사람 신고불이행",art:"제3조 제1항 제6호",
+ badges:[["f","범칙금 8만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"관리하는 곳에 노인·어린이·장애인·다친 사람·병든 사람·시체·사산아가 있음을 알면서 관계 공무원에게 지체 없이 신고하지 않음",
+ tip:"아동학대·노인학대 의심 시 즉시 분리·보호조치(아동복지법·노인복지법) 우선. 신고의무 위반은 별도 고발 검토.",
+ text:"6. (도움이 필요한 사람 등의 신고불이행) 자기가 관리하고 있는 곳에 도움을 받아야 할 노인, 어린이, 장애인, 다친 사람 또는 병든 사람이 있거나 시체 또는 사산아가 있는 것을 알면서 이를 관계 공무원에게 지체 없이 신고하지 아니한 사람",ref:"경범죄 처벌법 제3조①6 / 시행령 별표 8만원"},
+{id:"kb15",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"관명사칭 등 (경찰 사칭 포함)",art:"제3조 제1항 제7호",
+ badges:[["f","범칙금 8만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"공직·계급·훈장·학위 등 명칭을 거짓으로 꾸며대거나 자격 없이 제복·훈장·표장 등을 사용",
+ tip:"경찰관 사칭으로 직권을 행사했다면 형법 제118조(3년 이하 징역·700만원 이하 벌금). 피해 편취 시 사기죄 경합.",
+ text:"7. (관명사칭 등) 국내외의 공직(公職), 계급, 훈장, 학위 또는 그 밖에 법령에 따라 정하여진 명칭이나 칭호 등을 거짓으로 꾸며 대거나 자격이 없으면서 법령에 따라 정하여진 제복, 훈장, 기장 또는 기념장(記念章), 그 밖의 표장(標章) 또는 이와 비슷한 것을 사용한 사람",ref:"경범죄 처벌법 제3조①7"},
+{id:"kb16",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"물품강매·호객행위",art:"제3조 제1항 제8호",
+ badges:[["f","가목 8만원"],["f","나목 5만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"요청하지 않은 물품 강매·용역 대가 요구, 또는 여러 사람 모이는 곳에서 떠들썩하게 손님을 부름",
+ tip:"가목(강매·대가 요구) 8만원, 나목(호객) 5만원. 협박·공갈 수반 시 형법 제350조 검토.",
+ text:"8. (물품강매ㆍ호객행위) 요청하지 아니한 물품을 억지로 사라고 한 사람, 요청하지 아니한 일을 해주거나 재주 등을 부리고 그 대가로 돈을 달라고 한 사람 또는 여러 사람이 모이거나 다니는 곳에서 영업을 목적으로 떠들썩하게 손님을 부른 사람\n※ 시행령 별표: 가목(강매) 8만원, 나목(호객) 5만원",ref:"경범죄 처벌법 제3조①8 / 시행령 별표"},
+{id:"kb17",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"광고물 무단부착 등",art:"제3조 제1항 제9호",
+ badges:[["f","가목 5만원"],["f","나목 8만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"타인·단체의 집·인공구조물·자동차에 광고물을 붙이거나 간판·표시물을 옮기거나 훼손, 공공장소에 광고물 살포",
+ tip:"가목(부착·게시) 5만원, 나목(옮김·훼손) 8만원. 옥외광고물법 위반은 별도 과태료.",
+ text:"9. (광고물 무단부착 등) 다른 사람 또는 단체의 집이나 그 밖의 인공구조물과 자동차 등에 함부로 광고물 등을 붙이거나 내걸거나 끼우거나 글씨 또는 그림을 쓰거나 그리거나 새기는 행위 등을 한 사람 또는 다른 사람이나 단체의 간판, 그 밖의 표시물 또는 인공구조물을 함부로 옮기거나 더럽히거나 훼손한 사람 또는 공공장소에서 광고물 등을 함부로 뿌린 사람",
+ ref:"경범죄 처벌법 제3조①9 / 시행령 별표"},
+{id:"kb18",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"마시는 물 사용방해",art:"제3조 제1항 제10호",
+ badges:[["f","범칙금 8만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"사람이 마시는 물을 더럽히거나 사용하는 것을 방해",
+ tip:"수도법·먹는물관리법 위반 병과 검토. 다수 피해 우려 시 즉결심판이 아닌 정식 수사로 진행.",
+ text:"10. (마시는 물 사용방해) 사람이 마시는 물을 더럽히거나 사용하는 것을 방해한 사람",ref:"경범죄 처벌법 제3조①10 / 시행령 별표 8만원"},
+{id:"kb19",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"쓰레기 등 투기",art:"제3조 제1항 제11호",
+ badges:[["f","가목 5만원"],["f","나목 3만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"담배꽁초·껌·휴지·쓰레기·죽은 짐승 등 더러운 물건이나 못쓰게 된 물건을 아무 곳에나 버림",
+ tip:"가목(쓰레기 등) 5만원, 나목(담배꽁초·껌·휴지) 3만원. 폐기물관리법 위반(대량 투기)은 별도.",
+ text:"11. (쓰레기 등 투기) 담배꽁초, 껌, 휴지, 쓰레기, 죽은 짐승, 그 밖의 더러운 물건이나 못쓰게 된 물건을 함부로 아무 곳에나 버린 사람",
+ ref:"경범죄 처벌법 제3조①11 / 시행령 별표"},
+{id:"kb20",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"노상방뇨 등",art:"제3조 제1항 제12호",
+ badges:[["f","가목 5만원"],["f","나목(침) 3만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"여러 사람이 모이는 길·공원 등에서 침을 뱉거나 대소변을 봄, 개 등 짐승의 대변을 치우지 않음",
+ tip:"가목(대소변·반려견 배설물) 5만원, 나목(침 뱉기) 3만원. 피해자(민원인)가 특정되면 범칙자 제외 사유(제6조②3).",
+ text:"12. (노상방뇨 등) 길, 공원, 그 밖에 여러 사람이 모이거나 다니는 곳에서 함부로 침을 뱉거나 대소변을 보거나 또는 그렇게 하도록 시키거나 개 등 짐승을 끌고 와서 대변을 보게 하고 이를 치우지 아니한 사람\n※ 시행령 별표: 가목 5만원, 나목 3만원",ref:"경범죄 처벌법 제3조①12 / 시행령 별표 5만원"},
+{id:"kb21",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"의식방해",art:"제3조 제1항 제13호",
+ badges:[["f","범칙금 8만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"행사·의식을 못된 장난 등으로 방해하거나, 말려도 듣지 않고 방해 우려 물건을 가지고 행사장에 들어감",
+ tip:"집회·시위 중 행사 방해는 집시법 위반과 경합 검토. 장례식 방해는 형법 제158조.",
+ text:"13. (의식방해) 공공기관이나 그 밖의 단체 또는 개인이 하는 행사나 의식을 못된 장난 등으로 방해하거나 행사나 의식을 하는 자 또는 그 밖에 관계 있는 사람이 말려도 듣지 아니하고 행사나 의식을 방해할 우려가 뚜렷한 물건을 가지고 행사장 등에 들어간 사람",ref:"경범죄 처벌법 제3조①13 / 시행령 별표 8만원"},
+{id:"kb22",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"단체가입 강요",art:"제3조 제1항 제14호",
+ badges:[["f","범칙금 5만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"싫다고 하는데도 되풀이하여 단체 가입을 억지로 강요",
+ tip:"폭행·협박 수반 시 강요죄(형법 제324조)·공갈죄 검토. 노동조합 가입 강요는 노조법 영역.",
+ text:"14. (단체가입 강요) 싫다고 하는데도 되풀이하여 단체 가입을 억지로 강요한 사람",ref:"경범죄 처벌법 제3조①14 / 시행령 별표 5만원"},
+{id:"kb23",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"자연훼손",art:"제3조 제1항 제15호",
+ badges:[["f","범칙금 5만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"공원·명승지·유원지 등에서 풀·꽃·나무·돌을 함부로 꺾거나 캐거나 바위·나무에 글씨를 새김",
+ tip:"산림자원법·자연공원법 위반은 별도. 야생생물 보호종 채취는 자연환경보전법.",
+ text:"15. (자연훼손) 공원ㆍ명승지ㆍ유원지나 그 밖의 녹지구역 등에서 풀ㆍ꽃ㆍ나무ㆍ돌 등을 함부로 꺾거나 캔 사람 또는 바위ㆍ나무 등에 글씨를 새기거나 하여 자연을 훼손한 사람",ref:"경범죄 처벌법 제3조①15 / 시행령 별표 5만원"},
+{id:"kb24",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"타인의 가축·기계 무단조작",art:"제3조 제1항 제16호",
+ badges:[["f","범칙금 8만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"타인의 소·말 등 짐승, 매어 놓은 배·뗏목을 풀어 놓거나 자동차 등 기계를 조작",
+ tip:"운전까지 했으면 무단운전·절도(이용의도) 검토. 피해 복구비용은 민사.",
+ text:"16. (타인의 가축ㆍ기계 등 무단조작) 다른 사람 또는 단체의 소나 말, 그 밖의 짐승 또는 매어 놓은 배ㆍ뗏목 등을 함부로 풀어 놓거나 자동차 등의 기계를 조작한 사람",ref:"경범죄 처벌법 제3조①16 / 시행령 별표 8만원"},
+{id:"kb25",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"물길의 흐름 방해",art:"제3조 제1항 제17호",
+ badges:[["f","범칙금 2만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"개천·도랑 등 물길의 흐름에 방해될 행위",
+ tip:"하천법상 점용·공작물 설치 위반은 별도 허가관청 통보.",
+ text:"17. (물길의 흐름 방해) 개천ㆍ 도랑이나 그 밖의 물길의 흐름에 방해될 행위를 한 사람",ref:"경범죄 처벌법 제3조①17 / 시행령 별표 2만원"},
+{id:"kb26",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"구걸행위 등",art:"제3조 제1항 제18호",
+ badges:[["f","가목 8만원"],["f","나목 5만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"구걸하도록 시켜 부당이익을 얻거나, 공공장소에서 구걸해 통행을 방해하거나 귀찮게 함",
+ tip:"가목(구걸 알선·이익) 8만원, 나목(직접 구걸) 5만원. 아동·장애인을 이용한 구걸은 아동복지법·장애인복지법 우선 검토.",
+ text:"18. (구걸행위 등) 다른 사람에게 구걸하도록 시켜 올바르지 아니한 이익을 얻은 사람 또는 공공장소에서 구걸을 하여 다른 사람의 통행을 방해하거나 귀찮게 한 사람",ref:"경범죄 처벌법 제3조①18 / 시행령 별표"},
+{id:"kb27",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"불안감 조성 (문신 노출 포함)",art:"제3조 제1항 제19호",
+ badges:[["f","범칙금 5만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"길을 막거나 시비·추적·겁을 주는 언동으로 불안·불쾌감을 주거나, 공공장소에서 고의로 험악한 문신을 드러냄",
+ tip:"지속적 추적·잠복은 스토킹처벌법(2023.7.18. 시행) 우선 적용 검토. 문신 부분은 헌재 위헌 결정 후 개정된 조항.",
+ text:"19. (불안감조성) 정당한 이유 없이 길을 막거나 시비를 걸거나 주위에 모여들거나 뒤따르거나 몹시 거칠게 겁을 주는 말이나 행동으로 다른 사람을 불안하게 하거나 귀찮고 불쾌하게 한 사람 또는 여러 사람이 이용하거나 다니는 도로ㆍ공원 등 공공장소에서 고의로 험악한 문신(文身)을 드러내어 다른 사람에게 혐오감을 준 사람",ref:"경범죄 처벌법 제3조①19 / 시행령 별표 5만원"},
+{id:"kb28",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"음주소란 등",art:"제3조 제1항 제20호",
+ badges:[["f","범칙금 5만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"여러 사람이 모이는 음식점·극장·차량 안에서 거친 말·행동으로 시끄럽게 하거나 술 취해 이유 없이 주정",
+ tip:"업무방해(형법 제314조) 또는 공무집행방해로 발전하는지 확인. 관공서 주취소란은 제3조③1(60만원 이하·통고 불가).",
+ text:"20. (음주소란 등) 공회당ㆍ극장ㆍ음식점 등 여러 사람이 모이거나 다니는 곳 또는 여러 사람이 타는 기차ㆍ자동차ㆍ배 등에서 몹시 거친 말이나 행동으로 주위를 시끄럽게 하거나 술에 취하여 이유 없이 다른 사람에게 주정한 사람",ref:"경범죄 처벌법 제3조①20 / 시행령 별표 5만원"},
+{id:"kb29",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"인근소란 등 (층간소음)",art:"제3조 제1항 제21호",
+ badges:[["f","범칙금 3만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"악기·라디오·TV·확성기·전동기 등 소리를 지나치게 크게 내거나 큰소리로 떠들어 이웃을 시끄럽게 함",
+ tip:"층간소음은 경범죄보다 공동주택 층간소음 기준(주간 5분·야간 5분 등) 확인 후 고발. 반복 시 즉결심판·정식 수사.",
+ text:"21. (인근소란 등) 악기ㆍ라디오ㆍ텔레비전ㆍ전축ㆍ종ㆍ확성기ㆍ전동기(電動機) 등의 소리를 지나치게 크게 내거나 큰소리로 떠들거나 노래를 불러 이웃을 시끄럽게 한 사람",ref:"경범죄 처벌법 제3조①21 / 시행령 별표 3만원"},
+{id:"kb30",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"위험한 불씨 사용",art:"제3조 제1항 제22호",
+ badges:[["f","범칙금 8만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"건조물·수풀·인화물 가까이에서 주의 없이 불을 피우거나 휘발유 등 가까이에서 불씨 사용",
+ tip:"산림 인근이면 산림보호법·실화죄(형법 제170조) 검토. 소방서 통보.",
+ text:"22. (위험한 불씨 사용) 충분한 주의를 하지 아니하고 건조물, 수풀, 그 밖에 불붙기 쉬운 물건 가까이에서 불을 피우거나 휘발유 또는 그 밖에 불이 옮아붙기 쉬운 물건 가까이에서 불씨를 사용한 사람",ref:"경범죄 처벌법 제3조①22 / 시행령 별표 8만원"},
+{id:"kb31",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"물건 던지기 등 위험행위",art:"제3조 제1항 제23호",
+ badges:[["f","범칙금 3만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"사람·물건에 해를 끼칠 우려가 있는 곳에 주의 없이 물건을 던지거나 붓거나 쏨",
+ tip:"투척으로 상해·손괴 발생 시 형법 제257조·제366조. 아파트 투기·고층 투척은 즉시 정식 수사.",
+ text:"23. (물건 던지기 등 위험행위) 다른 사람의 신체나 다른 사람 또는 단체의 물건에 해를 끼칠 우려가 있는 곳에 충분한 주의를 하지 아니하고 물건을 던지거나 붓거나 또는 쏜 사람",ref:"경범죄 처벌법 제3조①23 / 시행령 별표 3만원"},
+{id:"kb32",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"인공구조물 관리소홀",art:"제3조 제1항 제24호",
+ badges:[["f","범칙금 5만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"무너지거나 떨어질 우려가 있는 구조물을 공무원의 시정 요구에도 필요한 조치 없이 방치",
+ tip:"위험 즉시 통제·출입금지(경직법 제5조) 후 소관 부서 통보. 사고 시 업무상과실치사상.",
+ text:"24. (인공구조물 등의 관리소홀) 무너지거나 넘어지거나 떨어질 우려가 있는 인공구조물이나 그 밖의 물건에 대하여 관계 공무원으로부터 고칠 것을 요구받고도 필요한 조치를 게을리하여 여러 사람을 위험에 빠트릴 우려가 있게 한 사람",ref:"경범죄 처벌법 제3조①24 / 시행령 별표 5만원"},
+{id:"kb33",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"위험한 동물의 관리 소홀",art:"제3조 제1항 제25호",
+ badges:[["f","범칙금 5만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"사람·가축에 해를 끼치는 버릇이 있는 개 등 동물을 함부로 풀어놓거나 제대로 살피지 않아 돌아다니게 함",
+ tip:"개물림 사고는 동물보호법상 관리의무 위반·과실치상 검토. 맹견은 동물보호법상 별도 관리 기준.",
+ text:"25. (위험한 동물의 관리 소홀) 사람이나 가축에 해를 끼치는 버릇이 있는 개나 그 밖의 동물을 함부로 풀어놓거나 제대로 살피지 아니하여 나다니게 한 사람",ref:"경범죄 처벌법 제3조①25 / 시행령 별표 5만원"},
+{id:"kb34",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"동물 등에 의한 행패",art:"제3조 제1항 제26호",
+ badges:[["f","가목 5만원"],["f","나목 8만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"소·말을 놀라게 해 달아나게 하거나, 개 등 동물을 시켜 사람·가축에게 달려들게 함",
+ tip:"가목 5만원, 나목(사람·가축에 달려들게 함) 8만원. 부상 시 상해죄.",
+ text:"26. (동물 등에 의한 행패 등) 소나 말을 놀라게 하여 달아나게 하거나 개나 그 밖의 동물을 시켜 사람이나 가축에게 달려들게 한 사람",ref:"경범죄 처벌법 제3조①26 / 시행령 별표"},
+{id:"kb35",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"무단소등",art:"제3조 제1항 제27호",
+ badges:[["f","범칙금 5만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"여러 사람이 다니거나 모이는 곳에 켜 놓은 등불, 타인이 표시를 위해 켜 놓은 등불을 함부로 끔",
+ tip:"야간 안전사고 유발 우려 확인. 도로조명이면 도로법 관리청 통보.",
+ text:"27. (무단소등) 여러 사람이 다니거나 모이는 곳에 켜 놓은 등불이나 다른 사람 또는 단체가 표시를 하기 위하여 켜 놓은 등불을 함부로 끈 사람",ref:"경범죄 처벌법 제3조①27 / 시행령 별표 5만원"},
+{id:"kb36",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"공중통로 안전관리소홀",art:"제3조 제1항 제28호",
+ badges:[["f","범칙금 5만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"여러 사람이 다니는 곳에서 위험한 사고를 막을 의무가 있으면서 등불을 켜지 않거나 예방조치를 게을리함",
+ tip:"사고 발생 시 업무상과실치사상(형법 제268조)로 전환. 관리주체 확인해 시정명령.",
+ text:"28. (공중통로 안전관리소홀) 여러 사람이 다니는 곳에서 위험한 사고가 발생하는 것을 막을 의무가 있으면서도 등불을 켜 놓지 아니하거나 그 밖의 예방조치를 게을리한 사람",ref:"경범죄 처벌법 제3조①28 / 시행령 별표 5만원"},
+{id:"kb37",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"공무원 원조불응",art:"제3조 제1항 제29호",
+ badges:[["f","범칙금 5만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"재해·화재·교통사고·범죄 등 급박한 사고 현장에서 공무원의 출입 지시에 불응하거나 도움 요청을 거절",
+ tip:"현장 통제가 우선. 구조 방해가 지속되면 공무집행방해(형법 제136조) 적용 검토.",
+ text:"29. (공무원 원조불응) 눈ㆍ비ㆍ바람ㆍ해일ㆍ지진 등으로 인한 재해, 화재ㆍ교통사고ㆍ범죄, 그 밖의 급작스러운 사고가 발생하였을 때에 현장에 있으면서도 정당한 이유 없이 관계 공무원 또는 이를 돕는 사람의 현장출입에 관한 지시에 따르지 아니하거나 공무원이 도움을 요청하여도 도움을 주지 아니한 사람",ref:"경범죄 처벌법 제3조①29 / 시행령 별표 5만원"},
+{id:"kb38",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"거짓 인적사항 사용",art:"제3조 제1항 제30호",
+ badges:[["f","범칙금 8만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"성명·주민등록번호·주소·직업 등을 거짓으로 꾸며대거나, 인적사항을 물을 권한 있는 공무원에게 다른 사람 인적사항을 자기 것으로 속임",
+ tip:"불심검문 중 거짓 진술은 이 조항. 신분증 위조·행사는 형법 제230조 별도.",
+ text:"30. (거짓 인적사항 사용) 성명, 주민등록번호, 등록기준지, 주소, 직업 등을 거짓으로 꾸며대고 배나 비행기를 타거나 인적사항을 물을 권한이 있는 공무원이 적법한 절차를 거쳐 묻는 경우 정당한 이유 없이 다른 사람의 인적사항을 자기의 것으로 거짓으로 꾸며댄 사람",ref:"경범죄 처벌법 제3조①30 / 시행령 별표 8만원"},
+{id:"kb39",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"미신요법",art:"제3조 제1항 제31호",
+ badges:[["f","범칙금 2만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"근거 없이 신기한 약방문·미신적 방법으로 병을 진찰·치료·예방한다며 사람들을 홀림",
+ tip:"유료 진료·약 판매 시 의료법·약사법 위반 병과. 피해자 다수면 정식 수사.",
+ text:"31. (미신요법) 근거 없이 신기하고 용한 약방문인 것처럼 내세우거나 그 밖의 미신적인 방법으로 병을 진찰ㆍ치료ㆍ예방한다고 하여 사람들의 마음을 홀리게 한 사람",ref:"경범죄 처벌법 제3조①31 / 시행령 별표 2만원"},
+{id:"kb40",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"야간통행제한 위반",art:"제3조 제1항 제32호",
+ badges:[["f","범칙금 3만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"전시·사변·천재지변 등 사회 위험 상황에서 경찰청장·해양경찰청장이 정한 야간통행제한 위반",
+ tip:"현재 발령된 통행제한이 있어야 성립. 재난 시 재난안전법상 통제와 구분해 고지.",
+ text:"32. (야간통행제한 위반) 전시ㆍ사변ㆍ천재지변, 그 밖에 사회에 위험이 생길 우려가 있을 경우에 경찰청장이나 해양경찰청장이 정하는 야간통행제한을 위반한 사람",ref:"경범죄 처벌법 제3조①32 / 시행령 별표 3만원"},
+{id:"kb41",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"과다노출",art:"제3조 제1항 제33호",
+ badges:[["f","범칙금 5만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"공개된 장소에서 공공연하게 성기·엉덩이 등 주요 부위를 노출해 부끄러운 느낌이나 불쾌감을 줌",
+ tip:"성적 목적·추행 의도가 있으면 공연음란(형법 제245조) 검토. 아동 대상이면 청소년성보호법.",
+ text:"33. (과다노출) 공개된 장소에서 공공연하게 성기ㆍ엉덩이 등 신체의 주요한 부위를 노출하여 다른 사람에게 부끄러운 느낌이나 불쾌감을 준 사람\n※ 2016.11.24. 헌재 위헌 결정(구 조문) 후 2017.10.24. 개정.",ref:"경범죄 처벌법 제3조①33 / 시행령 별표 5만원"},
+{id:"kb42",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"지문채취 불응",art:"제3조 제1항 제34호",
+ badges:[["f","범칙금 5만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"입건된 피의자의 신원을 다른 방법으로 확인할 수 없는데 지문채취를 정당한 이유 없이 거부",
+ tip:"2026.9.29. 개정(2026.10.2. 시행)으로 ‘중대범죄수사청수사관’이 추가되었다. 신원확인 절차·고지 후 거부 의사 확인.",
+ text:"34. (지문채취 불응) 범죄 피의자로 입건된 사람의 신원을 지문조사 외의 다른 방법으로는 확인할 수 없어 중대범죄수사청수사관이나 경찰공무원이 지문을 채취하려고 할 때에 정당한 이유 없이 이를 거부한 사람",
+ ref:"경범죄 처벌법 제3조①34 (2026.9.29. 개정) / 시행령 별표 5만원"},
+{id:"kb43",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"자릿세 징수 등",art:"제3조 제1항 제35호",
+ badges:[["f","범칙금 8만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"개방된 시설·장소에서 좌석·주차 자리를 잡아주며 돈을 받거나 요구하거나 받으려고 따라다님",
+ tip:"위협·폭력 수반 시 공갈죄. 노점상·주차 알선 실태 확인해 상습이면 정식 수사.",
+ text:"35. (자릿세 징수 등) 여러 사람이 모이거나 쓸 수 있도록 개방된 시설 또는 장소에서 좌석이나 주차할 자리를 잡아 주기로 하거나 잡아주면서, 돈을 받거나 요구하거나 돈을 받으려고 다른 사람을 귀찮게 따라다니는 사람",ref:"경범죄 처벌법 제3조①35 / 시행령 별표 8만원"},
+{id:"kb44",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"행렬방해",art:"제3조 제1항 제36호",
+ badges:[["f","범칙금 5만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"승차·승선·입장·매표 행렬에 끼어들거나 떠밀어 질서를 어지럽힘",
+ tip:"폭행·상해 발생 시 별도 입건. 다중 밀집 현장에서는 안전관리 우선.",
+ text:"36. (행렬방해) 공공장소에서 승차ㆍ승선, 입장ㆍ매표 등을 위한 행렬에 끼어들거나 떠밀거나 하여 그 행렬의 질서를 어지럽힌 사람",ref:"경범죄 처벌법 제3조①36 / 시행령 별표 5만원"},
+{id:"kb45",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"무단 출입",art:"제3조 제1항 제37호",
+ badges:[["f","범칙금 2만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"출입이 금지된 구역·시설·장소에 정당한 이유 없이 들어감",
+ tip:"철도·공항·군사시설이면 각 특별법 우선. 주거·건조물이면 주거침입(형법 제319조).",
+ text:"37. (무단 출입) 출입이 금지된 구역이나 시설 또는 장소에 정당한 이유 없이 들어간 사람",ref:"경범죄 처벌법 제3조①37 / 시행령 별표 2만원"},
+{id:"kb46",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"총포 등 조작장난",art:"제3조 제1항 제38호",
+ badges:[["f","범칙금 8만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"여러 사람이 모이는 곳에서 주의 없이 총포·화약류·폭발 우려 물건을 다루거나 장난",
+ tip:"총포도검화약류법 위반 병과. 폭발물이면 형법 제119조(폭발물 사용).",
+ text:"38. (총포 등 조작장난) 여러 사람이 모이거나 다니는 곳에서 충분한 주의를 하지 아니하고 총포, 화약류, 그 밖에 폭발의 우려가 있는 물건을 다루거나 이를 가지고 장난한 사람",ref:"경범죄 처벌법 제3조①38 / 시행령 별표 8만원"},
+{id:"kb47",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"무임승차 및 무전취식",art:"제3조 제1항 제39호",
+ badges:[["f","범칙금 5만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"영업용 차·배를 타거나 남이 파는 음식을 먹고 정당한 이유 없이 값을 치르지 않음",
+ tip:"처음부터 지불할 의사·능력이 없었다면 사기죄(형법 제347조) 또는 점유이탈물횡령 검토. 상습이면 정식 수사.",
+ text:"39. (무임승차 및 무전취식) 영업용 차 또는 배 등을 타거나 다른 사람이 파는 음식을 먹고 정당한 이유 없이 제 값을 치르지 아니한 사람",ref:"경범죄 처벌법 제3조①39 / 시행령 별표 5만원"},
+{id:"kb48",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"장난전화 등",art:"제3조 제1항 제40호",
+ badges:[["f","범칙금 8만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"정당한 이유 없이 전화·문자·편지·전자우편·전자문서 등을 여러 차례 되풀이해 괴롭힘",
+ tip:"지속·반복적이면 스토킹처벌법(제18조) 우선 검토. 협박 내용이면 형법 제283조.",
+ text:"40. (장난전화 등) 정당한 이유 없이 다른 사람에게 전화ㆍ문자메시지ㆍ편지ㆍ전자우편ㆍ전자문서 등을 여러 차례 되풀이하여 괴롭힌 사람",ref:"경범죄 처벌법 제3조①40 / 시행령 별표 8만원"},
+{id:"kb49",tab:"경범죄",cat:"제3조 ① (10만원 이하)",name:"지속적 괴롭힘 (스토킹 유형)",art:"제3조 제1항 제41호",
+ badges:[["f","범칙금 8만원"],["p","10만원 이하 벌금·구류·과료"]],
+ sum:"상대방의 명시적 의사에 반해 지속적으로 접근·면회·교제 요구, 지켜보기·따라다니기·잠복·기다리기를 반복",
+ tip:"2023.7.18. 시행 스토킹처벌법과 경합. 스토킹 신고 접수 시 ①응급조치 ②긴급응급조치 ③잠정조치 절차 우선 검토.",
+ text:"41. (지속적 괴롭힘) 상대방의 명시적 의사에 반하여 지속적으로 접근을 시도하여 면회 또는 교제를 요구하거나 지켜보기, 따라다니기, 잠복하여 기다리기 등의 행위를 반복하여 하는 사람",ref:"경범죄 처벌법 제3조①41 / 시행령 별표 8만원"},
+
+{id:"kb50",tab:"경범죄",cat:"제3조 ② (20만원 이하)",name:"출판물의 부당게재 등",art:"제3조 제2항 제1호",
+ badges:[["f","범칙금 16만원"],["p","20만원 이하 벌금·구류·과료"]],
+ sum:"부당한 이익을 얻을 목적으로 신문·잡지 등에 싣거나 싣지 않겠다고 약속하고 돈·물건을 받음",
+ tip:"언론사 대상 청탁금지. 금품 수수액이 크면 배임수증재·알선수재 검토.",
+ text:"② 다음 각 호의 어느 하나에 해당하는 사람은 20만원 이하의 벌금, 구류 또는 과료의 형으로 처벌한다.\n1. (출판물의 부당게재 등) 올바르지 아니한 이익을 얻을 목적으로 다른 사람 또는 단체의 사업이나 사사로운 일에 관하여 신문, 잡지, 그 밖의 출판물에 어떤 사항을 싣거나 싣지 아니할 것을 약속하고 돈이나 물건을 받은 사람",ref:"경범죄 처벌법 제3조②1 / 시행령 별표 16만원"},
+{id:"kb51",tab:"경범죄",cat:"제3조 ② (20만원 이하)",name:"거짓 광고",art:"제3조 제2항 제2호",
+ badges:[["f","범칙금 16만원"],["p","20만원 이하 벌금·구류·과료"]],
+ sum:"물품 판매·용역 제공에서 사람을 속이거나 잘못 알게 할 만한 사실로 광고",
+ tip:"계속적·조직적이면 사기죄, 표시광고법 위반은 공정위 통보.",
+ text:"2. (거짓 광고) 여러 사람에게 물품을 팔거나 나누어 주거나 일을 해주면서 다른 사람을 속이거나 잘못 알게 할 만한 사실을 들어 광고한 사람",ref:"경범죄 처벌법 제3조②2 / 시행령 별표 16만원"},
+{id:"kb52",tab:"경범죄",cat:"제3조 ② (20만원 이하)",name:"업무방해 (경범)",art:"제3조 제2항 제3호",
+ badges:[["f","범칙금 16만원"],["p","20만원 이하 벌금·구류·과료"]],
+ sum:"못된 장난 등으로 다른 사람·단체·공무수행 중인 자의 업무를 방해",
+ tip:"위력·허위사실 유포에 의한 업무방해는 형법 제314조(5년 이하). 단순 장난·경미한 경우 이 조항.",
+ text:"3. (업무방해) 못된 장난 등으로 다른 사람, 단체 또는 공무수행 중인 자의 업무를 방해한 사람",ref:"경범죄 처벌법 제3조②3 / 시행령 별표 16만원"},
+{id:"kb53",tab:"경범죄",cat:"제3조 ② (20만원 이하)",name:"암표매매",art:"제3조 제2항 제4호",
+ badges:[["f","범칙금 16만원"],["p","20만원 이하 벌금·구류·과료"]],
+ sum:"흥행장·경기장·역 등에서 웃돈을 받고 입장권·승차권·승선권을 되팜",
+ tip:"상습·조직적 암표는 경범죄가 아닌 정식 수사. 공연법·철도사업법 별도.",
+ text:"4. (암표매매) 흥행장, 경기장, 역, 나루터, 정류장, 그 밖에 정하여진 요금을 받고 입장시키거나 승차 또는 승선시키는 곳에서 웃돈을 받고 입장권ㆍ승차권 또는 승선권을 다른 사람에게 되판 사람",ref:"경범죄 처벌법 제3조②4 / 시행령 별표 16만원"},
+{id:"kb54",tab:"경범죄",cat:"제3조 ③ (60만원 이하)",name:"관공서에서의 주취소란",art:"제3조 제3항 제1호",
+ badges:[["p","60만원 이하 벌금·구류·과료"],["x","통고처분 불가"]],
+ sum:"술에 취한 채 관공서에서 거친 말·행동으로 주정하거나 시끄럽게 함",
+ tip:"민원실·지구대 청사 내 주취 소란. 진정·보호조치(경직법 제4조) 후 즉결심판. 공무원 폭행 시 공무집행방해.",
+ text:"③ 다음 각 호의 어느 하나에 해당하는 사람은 60만원 이하의 벌금, 구류 또는 과료의 형으로 처벌한다.\n1. (관공서에서의 주취소란) 술에 취한 채로 관공서에서 몹시 거친 말과 행동으로 주정하거나 시끄럽게 한 사람",ref:"경범죄 처벌법 제3조③1 (시행령 별표 없음 → 통고처분 불가)"},
+{id:"kb55",tab:"경범죄",cat:"제3조 ③ (60만원 이하)",name:"거짓신고",art:"제3조 제3항 제2호",
+ badges:[["p","60만원 이하 벌금·구류·과료"],["x","통고처분 불가"]],
+ sum:"있지도 않은 범죄나 재해 사실을 공무원에게 거짓으로 신고",
+ tip:"112 허위신고 다발 지역은 즉결심판 청구. 특정인을 범인으로 지목하면 무고죄(형법 제156조) 검토.",
+ text:"2. (거짓신고) 있지 아니한 범죄나 재해 사실을 공무원에게 거짓으로 신고한 사람",ref:"경범죄 처벌법 제3조③2 (시행령 별표 없음 → 통고처분 불가)"},
+/* ================= 형법 ================= */
+{id:"cr1",tab:"형법",cat:"총칙",name:"형사미성년자",art:"형법 제9조",badges:[["a","14세 미만 처벌 불가"]],sum:"14세되지 않은 자의 행위는 벌하지 않음",tip:"생일 기준 만 나이로 판단. 10세 이상 14세 미만은 소년법상 보호사건·우범자 조치 검토, 가족·학교 통보.",text:"제9조(형사미성년자) 14세되지 아니한 자의 행위는 벌하지 아니한다.",ref:"형법 [시행 2026.10.2.] 제9조"},
+{id:"cr2",tab:"형법",cat:"총칙",name:"심신장애",art:"형법 제10조",badges:[["a","심신상실=불벌 / 심신미약=감경"]],sum:"심신장애로 변별·의사결정 능력이 없으면 벌하지 않고, 미약하면 감경할 수 있음",tip:"주취 정도·평소 정신질환·약물 복용 확인. 음주로 자초한 경우(제3항) 적용 배제. 필요 시 응급입원(정신건강복지법).",text:"제10조(심신장애인) ①심신장애로 인하여 사물을 변별할 능력이 없거나 의사를 결정할 능력이 없는 자의 행위는 벌하지 아니한다. ②심신장애로 인하여 전항의 능력이 미약한 자의 행위는 형을 감경할 수 있다. ③위험의 발생을 예견하고 자의로 심신장애를 야기한 자의 행위에는 전2항의 규정을 적용하지 아니한다.",ref:"형법 제10조"},
+{id:"cr3",tab:"형법",cat:"총칙",name:"정당행위",art:"형법 제20조",badges:[["a","위법성 조각"]],sum:"법령에 의한 행위, 업무로 인한 행위, 사회상규에 위배되지 않는 행위는 벌하지 않음",tip:"직무집행의 정당성(목적·수단·비례) 판단의 기본 조항. 상대방 항거 시 정당방위·긴급피난과 함께 검토.",text:"제20조(정당행위) 법령에 의한 행위 또는 업무로 인한 행위 기타 사회상규에 위배되지 아니하는 행위는 벌하지 아니한다.",ref:"형법 제20조"},
+{id:"cr4",tab:"형법",cat:"총칙",name:"정당방위",art:"형법 제21조",badges:[["a","위법성 조각"]],sum:"현재의 부당한 침해로부터 자기·타인의 법익을 방위하기 위한 상당한 행위는 벌하지 않음",tip:"야간·불안 상태의 공포·경악·흥분·당황으로 인한 과잉방위는 벌하지 않음(제3항). 방어 정도·종료 후 추가 가격 여부 확인.",text:"제21조(정당방위) ① 현재의 부당한 침해로부터 자기 또는 타인의 법익(法益)을 방위하기 위하여 한 행위는 상당한 이유가 있는 경우에는 벌하지 아니한다. ② 방위행위가 그 정도를 초과한 경우에는 정황(情況)에 따라 그 형을 감경하거나 면제할 수 있다. ③ 제2항의 경우에 야간이나 그 밖의 불안한 상태에서 공포를 느끼거나 경악(驚愕)하거나 흥분하거나 당황하였기 때문에 그 행위를 하였을 때에는 벌하지 아니한다.",ref:"형법 제21조"},
+{id:"cr5",tab:"형법",cat:"총칙",name:"긴급피난",art:"형법 제22조",badges:[["a","위법성 조각"]],sum:"자기·타인의 법익에 대한 현재의 위난을 피하기 위한 상당한 행위는 벌하지 않음",tip:"위난을 피할 책임이 있는 자(소방·경찰 등 직무상 의무자)에게는 적용되지 않음(제2항).",text:"제22조(긴급피난) ①자기 또는 타인의 법익에 대한 현재의 위난을 피하기 위한 행위는 상당한 이유가 있는 때에는 벌하지 아니한다. ②위난을 피하지 못할 책임이 있는 자에 대하여는 전항의 규정을 적용하지 아니한다. ③전조 제2항과 제3항의 규정은 본조에 준용한다.",ref:"형법 제22조"},
+{id:"cr6",tab:"형법",cat:"총칙",name:"중지범",art:"형법 제26조",badges:[["a","감경·면제"]],sum:"실행에 착수한 후 자의로 중지하거나 결과 발생을 방지하면 형을 감경·면제",tip:"현장에서 자발적 중지·피해 회복 여부를 조서에 구체적으로 기재(자의성 입증).",text:"제26조(중지범) 범인이 실행에 착수한 행위를 자의(自意)로 중지하거나 그 행위로 인한 결과의 발생을 자의로 방지한 경우에는 형을 감경하거나 면제한다.",ref:"형법 제26조"},
+{id:"cr7",tab:"형법",cat:"총칙",name:"공동정범·교사·방조",art:"형법 제30조~제32조",badges:[["a","공범"]],sum:"2인 이상 공동하여 범죄를 범하면 각자를 정범으로 처벌, 교사는 정범과 동일 형, 방조는 감경",tip:"현장에서는 공동의 의사·역할 분담(실행행위 여부) 확인이 핵심. 2인 이상 합동 절도·폭행은 특수범 가중.",text:"제30조(공동정범) 2인 이상이 공동하여 죄를 범한 때에는 각자를 그 죄의 정범으로 처벌한다.\n제31조(교사범) ①타인을 교사하여 죄를 범하게 한 자는 죄를 실행한 자와 동일한 형으로 처벌한다.\n제32조(종범) ①타인의 범죄를 방조한 자는 종범으로 처벌한다. ②종범의 형은 정범의 형보다 감경한다.",ref:"형법 제30조~제32조"},
+{id:"cr8",tab:"형법",cat:"총칙",name:"자수·자복",art:"형법 제52조",badges:[["a","감경·면제 가능"]],sum:"범죄 후 수사기관에 자수하면 형을 감경·면제할 수 있고, 반의사불벌죄는 피해자에 자복해도 같음",tip:"검거 후 자백은 자수 아님. 자수 시각·경위·수사기관 특정을 조서에 명확히.",text:"제52조(자수, 자복) ① 죄를 지은 후 수사기관에 자수한 경우에는 형을 감경하거나 면제할 수 있다. ② 피해자의 의사에 반하여 처벌할 수 없는 범죄의 경우에는 피해자에게 죄를 자복(自服)하였을 때에도 형을 감경하거나 면제할 수 있다.",ref:"형법 제52조"},
+
+{id:"cr10",tab:"형법",cat:"폭력·신체",name:"폭행·존속폭행",art:"형법 제260조",badges:[["p","2년 이하 징역·500만원 이하 벌금·구류·과료"],["a","반의사불벌"]],sum:"사람의 신체에 폭행을 가함. 피해자의 명시한 의사에 반해 공소제기 불가",tip:"폭행의 고의·유형력 행사 확인. 피해자 처벌불원 의사는 접수 시·수사 중 서면으로 확인. 특수폭행(제261조)·상해(제257조)와 구분.",text:"제260조(폭행, 존속폭행) ①사람의 신체에 대하여 폭행을 가한 자는 2년 이하의 징역, 500만원 이하의 벌금, 구류 또는 과료에 처한다. ②자기 또는 배우자의 직계존속에 대하여 제1항의 죄를 범한 때에는 5년 이하의 징역 또는 700만원 이하의 벌금에 처한다. ③제1항 및 제2항의 죄는 피해자의 명시한 의사에 반하여 공소를 제기할 수 없다.",ref:"형법 제260조"},
+{id:"cr11",tab:"형법",cat:"폭력·신체",name:"특수폭행",art:"형법 제261조",badges:[["p","5년 이하 징역·1천만원 이하 벌금"]],sum:"단체·다중의 위력을 보이거나 위험한 물건을 휴대하고 폭행",tip:"위험한 물건(깨진 병·돌·흉기·차량 등) 휴대 여부와 사용 가능성 판단. 반의사불벌 아님 → 피해자 불원해도 처벌 가능.",text:"제261조(특수폭행) 단체 또는 다중의 위력을 보이거나 위험한 물건을 휴대하여 제260조제1항 또는 제2항의 죄를 범한 때에는 5년 이하의 징역 또는 1천만원 이하의 벌금에 처한다.",ref:"형법 제261조"},
+{id:"cr12",tab:"형법",cat:"폭력·신체",name:"상해·존속상해",art:"형법 제257조",badges:[["p","7년 이하 징역·10년 이하 자격정지·1천만원 이하 벌금"]],sum:"사람의 신체를 상해함(생명에 위험 없는 상해)",tip:"상해진단서 확보, 치료 전 촬영. 반의사불벌 아님. 폭행치상은 제262조·제257조 적용.",text:"제257조(상해, 존속상해) ①사람의 신체를 상해한 자는 7년 이하의 징역, 10년 이하의 자격정지 또는 1천만원 이하의 벌금에 처한다. ②자기 또는 배우자의 직계존속에 대하여 제1항의 죄를 범한 때에는 10년 이하의 징역 또는 1천500만원 이하의 벌금에 처한다. ③전 2항의 미수범은 처벌한다.",ref:"형법 제257조"},
+{id:"cr13",tab:"형법",cat:"폭력·신체",name:"중상해",art:"형법 제258조",badges:[["p","1년 이상 10년 이하 징역"]],sum:"상해로 생명에 대한 위험을 발생시키거나 불구·불치·난치의 질병에 이르게 함",tip:"중상해 판단은 의학적 소견 필요. 존속중상해는 2년 이상 15년 이하.",text:"제258조(중상해, 존속중상해) ①사람의 신체를 상해하여 생명에 대한 위험을 발생하게 한 자는 1년 이상 10년 이하의 징역에 처한다. ②신체의 상해로 인하여 불구 또는 불치나 난치의 질병에 이르게 한 자도 전항의 형과 같다. ③자기 또는 배우자의 직계존속에 대하여 전2항의 죄를 범한 때에는 2년 이상 15년 이하의 징역에 처한다.",ref:"형법 제258조"},
+{id:"cr14",tab:"형법",cat:"폭력·신체",name:"특수상해",art:"형법 제258조의2",badges:[["p","1년 이상 10년 이하 징역"]],sum:"단체·다중의 위력 또는 위험한 물건을 휴대한 상해(중상해는 2년 이상 20년 이하)",tip:"흉기 휴대 여부가 핵심. 미수범 처벌(제3항).",text:"제258조의2(특수상해) ① 단체 또는 다중의 위력을 보이거나 위험한 물건을 휴대하여 제257조제1항 또는 제2항의 죄를 범한 때에는 1년 이상 10년 이하의 징역에 처한다. ② 단체 또는 다중의 위력을 보이거나 위험한 물건을 휴대하여 제258조의 죄를 범한 때에는 2년 이상 20년 이하의 징역에 처한다. ③ 제1항의 미수범은 처벌한다.",ref:"형법 제258조의2"},
+{id:"cr15",tab:"형법",cat:"폭력·신체",name:"폭행치사상",art:"형법 제262조",badges:[["p","상해·사망 결과에 따라 제257조~제259조 적용"]],sum:"폭행(제260조)·특수폭행(제261조)으로 사람을 사망·상해에 이르게 하면 상해·치사 규정 적용",tip:"사망 시 폭행치사(제262조→제259조, 3년 이상 유기징역). 부검·사인 규명 필요.",text:"제262조(폭행치사상) 제260조와 제261조의 죄를 지어 사람을 사망이나 상해에 이르게 한 경우에는 제257조부터 제259조까지의 예에 따른다.",ref:"형법 제262조"},
+{id:"cr16",tab:"형법",cat:"폭력·신체",name:"상습폭력·상습상해",art:"형법 제264조",badges:[["p","2분의 1까지 가중"]],sum:"상습으로 상해·중상해·특수상해·폭행·특수폭행을 범하면 2분의 1까지 가중",tip:"전과(동종 폭력) 조회로 상습성 입증. 폭력행위처벌법상 상습범 규정도 함께 검토.",text:"제264조(상습범) 상습으로 제257조, 제258조, 제258조의2, 제260조 또는 제261조의 죄를 범한 때에는 그 죄에 정한 형의 2분의 1까지 가중한다.",ref:"형법 제264조"},
+{id:"cr17",tab:"형법",cat:"폭력·신체",name:"과실치상",art:"형법 제266조",badges:[["p","500만원 이하 벌금·구류·과료"],["a","반의사불벌"]],sum:"과실로 사람의 신체를 상해에 이르게 함",tip:"교통사고는 교통사고처리특례법 우선. 그 외 현장(낙하물·충돌)은 이 조항.",text:"제266조(과실치상) ①과실로 인하여 사람의 신체를 상해에 이르게 한 자는 500만원 이하의 벌금, 구류 또는 과료에 처한다. ②제1항의 죄는 피해자의 명시한 의사에 반하여 공소를 제기할 수 없다.",ref:"형법 제266조"},
+{id:"cr18",tab:"형법",cat:"폭력·신체",name:"과실치사",art:"형법 제267조",badges:[["p","2년 이하 금고·700만원 이하 벌금"]],sum:"과실로 사람을 사망에 이르게 함",tip:"업무상과실·중과실이면 제268조(5년 이하 금고·2천만원 이하 벌금).",text:"제267조(과실치사) 과실로 인하여 사람을 사망에 이르게 한 자는 2년 이하의 금고 또는 700만원 이하의 벌금에 처한다.",ref:"형법 제267조"},
+{id:"cr19",tab:"형법",cat:"폭력·신체",name:"업무상과실·중과실 치사상",art:"형법 제268조",badges:[["p","5년 이하 금고·2천만원 이하 벌금"]],sum:"업무상과실 또는 중대한 과실로 사람을 사망·상해에 이르게 함",tip:"공사장·시설물 안전사고, 의료사고 등. 산업안전보건법·중대재해처벌법 병과 검토.",text:"제268조(업무상과실ㆍ중과실 치사상) 업무상과실 또는 중대한 과실로 사람을 사망이나 상해에 이르게 한 자는 5년 이하의 금고 또는 2천만원 이하의 벌금에 처한다.",ref:"형법 제268조"},
+{id:"cr20",tab:"형법",cat:"폭력·신체",name:"체포·감금",art:"형법 제276조",badges:[["p","5년 이하 징역·700만원 이하 벌금"]],sum:"사람을 체포 또는 감금함",tip:"가해자가 실제로 구금 상태를 만들어야 성립. 현장에서는 즉시 해제·피해자 안전 확보.",text:"제276조(체포, 감금, 존속체포, 존속감금) ①사람을 체포 또는 감금한 자는 5년 이하의 징역 또는 700만원 이하의 벌금에 처한다. ②자기 또는 배우자의 직계존속에 대하여 제1항의 죄를 범한 때에는 10년 이하의 징역 또는 1천500만원 이하의 벌금에 처한다.",ref:"형법 제276조"},
+{id:"cr21",tab:"형법",cat:"폭력·신체",name:"중체포·중감금",art:"형법 제277조",badges:[["p","7년 이하 징역"]],sum:"체포·감금하여 가혹한 행위를 가함",tip:"가혹행위(폭행·협박·냉온방치 등) 확인. 존속은 2년 이상 유기징역.",text:"제277조(중체포, 중감금, 존속중체포, 존속중감금) ①사람을 체포 또는 감금하여 가혹한 행위를 가한 자는 7년 이하의 징역에 처한다. ②자기 또는 배우자의 직계존속에 대하여 전항의 죄를 범한 때에는 2년 이상의 유기징역에 처한다.",ref:"형법 제277조"},
+{id:"cr22",tab:"형법",cat:"폭력·신체",name:"특수체포·특수감금",art:"형법 제278조",badges:[["p","2분의 1까지 가중"]],sum:"단체·다중의 위력 또는 위험한 물건 휴대하여 체포·감금",tip:"조직적 감금(보이스피싱·성매매·노동착취)은 각 특별법과 경합.",text:"제278조(특수체포, 특수감금) 단체 또는 다중의 위력을 보이거나 위험한 물건을 휴대하여 전 2조의 죄를 범한 때에는 그 죄에 정한 형의 2분의 1까지 가중한다.",ref:"형법 제278조"},
+{id:"cr23",tab:"형법",cat:"폭력·신체",name:"협박·존속협박",art:"형법 제283조",badges:[["p","3년 이하 징역·500만원 이하 벌금·구류·과료"],["a","반의사불벌"]],sum:"사람을 협박함(해악의 고지)",tip:"해악의 내용·실현 가능성·상대방 인식 확인. 문자·통화 녹음·카톡 캡처 확보. 특수협박은 제284조.",text:"제283조(협박, 존속협박) ①사람을 협박한 자는 3년 이하의 징역, 500만원 이하의 벌금, 구류 또는 과료에 처한다. ②자기 또는 배우자의 직계존속에 대하여 제1항의 죄를 범한 때에는 5년 이하의 징역 또는 700만원 이하의 벌금에 처한다. ③제1항 및 제2항의 죄는 피해자의 명시한 의사에 반하여 공소를 제기할 수 없다.",ref:"형법 제283조"},
+{id:"cr24",tab:"형법",cat:"폭력·신체",name:"특수협박",art:"형법 제284조",badges:[["p","7년 이하 징역·1천만원 이하 벌금"]],sum:"단체·다중의 위력 또는 위험한 물건을 휴대하여 협박",tip:"반의사불벌 아님. 위험한 물건의 사용 가능성·휴대 상태 사진 확보.",text:"제284조(특수협박) 단체 또는 다중의 위력을 보이거나 위험한 물건을 휴대하여 전조제1항, 제2항의 죄를 범한 때에는 7년 이하의 징역 또는 1천만원 이하의 벌금에 처한다.",ref:"형법 제284조"},
+{id:"cr25",tab:"형법",cat:"폭력·신체",name:"강요",art:"형법 제324조",badges:[["p","5년 이하 징역·3천만원 이하 벌금"]],sum:"폭행·협박으로 사람의 권리행사를 방해하거나 의무 없는 일을 하게 함",tip:"단체·다중 위력 또는 위험한 물건 휴대 시 10년 이하·5천만원 이하(제2항).\n인질강요는 제324조의2(3년 이상 유기징역).",text:"제324조(강요) ①폭행 또는 협박으로 사람의 권리행사를 방해하거나 의무없는 일을 하게 한 자는 5년 이하의 징역 또는 3천만원 이하의 벌금에 처한다. ② 단체 또는 다중의 위력을 보이거나 위험한 물건을 휴대하여 제1항의 죄를 범한 자는 10년 이하의 징역 또는 5천만원 이하의 벌금에 처한다.",ref:"형법 제324조"},
+{id:"cr26",tab:"형법",cat:"폭력·신체",name:"공갈",art:"형법 제350조",badges:[["p","10년 이하 징역·2천만원 이하 벌금"]],sum:"사람을 공갈하여 재물의 교부를 받거나 재산상 이익을 취득",tip:"폭행·협박과 재물 교부의 인과관계 확인. 특수공갈(제350조의2)은 1년 이상 15년 이하 징역.",text:"제350조(공갈) ①사람을 공갈하여 재물의 교부를 받거나 재산상 이익을 취득한 자는 10년 이하의 징역 또는 2천만원 이하의 벌금에 처한다. ②전항의 방법으로 제삼자로 하여금 재물의 교부를 받게 하거나 재산상 이익을 취득하게 한 때에도 전항의 형과 같다.",ref:"형법 제350조"},
+{id:"cr27",tab:"형법",cat:"폭력·신체",name:"특수공갈",art:"형법 제350조의2",badges:[["p","1년 이상 15년 이하 징역"]],sum:"단체·다중의 위력 또는 위험한 물건을 휴대하여 공갈",tip:"조직적 갈취·폭력행위처벌법상 공갈과 경합 검토. 신설 조문으로 별표·판례 확인 필요.",text:"제350조의2(특수공갈) 단체 또는 다중의 위력을 보이거나 위험한 물건을 휴대하여 제350조의 죄를 범한 자는 1년 이상 15년 이하의 징역에 처한다.",ref:"형법 제350조의2"},
+
+{id:"cr30",tab:"형법",cat:"재산",name:"절도",art:"형법 제329조",badges:[["p","6년 이하 징역·1천만원 이하 벌금"]],sum:"타인의 재물을 절취함",tip:"점유 침탈·불법영득의사 확인. 소액이라도 절도는 현행범 체포 가능(50만원 제한은 벌금형 기준). 장물 여부 확인.",text:"제329조(절도) 타인의 재물을 절취한 자는 6년 이하의 징역 또는 1천만원 이하의 벌금에 처한다.",ref:"형법 제329조"},
+{id:"cr31",tab:"형법",cat:"재산",name:"야간주거침입절도",art:"형법 제330조",badges:[["p","10년 이하 징역"]],sum:"야간에 주거·관리 건조물·선박·항공기·점유 방실에 침입하여 재물을 절취",tip:"야간(일몰 후 일출 전) 여부, 침입 사실 특정. 주거침입(제319조)과 경합.",text:"제330조(야간주거침입절도) 야간에 사람의 주거, 관리하는 건조물, 선박, 항공기 또는 점유하는 방실(房室)에 침입하여 타인의 재물을 절취(竊取)한 자는 10년 이하의 징역에 처한다.",ref:"형법 제330조"},
+{id:"cr32",tab:"형법",cat:"재산",name:"특수절도",art:"형법 제331조",badges:[["p","1년 이상 10년 이하 징역"]],sum:"야간에 문·담 등을 손괴하고 침입해 절도, 또는 흉기 휴대·2인 이상 합동 절도",tip:"2인 이상 공동 실행 여부, 흉기 휴대 여부가 핵심. 상습이면 제332조로 2분의 1 가중.",text:"제331조(특수절도) ① 야간에 문이나 담 그 밖의 건조물의 일부를 손괴하고 제330조의 장소에 침입하여 타인의 재물을 절취한 자는 1년 이상 10년 이하의 징역에 처한다. ② 흉기를 휴대하거나 2명 이상이 합동하여 타인의 재물을 절취한 자도 제1항의 형에 처한다.",ref:"형법 제331조"},
+{id:"cr33",tab:"형법",cat:"재산",name:"강도",art:"형법 제333조",badges:[["p","3년 이상 유기징역"]],sum:"폭행·협박으로 타인의 재물을 강취하거나 재산상 이익을 취득",tip:"폭행·협박과 재물 탈취의 인과관계. 준강도(제335조)·특수강도(제334조) 검토.",text:"제333조(강도) 폭행 또는 협박으로 타인의 재물을 강취하거나 기타 재산상의 이익을 취득하거나 제삼자로 하여금 이를 취득하게 한 자는 3년 이상의 유기징역에 처한다.",ref:"형법 제333조"},
+{id:"cr34",tab:"형법",cat:"재산",name:"특수강도",art:"형법 제334조",badges:[["p","무기 또는 5년 이상 징역"]],sum:"야간 주거침입 강도, 또는 흉기 휴대·2인 이상 합동 강도",tip:"야간침입 여부·공범 수·흉기 확인. 강도상해(제337조)는 무기 또는 7년 이상.",text:"제334조(특수강도) ①야간에 사람의 주거, 관리하는 건조물, 선박이나 항공기 또는 점유하는 방실에 침입하여 제333조의 죄를 범한 자는 무기 또는 5년 이상의 징역에 처한다. ②흉기를 휴대하거나 2인 이상이 합동하여 전조의 죄를 범한 자도 전항의 형과 같다.",ref:"형법 제334조"},
+{id:"cr35",tab:"형법",cat:"재산",name:"준강도",art:"형법 제335조",badges:[["p","강도 예 (3년 이상 유기징역)"]],sum:"절도범이 재물 탈환 항거·체포 면탈·흔적 인멸 목적으로 폭행·협박하면 강도로 처벌",tip:"절도 후 추격 중 폭행이 핵심. 폭행 시점·목적을 조서에 구체적으로.",text:"제335조(준강도) 절도가 재물의 탈환에 항거하거나 체포를 면탈하거나 범죄의 흔적을 인멸할 목적으로 폭행 또는 협박한 때에는 제333조 및 제334조의 예에 따른다.",ref:"형법 제335조"},
+{id:"cr36",tab:"형법",cat:"재산",name:"강도상해·치상 / 강도살인",art:"형법 제337조·제338조",badges:[["p","무기 또는 7년 이상 징역 / 사형·무기"]],sum:"강도가 상해를 가하면 무기 또는 7년 이상, 살해하면 사형 또는 무기징역",tip:"강도 사건은 즉시 강력팀 인계. 피해자 진술·상해 부위 사진·흉기 압수.",text:"제337조(강도상해, 치상) 강도가 사람을 상해하거나 상해에 이르게 한때에는 무기 또는 7년 이상의 징역에 처한다.\n제338조(강도살인ㆍ치사) 강도가 사람을 살해한 때에는 사형 또는 무기징역에 처한다. 사망에 이르게 한 때에는 무기 또는 10년 이상의 징역에 처한다.",ref:"형법 제337조·제338조"},
+{id:"cr37",tab:"형법",cat:"재산",name:"사기",art:"형법 제347조",badges:[["p","20년 이하 징역·5천만원 이하 벌금"]],sum:"사람을 기망하여 재물 교부를 받거나 재산상 이익을 취득",tip:"2025.12.23. 개정으로 법정형이 상향(구 10년·2천만원). 기망행위·착오·처분·이득의 순환 확인. 컴퓨터 사기는 제347조의2.",text:"제347조(사기) ① 사람을 기망하여 재물의 교부를 받거나 재산상의 이익을 취득한 자는 20년 이하의 징역 또는 5천만원 이하의 벌금에 처한다. ②전항의 방법으로 제삼자로 하여금 재물의 교부를 받게 하거나 재산상의 이익을 취득하게 한 때에도 전항의 형과 같다.",ref:"형법 제347조 (2025.12.23. 개정)"},
+{id:"cr38",tab:"형법",cat:"재산",name:"컴퓨터등 사용사기",art:"형법 제347조의2",badges:[["p","20년 이하 징역·5천만원 이하 벌금"]],sum:"컴퓨터 등 정보처리장치에 허위정보·부정명령을 입력해 재산상 이익 취득",tip:"계좌 이체·상품권·포인트 부정 취득. 전기통신금융사기(보이스피싱)는 특별법 가중.",text:"제347조의2(컴퓨터등 사용사기) 컴퓨터등 정보처리장치에 허위의 정보 또는 부정한 명령을 입력하거나 권한 없이 정보를 입력ㆍ변경하여 정보처리를 하게 함으로써 재산상의 이익을 취득하거나 제3자로 하여금 취득하게 한 자는 20년 이하의 징역 또는 5천만원 이하의 벌금에 처한다.",ref:"형법 제347조의2"},
+{id:"cr39",tab:"형법",cat:"재산",name:"준사기",art:"형법 제348조",badges:[["p","20년 이하 징역·5천만원 이하 벌금"]],sum:"미성년자의 사리분별력 부족 또는 심신장애를 이용해 재물·이익 취득",tip:"노인·아동·장애인 대상 악덕 상술. 피해자 진술 시 보호자·후견인 동석.",text:"제348조(준사기) ① 미성년자의 사리분별력 부족 또는 사람의 심신장애를 이용하여 재물을 교부받거나 재산상 이익을 취득한 자는 20년 이하의 징역 또는 5천만원 이하의 벌금에 처한다.",ref:"형법 제348조"},
+{id:"cr40",tab:"형법",cat:"재산",name:"횡령·배임",art:"형법 제355조",badges:[["p","5년 이하 징역·1천500만원 이하 벌금"]],sum:"보관 중인 타인 재물을 횡령·반환 거부하거나, 타인 사무를 처리하며 임무에 위배해 이익 취득·손해 가함",tip:"보관 관계(위탁 신임) 입증이 핵심. 업무상이면 제356조(10년·3천만원).",text:"제355조(횡령, 배임) ①타인의 재물을 보관하는 자가 그 재물을 횡령하거나 그 반환을 거부한 때에는 5년 이하의 징역 또는 1천500만원 이하의 벌금에 처한다. ②타인의 사무를 처리하는 자가 그 임무에 위배하는 행위로써 재산상의 이익을 취득하거나 제삼자로 하여금 이를 취득하게 하여 본인에게 손해를 가한 때에도 전항의 형과 같다.",ref:"형법 제355조"},
+{id:"cr41",tab:"형법",cat:"재산",name:"업무상 횡령·배임",art:"형법 제356조",badges:[["p","10년 이하 징역·3천만원 이하 벌금"]],sum:"업무상 임무에 위배하여 횡령·배임",tip:"회사 자금·공금 횡령. 특정경제범죄가중처벌법(이득액 5억 이상 등) 해당 여부 확인.",text:"제356조(업무상의 횡령과 배임) 업무상의 임무에 위배하여 제355조의 죄를 범한 자는 10년 이하의 징역 또는 3천만원 이하의 벌금에 처한다.",ref:"형법 제356조"},
+{id:"cr42",tab:"형법",cat:"재산",name:"배임수재·증재",art:"형법 제357조",badges:[["p","5년 이하 징역·1천만원 이하 벌금(증재 2년·500만원)"]],sum:"타인 사무 처리자가 부정한 청탁을 받고 재물·이익 취득(수재), 이를 공여(증재)",tip:"청탁의 부정성·대가관계 입증. 몰수·추징 규정(제3항).",text:"제357조(배임수증재) ① 타인의 사무를 처리하는 자가 그 임무에 관하여 부정한 청탁을 받고 재물 또는 재산상의 이익을 취득하거나 제3자로 하여금 이를 취득하게 한 때에는 5년 이하의 징역 또는 1천만원 이하의 벌금에 처한다. ② 제1항의 재물 또는 재산상 이익을 공여한 자는 2년 이하의 징역 또는 500만원 이하의 벌금에 처한다. ③ 범인 또는 그 사정을 아는 제3자가 취득한 제1항의 재물은 몰수한다. 그 재물을 몰수하기 불가능하거나 재산상의 이익을 취득한 때에는 그 가액을 추징한다.",ref:"형법 제357조"},
+{id:"cr43",tab:"형법",cat:"재산",name:"점유이탈물횡령",art:"형법 제360조",badges:[["p","1년 이하 징역·300만원 이하 벌금·과료"]],sum:"유실물·표류물·타인 점유를 이탈한 재물 또는 매장물을 횡령",tip:"습득물 신고 없이 가짐. 유실물법상 습득물 신고 의무 안내. 절도와 구분(점유 침탈 여부).",text:"제360조(점유이탈물횡령) ①유실물, 표류물 또는 타인의 점유를 이탈한 재물을 횡령한 자는 1년 이하의 징역이나 300만원 이하의 벌금 또는 과료에 처한다. ②매장물을 횡령한 자도 전항의 형과 같다.",ref:"형법 제360조"},
+{id:"cr44",tab:"형법",cat:"재산",name:"장물 취득·알선",art:"형법 제362조",badges:[["p","7년 이하 징역·1천500만원 이하 벌금"]],sum:"장물을 취득·양도·운반·보관하거나 그 행위를 알선",tip:"장물성 인식(정황) 입증. 중고거래·전당포 확인. 상습이면 가중.",text:"제362조(장물의 취득, 알선 등) ①장물을 취득, 양도, 운반 또는 보관한 자는 7년 이하의 징역 또는 1천500만원 이하의 벌금에 처한다. ②전항의 행위를 알선한 자도 전항의 형과 같다.",ref:"형법 제362조"},
+{id:"cr45",tab:"형법",cat:"재산",name:"재물손괴 등",art:"형법 제366조",badges:[["p","3년 이하 징역·700만원 이하 벌금"]],sum:"타인의 재물·문서·전자기록을 손괴·은닉 등 방법으로 효용을 해함",tip:"손괴 부위·수리비 견적 사진 확보. 특수손괴(제369조)는 5년 이하·1천만원 이하.",text:"제366조(재물손괴등) 타인의 재물, 문서 또는 전자기록등 특수매체기록을 손괴 또는 은닉 기타 방법으로 기 효용을 해한 자는 3년이하의 징역 또는 700만원 이하의 벌금에 처한다.",ref:"형법 제366조"},
+{id:"cr46",tab:"형법",cat:"재산",name:"특수손괴",art:"형법 제369조",badges:[["p","5년 이하 징역·1천만원 이하 벌금"]],sum:"단체·다중의 위력 또는 위험한 물건을 휴대하여 재물손괴",tip:"공익건조물 파괴는 제367조(10년 이하·2천만원 이하).",text:"제369조(특수손괴) ①단체 또는 다중의 위력을 보이거나 위험한 물건을 휴대하여 제366조의 죄를 범한 때에는 5년 이하의 징역 또는 1천만원 이하의 벌금에 처한다. ②제1항의 방법으로 제367조의 죄를 범한 때에는 1년 이상의 유기징역 또는 2천만원 이하의 벌금에 처한다.",ref:"형법 제369조"},
+{id:"cr47",tab:"형법",cat:"재산",name:"권리행사방해",art:"형법 제323조",badges:[["p","5년 이하 징역·700만원 이하 벌금"]],sum:"타인의 점유·권리 목적이 된 자기 물건을 취거·은닉·손괴해 권리행사를 방해",tip:"친족 사이면 고소가 있어야 공소제기(제328조①, 2025.12.31. 개정). 채권·임대차 분쟁 현장에서 확인.",text:"제323조(권리행사방해) 타인의 점유 또는 권리의 목적이 된 자기의 물건 또는 전자기록등 특수매체기록을 취거, 은닉 또는 손괴하여 타인의 권리행사를 방해한 자는 5년 이하의 징역 또는 700만원 이하의 벌금에 처한다.",ref:"형법 제323조"},
+{id:"cr48",tab:"형법",cat:"재산",name:"강제집행면탈",art:"형법 제327조",badges:[["p","3년 이하 징역·1천만원 이하 벌금"]],sum:"강제집행을 면할 목적으로 재산을 은닉·손괴·허위양도하거나 허위 채무를 부담해 채권자를 해함",tip:"가압류·강제집행 진행 중 재산 처분 정황. 민사집행 기록 확인 후 입건.",text:"제327조(강제집행면탈) 강제집행을 면할 목적으로 재산을 은닉, 손괴, 허위양도 또는 허위의 채무를 부담하여 채권자를 해한 자는 3년 이하의 징역 또는 1천만원 이하의 벌금에 처한다.",ref:"형법 제327조"},
+{id:"cr49",tab:"형법",cat:"재산",name:"친족 사이의 범행과 고소",art:"형법 제328조",badges:[["n","2025.12.31. 개정"],["a","고소 필요"]],sum:"제323조(권리행사방해) 죄를 피해자의 친족이 범한 경우 고소가 있어야 공소제기 가능",tip:"2025.12.31. 개정으로 종전 ‘친족상도례’(면제) 구조가 변경되었다. 가족 간 재산분쟁은 고소 여부·직계존속 고소 가능 여부 확인.",text:"제328조(친족 사이의 범행과 고소) ① 제323조의 죄를 지은 사람이 피해자의 친족인 경우에는 고소가 있어야 공소를 제기할 수 있다. 이 경우 「형사소송법」 제224조 및 「군사법원법」 제266조에도 불구하고 자기 또는 배우자의 직계존속을 고소할 수 있다. ② 삭제 <2025. 12. 31.> ③ 피해자의 친족이 아닌 공범에 대해서는 제1항을 적용하지 아니한다.",ref:"형법 제328조 (2025.12.31. 개정)"},
+
+{id:"cr60",tab:"형법",cat:"주거·업무·공무",name:"주거침입·퇴거불응",art:"형법 제319조",badges:[["p","3년 이하 징역·500만원 이하 벌금"]],sum:"사람의 주거·관리 건조물·선박·항공기·점유 방실에 침입하거나, 퇴거요구에 불응",tip:"침입 시점(문 개방·담 넘기 등)과 퇴거요구 시각·방법 확인. 퇴거불응은 요구 후 상당 시간 경과 필요.",text:"제319조(주거침입, 퇴거불응) ①사람의 주거, 관리하는 건조물, 선박이나 항공기 또는 점유하는 방실에 침입한 자는 3년 이하의 징역 또는 500만원 이하의 벌금에 처한다. ②전항의 장소에서 퇴거요구를 받고 응하지 아니한 자도 전항의 형과 같다.",ref:"형법 제319조"},
+{id:"cr61",tab:"형법",cat:"주거·업무·공무",name:"업무방해",art:"형법 제314조",badges:[["p","5년 이하 징역·1천500만원 이하 벌금"]],sum:"허위사실 유포·위계 또는 위력으로 사람의 업무를 방해(컴퓨터 장애 포함)",tip:"영업장 점거·난동·반복 민원. 위력의 정도·업무 방해 결과(매출·휴업) 입증. 경미하면 경범죄 제3조②3(16만원).",text:"제314조(업무방해) ①제313조의 방법 또는 위력으로써 사람의 업무를 방해한 자는 5년 이하의 징역 또는 1천500만원 이하의 벌금에 처한다. ②컴퓨터등 정보처리장치 또는 전자기록등 특수매체기록을 손괴하거나 정보처리장치에 허위의 정보 또는 부정한 명령을 입력하거나 기타 방법으로 정보처리에 장애를 발생하게 하여 사람의 업무를 방해한 자도 제1항의 형과 같다.",ref:"형법 제314조"},
+{id:"cr62",tab:"형법",cat:"주거·업무·공무",name:"신용훼손",art:"형법 제313조",badges:[["p","5년 이하 징역·1천500만원 이하 벌금"]],sum:"허위사실을 유포하거나 위계로 사람의 신용을 훼손",tip:"온라인 악성 리뷰·허위 게시글. 정보통신망법상 명예훼손과 경합 검토.",text:"제313조(신용훼손) 허위의 사실을 유포하거나 기타 위계로써 사람의 신용을 훼손한 자는 5년 이하의 징역 또는 1천500만원 이하의 벌금에 처한다.",ref:"형법 제313조"},
+{id:"cr63",tab:"형법",cat:"주거·업무·공무",name:"공무집행방해",art:"형법 제136조",badges:[["p","5년 이하 징역·1천만원 이하 벌금"]],sum:"직무를 집행하는 공무원에 대한 폭행·협박, 또는 직무상 행위 강요·조지·사퇴 강요 목적의 폭행·협박",tip:"직무집행의 적법성·현재성 입증(고지·제지 내용·영상). 폭행 부위·정도 사진, 동료 진술, 웨어러블 영상 확보.",text:"제136조(공무집행방해) ①직무를 집행하는 공무원에 대하여 폭행 또는 협박한 자는 5년 이하의 징역 또는 1천만원 이하의 벌금에 처한다. ②공무원에 대하여 그 직무상의 행위를 강요 또는 조지하거나 그 직을 사퇴하게 할 목적으로 폭행 또는 협박한 자도 전항의 형과 같다.",ref:"형법 제136조"},
+{id:"cr64",tab:"형법",cat:"주거·업무·공무",name:"위계에 의한 공무집행방해",art:"형법 제137조",badges:[["p","5년 이하 징역·1천만원 이하 벌금"]],sum:"위계로 공무원의 직무집행을 방해",tip:"허위 신고·서류 제출로 수사·단속 방해. 거짓신고(경범 60만원)와 구분되는 고의적 기망.",text:"제137조(위계에 의한 공무집행방해) 위계로써 공무원의 직무집행을 방해한 자는 5년 이하의 징역 또는 1천만원 이하의 벌금에 처한다.",ref:"형법 제137조"},
+{id:"cr65",tab:"형법",cat:"주거·업무·공무",name:"특수공무방해",art:"형법 제144조",badges:[["p","각조 형의 2분의 1까지 가중 / 상해 3년 이상"]],sum:"단체·다중의 위력 또는 위험한 물건을 휴대하여 공무집행방해 등을 범함",tip:"집단 항거·흉기 휴대 시 적용. 공무원 상해는 3년 이상, 사망은 무기 또는 5년 이상.",text:"제144조(특수공무방해) ①단체 또는 다중의 위력을 보이거나 위험한 물건을 휴대하여 제136조, 제138조와 제140조 내지 전조의 죄를 범한 때에는 각조에 정한 형의 2분의 1까지 가중한다. ②제1항의 죄를 범하여 공무원을 상해에 이르게 한 때에는 3년 이상의 유기징역에 처한다. 사망에 이르게 한 때에는 무기 또는 5년 이상의 징역에 처한다.",ref:"형법 제144조"},
+{id:"cr66",tab:"형법",cat:"주거·업무·공무",name:"공무원 자격 사칭",art:"형법 제118조",badges:[["p","3년 이하 징역·700만원 이하 벌금"]],sum:"공무원의 자격을 사칭하여 그 직권을 행사",tip:"경찰관·검사 사칭. 편취 수반 시 사기죄 경합, 경범죄 관명사칭(8만원)과 구분.",text:"제118조(공무원자격의 사칭) 공무원의 자격을 사칭하여 그 직권을 행사한 자는 3년 이하의 징역 또는 700만원 이하의 벌금에 처한다.",ref:"형법 제118조"},
+{id:"cr67",tab:"형법",cat:"주거·업무·공무",name:"공공장소 흉기소지",art:"형법 제116조의3",badges:[["p","3년 이하 징역·1천만원 이하 벌금"],["n","현행"]],sum:"정당한 이유 없이 도로·공원 등 공공장소에서 생명·신체에 위해를 가할 수 있는 흉기를 소지하고 드러내어 공중에 불안감·공포심을 일으킴",tip:"‘소지 + 드러냄 + 불안감’ 3요소. 단순 휴대·미신고는 경범죄 흉기은닉휴대(8만원). 즉시 흉기 압수·안전 확보.",text:"제116조의3(공공장소 흉기소지) 정당한 이유 없이 도로ㆍ공원 등 불특정 또는 다수의 사람이 이용하거나 통행할 수 있는 공공장소에서 사람의 생명, 신체에 위해를 가할 수 있는 흉기를 소지하고 이를 드러내어 공중에게 불안감 또는 공포심을 일으킨 사람은 3년 이하의 징역 또는 1천만원 이하의 벌금에 처한다.",ref:"형법 제116조의3"},
+{id:"cr68",tab:"형법",cat:"주거·업무·공무",name:"범인은닉·도피",art:"형법 제151조",badges:[["p","3년 이하 징역·500만원 이하 벌금"],["a","친족 특례"]],sum:"벌금 이상 형에 해당하는 죄를 범한 자를 은닉·도피하게 함",tip:"친족·동거가족이 본인을 위해 범한 때는 불벌(제2항). 대가성 있으면 별도 검토.",text:"제151조(범인은닉과 친족간의 특례) ①벌금 이상의 형에 해당하는 죄를 범한 자를 은닉 또는 도피하게 한 자는 3년 이하의 징역 또는 500만원 이하의 벌금에 처한다. ②친족 또는 동거의 가족이 본인을 위하여 전항의 죄를 범한 때에는 처벌하지 아니한다.",ref:"형법 제151조"},
+{id:"cr69",tab:"형법",cat:"주거·업무·공무",name:"증거인멸",art:"형법 제155조",badges:[["p","5년 이하 징역·700만원 이하 벌금"]],sum:"타인의 형사·징계사건 증거를 인멸·은닉·위조·변조하거나 사용, 증인 은닉·도피",tip:"CCTV 삭제·휴대폰 초기화 요청 목격 시 즉시 조서. 모해 목적이면 10년 이하.",text:"제155조(증거인멸 등과 친족간의 특례) ①타인의 형사사건 또는 징계사건에 관한 증거를 인멸, 은닉, 위조 또는 변조하거나 위조 또는 변조한 증거를 사용한 자는 5년 이하의 징역 또는 700만원 이하의 벌금에 처한다. ②타인의 형사사건 또는 징계사건에 관한 증인을 은닉 또는 도피하게 한 자도 제1항의 형과 같다. ③피고인, 피의자 또는 징계혐의자를 모해할 목적으로 전2항의 죄를 범한 자는 10년 이하의 징역에 처한다. ④친족 또는 동거의 가족이 본인을 위하여 본조의 죄를 범한 때에는 처벌하지 아니한다.",ref:"형법 제155조"},
+{id:"cr70",tab:"형법",cat:"주거·업무·공무",name:"무고",art:"형법 제156조",badges:[["p","10년 이하 징역·1천500만원 이하 벌금"]],sum:"타인에게 형사·징계처분을 받게 할 목적으로 공무소·공무원에게 허위 사실을 신고",tip:"허위 고소·고발. 신고 내용의 허위성과 처벌 목적 입증이 핵심. 악의적 반복 신고는 정식 수사.",text:"제156조(무고) 타인으로 하여금 형사처분 또는 징계처분을 받게 할 목적으로 공무소 또는 공무원에 대하여 허위의 사실을 신고한 자는 10년 이하의 징역 또는 1천500만원 이하의 벌금에 처한다.",ref:"형법 제156조"},
+{id:"cr71",tab:"형법",cat:"주거·업무·공무",name:"공용서류 무효·공용물 파괴",art:"형법 제141조",badges:[["p","7년 이하 징역·1천만원 이하 벌금"]],sum:"공무소 서류·물건·전자기록을 손상·은닉해 효용을 해함, 공무소 건조물·선박·기차·항공기 파괴",tip:"지구대·파출소 비품·서류 훼손. 건조물 파괴는 1년 이상 10년 이하.",text:"제141조(공용서류 등의 무효, 공용물의 파괴) ①공무소에서 사용하는 서류 기타 물건 또는 전자기록등 특수매체기록을 손상 또는 은닉하거나 기타 방법으로 그 효용을 해한 자는 7년 이하의 징역 또는 1천만원 이하의 벌금에 처한다. ②공무소에서 사용하는 건조물, 선박, 기차 또는 항공기를 파괴한 자는 1년 이상 10년 이하의 징역에 처한다.",ref:"형법 제141조"},
+
+{id:"cr80",tab:"형법",cat:"성·명예",name:"공연음란",art:"형법 제245조",badges:[["p","1년 이하 징역·500만원 이하 벌금·구류·과료"]],sum:"공연히 음란한 행위를 함",tip:"불특정·다수인이 인식할 수 있는 상태. 아동·청소년이 있으면 청소년성보호법, 과다노출은 경범죄 5만원.",text:"제245조(공연음란) 공연히 음란한 행위를 한 자는 1년 이하의 징역, 500만원 이하의 벌금, 구류 또는 과료에 처한다.",ref:"형법 제245조"},
+{id:"cr81",tab:"형법",cat:"성·명예",name:"강간",art:"형법 제297조",badges:[["p","3년 이상 유기징역"]],sum:"폭행 또는 협박으로 사람을 강간",tip:"피해자 진술 확보·동석자·의료 검진. 친고죄 아님(2013. 개정). 피해자 보호·2차 피해 방지 최우선.",text:"제297조(강간) 폭행 또는 협박으로 사람을 강간한 자는 3년 이상의 유기징역에 처한다.",ref:"형법 제297조"},
+{id:"cr82",tab:"형법",cat:"성·명예",name:"강제추행",art:"형법 제298조",badges:[["p","10년 이하 징역·1천500만원 이하 벌금"]],sum:"폭행 또는 협박으로 사람에 대하여 추행",tip:"폭행·협박 없이 추행한 경우(기습추행)는 성폭력처벌법 제3조. CCTV·목격자·신체 접촉 부위 확인.",text:"제298조(강제추행) 폭행 또는 협박으로 사람에 대하여 추행을 한 자는 10년 이하의 징역 또는 1천500만원 이하의 벌금에 처한다.",ref:"형법 제298조"},
+{id:"cr83",tab:"형법",cat:"성·명예",name:"준강간·준강제추행",art:"형법 제299조",badges:[["p","강간·추행 예 (3년 이상 / 10년 이하)"]],sum:"심신상실 또는 항거불능 상태를 이용하여 간음·추행",tip:"만취·수면·약물 상태. 피해자 혈중농도·수면 상태·현장 상황 확인. 약물 사용 의심 시 마약류 검사.",text:"제299조(준강간, 준강제추행) 사람의 심신상실 또는 항거불능의 상태를 이용하여 간음 또는 추행을 한 자는 제297조, 제297조의2 및 제298조의 예에 의한다.",ref:"형법 제299조"},
+{id:"cr84",tab:"형법",cat:"성·명예",name:"강간 등 상해·치상 / 살인·치사",art:"형법 제301조·제301조의2",badges:[["p","무기 또는 5년 이상 / 사형·무기"]],sum:"강간·추행 등 죄를 범하고 상해를 가하면 무기 또는 5년 이상, 살해하면 사형 또는 무기징역",tip:"성폭력처벌법상 특수강간·가중처벌 병과 검토. 피해자 응급 치료·증거보전 우선.",text:"제301조(강간 등 상해ㆍ치상) 제297조, 제297조의2 및 제298조부터 제300조까지의 죄를 범한 자가 사람을 상해하거나 상해에 이르게 한 때에는 무기 또는 5년 이상의 징역에 처한다.\n제301조의2(강간등 살인ㆍ치사) 제297조, 제297조의2 및 제298조부터 제300조까지의 죄를 범한 자가 사람을 살해한 때에는 사형 또는 무기징역에 처한다. 사망에 이르게 한 때에는 무기 또는 10년 이상의 징역에 처한다.",ref:"형법 제301조·제301조의2"},
+{id:"cr85",tab:"형법",cat:"성·명예",name:"미성년자 등에 대한 간음(위계·위력)",art:"형법 제302조",badges:[["p","5년 이하 징역"]],sum:"미성년자 또는 심신미약자에 대해 위계·위력으로 간음·추행",tip:"위계·위력(보호·감독 지위) 확인. 13세 미만·13~16세는 제305조 적용.",text:"제302조(미성년자 등에 대한 간음) 미성년자 또는 심신미약자에 대하여 위계 또는 위력으로써 간음 또는 추행을 한 자는 5년 이하의 징역에 처한다.",ref:"형법 제302조"},
+{id:"cr86",tab:"형법",cat:"성·명예",name:"13세 미만·13~16세 간음·추행",art:"형법 제305조",badges:[["p","강간·추행 예 (3년 이상 / 10년 이하)"]],sum:"13세 미만 간음·추행, 13세 이상 16세 미만에 대한 19세 이상 자의 간음·추행",tip:"동의 여부와 무관하게 성립. 아동·청소년 성보호법·아동학대처벌법 병과. 즉시 아동보호기관 연계.",text:"제305조(미성년자에 대한 간음, 추행) ① 13세 미만의 사람에 대하여 간음 또는 추행을 한 자는 제297조, 제297조의2, 제298조, 제301조 또는 제301조의2의 예에 의한다. ② 13세 이상 16세 미만의 사람에 대하여 간음 또는 추행을 한 19세 이상의 자는 제297조, 제297조의2, 제298조, 제301조 또는 제301조의2의 예에 의한다.",ref:"형법 제305조"},
+{id:"cr87",tab:"형법",cat:"성·명예",name:"명예훼손",art:"형법 제307조",badges:[["p","사실적시 2년·500만원 / 허위 5년·1천만원"],["a","제2항 반의사불벌"]],sum:"공연히 사실을 적시해 명예를 훼손(2년 이하), 허위 사실이면 5년 이하",tip:"제2항(허위)은 반의사불벌 — 피해자 의사 확인. 제1항은 반의사불벌 아님. 정보통신망법 제70조(온라인)와 구분.",text:"제307조(명예훼손) ①공연히 사실을 적시하여 사람의 명예를 훼손한 자는 2년 이하의 징역이나 금고 또는 500만원 이하의 벌금에 처한다. ②공연히 허위의 사실을 적시하여 사람의 명예를 훼손한 자는 5년 이하의 징역, 10년 이하의 자격정지 또는 1천만원 이하의 벌금에 처한다.",ref:"형법 제307조"},
+{id:"cr88",tab:"형법",cat:"성·명예",name:"모욕",art:"형법 제311조",badges:[["p","1년 이하 징역·금고·200만원 이하 벌금"],["a","반의사불벌"]],sum:"공연히 사람을 모욕",tip:"사실 적시 없이 경멸적 표현. 피해자 특정·공연성 확인. 온라인 모욕은 정보통신망법.",text:"제311조(모욕) 공연히 사람을 모욕한 자는 1년 이하의 징역이나 금고 또는 200만원 이하의 벌금에 처한다.",ref:"형법 제311조"},
+{id:"cr89",tab:"형법",cat:"성·명예",name:"사자의 명예훼손",art:"형법 제308조",badges:[["p","2년 이하 징역·금고·500만원 이하 벌금"]],sum:"공연히 허위 사실을 적시하여 사자의 명예를 훼손",tip:"유족 고소 가능. 사실 적시(제1항)는 처벌 대상 아님(허위만).",text:"제308조(사자의 명예훼손) 공연히 허위의 사실을 적시하여 사자의 명예를 훼손한 자는 2년 이하의 징역이나 금고 또는 500만원 이하의 벌금에 처한다.",ref:"형법 제308조"},
+
+{id:"cr95",tab:"형법",cat:"공안·교통",name:"일반교통방해",art:"형법 제185조",badges:[["p","10년 이하 징역·1천500만원 이하 벌금"]],sum:"육로·수로·교량을 손괴·불통하게 하거나 기타 방법으로 교통을 방해",tip:"도로 점거·차량 방치·낙하물 투기. 집회·시위는 집시법상 조건부 허용 여부 확인.",text:"제185조(일반교통방해) 육로, 수로 또는 교량을 손괴 또는 불통하게 하거나 기타 방법으로 교통을 방해한 자는 10년 이하의 징역 또는 1천500만원 이하의 벌금에 처한다.",ref:"형법 제185조"},
+{id:"cr96",tab:"형법",cat:"공안·교통",name:"현주건조물 등 방화",art:"형법 제164조",badges:[["p","무기 또는 3년 이상 징역"]],sum:"불을 놓아 사람이 주거로 사용하거나 현존하는 건조물·기차·자동차·선박·항공기·지하채굴시설을 태움",tip:"방화 사건은 즉시 화재감식·강력팀 인계. 상해 시 무기 또는 5년 이상, 사망 시 사형·무기 또는 7년 이상.",text:"제164조(현주건조물 등 방화) ① 불을 놓아 사람이 주거로 사용하거나 사람이 현존하는 건조물, 기차, 전차, 자동차, 선박, 항공기 또는 지하채굴시설을 불태운 자는 무기 또는 3년 이상의 징역에 처한다. ② 제1항의 죄를 지어 사람을 상해에 이르게 한 경우에는 무기 또는 5년 이상의 징역에 처한다. 사망에 이르게 한 경우에는 사형, 무기 또는 7년 이상의 징역에 처한다.",ref:"형법 제164조"},
+{id:"cr97",tab:"형법",cat:"공안·교통",name:"일반물건 방화·실화",art:"형법 제167조·제170조",badges:[["p","1년 이상 10년 이하 / 1천500만원 이하 벌금"]],sum:"그 밖의 물건을 태워 공공의 위험을 발생시키면 1년 이상 10년 이하, 과실이면 1천500만원 이하 벌금",tip:"자기 소유 물건 방화도 공공 위험 발생 시 처벌(3년 이하·700만원 이하).",text:"제167조(일반물건 방화) ① 불을 놓아 제164조부터 제166조까지에 기재한 외의 물건을 불태워 공공의 위험을 발생하게 한 자는 1년 이상 10년 이하의 징역에 처한다. ② 제1항의 물건이 자기 소유인 경우에는 3년 이하의 징역 또는 700만원 이하의 벌금에 처한다.\n제170조(실화) ① 과실로 제164조 또는 제165조에 기재한 물건 또는 타인 소유인 제166조에 기재한 물건을 불태운 자는 1천500만원 이하의 벌금에 처한다.",ref:"형법 제167조·제170조"},
+{id:"cr98",tab:"형법",cat:"공안·교통",name:"진화방해",art:"형법 제169조",badges:[["p","10년 이하 징역"]],sum:"화재 시 진화용 시설·물건을 은닉·손괴하거나 기타 방법으로 진화를 방해",tip:"소화전·소화기 훼손, 소방활동 방해. 소방기본법 위반 병과.",text:"제169조(진화방해) 화재에 있어서 진화용의 시설 또는 물건을 은닉 또는 손괴하거나 기타 방법으로 진화를 방해한 자는 10년 이하의 징역에 처한다.",ref:"형법 제169조"},
+/* ================= 형사소송법 · 경찰관 직무집행법 ================= */
+{id:"ps1",tab:"형소법",cat:"수사 원칙",name:"임의수사 원칙 · 강제처분 최소화",art:"형사소송법 제198조·제199조",badges:[["a","원칙"]],sum:"수사는 불구속 상태에서 함이 원칙, 강제처분은 법률에 특별한 규정이 있을 때 필요한 최소한도에서만",tip:"모든 현장 조치의 출발점. 임의동행·임의제출·동의 없는 휴대폰 열람은 강제처분인지 매번 점검.",text:"제198조(준수사항) ①피의자에 대한 수사는 불구속 상태에서 함을 원칙으로 한다. ②사법경찰관리와 그 밖에 직무상 수사에 관계있는 자는 피의자 또는 다른 사람의 인권을 존중하고 수사과정에서 알게 된 비밀을 엄수하며 수사에 방해되는 일이 없도록 하여야 한다. ③ 사법경찰관리와 그 밖에 직무상 수사에 관계있는 자는 수사과정에서 수사와 관련하여 작성하거나 취득한 서류 또는 물건에 대한 목록을 빠짐 없이 작성하여야 한다.\n제199조(수사와 필요한 조사) ①수사에 관하여는 그 목적을 달성하기 위하여 필요한 조사를 할 수 있다. 다만, 강제처분은 이 법률에 특별한 규정이 있는 경우에 한하며, 필요한 최소한도의 범위 안에서만 하여야 한다.",ref:"형사소송법 [시행 2026.10.2.] 제198조·제199조"},
+{id:"ps2",tab:"형소법",cat:"체포",name:"현행범인 · 준현행범인",art:"형사소송법 제211조",badges:[["a","영장 불요"]],sum:"범죄를 실행 중이거나 실행 직후인 사람이 현행범인. 추적·장물·흉기·신체 흔적·도주 시도는 준현행범인",tip:"체포 시점의 4가지 준현행범 요건을 조서에 특정(누가·언제·어떻게 추적했는지). 시간 경과 시 현행성 입증이 관건.",text:"제211조(현행범인과 준현행범인) ① 범죄를 실행하고 있거나 실행하고 난 직후의 사람을 현행범인이라 한다. ② 다음 각 호의 어느 하나에 해당하는 사람은 현행범인으로 본다.\n1. 범인으로 불리며 추적되고 있을 때\n2. 장물이나 범죄에 사용되었다고 인정하기에 충분한 흉기나 그 밖의 물건을 소지하고 있을 때\n3. 신체나 의복류에 증거가 될 만한 뚜렷한 흔적이 있을 때\n4. 누구냐고 묻자 도망하려고 할 때",ref:"형사소송법 제211조"},
+{id:"ps3",tab:"형소법",cat:"체포",name:"현행범인 체포 — 누구나",art:"형사소송법 제212조",badges:[["a","영장 불요"]],sum:"현행범인은 누구든지 영장 없이 체포할 수 있음",tip:"일반 시민의 체포도 가능. 경찰관 체포 시에도 제214조(경미사건)·제200조의5(고지) 준수.",text:"제212조(현행범인의 체포) 현행범인은 누구든지 영장없이 체포할 수 있다.",ref:"형사소송법 제212조"},
+{id:"ps4",tab:"형소법",cat:"체포",name:"체포된 현행범인의 인도",art:"형사소송법 제213조",badges:[["a","절차"]],sum:"사법경찰관리가 아닌 자가 현행범을 체포하면 즉시 사법경찰관리에게 인도, 인도받으면 체포자 성명·주거·체포사유 확인",tip:"시민 체포자에게 신분·연락처·진술 확보(증인化). 필요 시 경찰관서 동행 요구(제2항).",text:"제213조(체포된 현행범인의 인도) ① 사법경찰관리 아닌 자가 현행범인을 체포한 때에는 즉시 사법경찰관리에게 인도하여야 한다. ②사법경찰관리가 현행범인의 인도를 받은 때에는 체포자의 성명, 주거, 체포의 사유를 물어야 하고 필요한 때에는 체포자에 대하여 경찰관서에 동행함을 요구할 수 있다.",ref:"형사소송법 제213조"},
+{id:"ps5",tab:"형소법",cat:"체포",name:"체포 시 고지 — 피의사실·이유·변호인·변명 기회",art:"형사소송법 제200조의5",badges:[["a","필수 고지"],["x","위반 시 위법수집증거 다툼"]],sum:"피의자를 체포하면 피의사실의 요지, 체포의 이유, 변호인을 선임할 수 있음을 말하고 변명할 기회를 주어야 함",tip:"현행범 체포에도 준용(제213조의2). 고지 일시·장소·방법을 조서에 특정하고, 가능하면 영상 기록.",text:"제200조의5(체포와 피의사실 등의 고지) 사법경찰관은 피의자를 체포하는 경우에는 피의사실의 요지, 체포의 이유와 변호인을 선임할 수 있음을 말하고 변명할 기회를 주어야 한다.\n\n제213조의2(준용규정) 제87조, 제89조, 제90조, 제200조의2제5항 및 제200조의5는 사법경찰관리가 현행범인을 체포하거나 현행범인을 인도받은 경우에 이를 준용한다.",ref:"형사소송법 제200조의5·제213조의2"},
+{id:"ps6",tab:"형소법",cat:"체포",name:"미란다 원칙 — 원터치 고지 카드",art:"형사소송법 제200조의5·제213조의2",kind:"miranda",badges:[["a","그대로 읽어주기"]],sum:"체포 현장에서 큰 소리로 또박또박 읽어 주는 표준 고지",tip:"고지 후 ①이해 여부 ②변호인 선임 의사 ③통지받을 사람 ④진술 여부를 확인하고 조서에 기재. 고지 없이 얻은 진술은 증거능력이 다툼.",text:"【표준 고지】\n당신은 ○○○ 혐의로 현행범인으로 체포합니다.\n\n첫째, 당신은 변호인을 선임할 권리가 있습니다. 변호인이 없는 경우에는 국선변호인 선정을 신청할 수 있습니다.\n\n둘째, 당신은 진술을 거부할 수 있으며, 진술을 거부하더라도 불이익을 받지 않습니다.\n\n셋째, 당신에게 유리한 사실을 진술할 기회가 있습니다.\n\n넷째, 체포 사실을 변호인 또는 가족 등 당신이 지정하는 사람에게 알려 드립니다.\n\n다섯째, 영장 없이 체포한 경우 48시간 이내에 구속영장을 청구하거나 석방합니다.\n\n이상의 권리를 이해하셨습니까?",quote:"당신은 ○○○ 혐의로 현행범인으로 체포합니다. 당신은 변호인을 선임할 수 있고, 진술을 거부할 수 있으며, 유리한 사실을 진술할 기회가 있습니다. 체포 사실은 지정하신 분에게 알려 드립니다.",ref:"형사소송법 제200조의5·제213조의2 / 제87조 / 제200조의2제5항"},
+{id:"ps7",tab:"형소법",cat:"체포",name:"경미사건 현행범 체포 제한 (50만원)",art:"형사소송법 제214조",badges:[["x","주거 불명할 때만 체포"]],sum:"다액 50만원 이하 벌금·구류·과료에 해당하는 죄의 현행범은 주거가 분명하지 않을 때에만 체포 가능",tip:"경범죄(10만·20만원 이하)와 대부분 형법 조문이 이 제한 대상. 주거 불명·신원 불확실 사유를 구체적으로 기록해야 적법.",text:"제214조(경미사건과 현행범인의 체포) 다액 50만원이하의 벌금, 구류 또는 과료에 해당하는 죄의 현행범인에 대하여는 범인의 주거가 분명하지 아니한 때에 한하여 제212조 내지 제213조의 규정을 적용한다.",ref:"형사소송법 제214조"},
+{id:"ps8",tab:"형소법",cat:"체포",name:"체포영장",art:"형사소송법 제200조의2",badges:[["a","48시간 내 구속영장"]],sum:"출석요구 불응 우려 등 요건 + 법원 체포영장. 경미사건은 주거 불명 또는 정당한 이유 없는 출석요구 불응 시에 한함",tip:"영장 청구 시 사유·소명자료. 체포 후 구속하려면 48시간 내 구속영장 청구, 아니면 즉시 석방(제5항).",text:"제200조의2(영장에 의한 체포) ①피의자가 죄를 범하였다고 의심할 만한 상당한 이유가 있고, 정당한 이유없이 제200조에 따른 출석요구에 응하지 아니하거나 응하지 아니할 우려가 있는 때에는 사법경찰관은 검사에게 신청하여 검사의 청구로 관할 지방법원 판사의 체포영장을 발부받아 피의자를 체포할 수 있다. 다만, 다액 50만원이하의 벌금, 구류 또는 과료에 해당하는 사건에 관하여는 피의자가 일정한 주거가 없는 경우 또는 정당한 이유없이 제200조에 따른 출석요구에 응하지 아니한 경우에 한한다.\n⑤체포한 피의자를 구속하고자 할 때에는 체포한 때부터 48시간이내에 제201조의 규정에 의하여 구속영장을 청구하여야 하고, 그 기간내에 구속영장을 청구하지 아니하는 때에는 피의자를 즉시 석방하여야 한다.",ref:"형사소송법 제200조의2"},
+{id:"ps9",tab:"형소법",cat:"체포",name:"긴급체포",art:"형사소송법 제200조의3",badges:[["x","장기 3년 이상 + 긴급성"],["a","즉시 검사 승인"]],sum:"사형·무기 또는 장기 3년 이상 징역·금고에 해당하고 증거인멸·도주 우려 + 영장 받을 시간적 여유가 없을 때 영장 없이 체포",tip:"긴급성(우연히 발견 등) 입증이 핵심. 체포 즉시 검사 승인, 즉시 긴급체포서 작성(범죄사실 요지·긴급체포 사유).",text:"제200조의3(긴급체포) ①사법경찰관은 피의자가 사형ㆍ무기 또는 장기 3년 이상의 징역이나 금고에 해당하는 죄를 범하였다고 의심할 만한 상당한 이유가 있고, 다음 각 호의 어느 하나에 해당하는 사유가 있는 경우에 긴급을 요하여 지방법원판사의 체포영장을 받을 수 없는 때에는 그 사유를 알리고 영장없이 피의자를 체포할 수 있다. 이 경우 긴급을 요한다 함은 피의자를 우연히 발견한 경우등과 같이 체포영장을 받을 시간적 여유가 없는 때를 말한다.\n1. 피의자가 증거를 인멸할 염려가 있는 때\n2. 피의자가 도망하거나 도망할 우려가 있는 때\n② 사법경찰관이 제1항에 따라 피의자를 체포한 경우에는 즉시 검사의 승인을 받아야 한다. ③ 사법경찰관은 제1항에 따라 피의자를 체포한 경우에는 즉시 긴급체포서를 작성하여야 한다. ④제3항의 규정에 의한 긴급체포서에는 범죄사실의 요지, 긴급체포의 사유등을 기재하여야 한다.",ref:"형사소송법 제200조의3"},
+{id:"ps10",tab:"형소법",cat:"체포",name:"긴급체포 후 48시간 · 석방 후 재체포 금지",art:"형사소송법 제200조의4",badges:[["x","48시간 내 구속영장"]],sum:"긴급체포 후 구속하려면 48시간 내 구속영장 청구, 못 받으면 즉시 석방. 석방 후에는 영장 없이 동일 범죄로 재체포 불가",tip:"기산점은 ‘체포한 때’. 석방 시 검사 통보(제6항)와 법원 통지(제4항) 절차 확인.",text:"제200조의4(긴급체포와 영장청구기간) ①사법경찰관이 제200조의3에 따라 피의자를 체포한 경우 피의자를 구속하고자 할 때에는 지체 없이 검사에게 신청하여 검사의 청구로 관할 지방법원 판사에게 구속영장을 청구하여야 한다. 이 경우 구속영장은 피의자를 체포한 때부터 48시간 이내에 청구하여야 하며, 제200조의3제3항에 따른 긴급체포서를 첨부하여야 한다.\n②제1항의 규정에 의하여 구속영장을 청구하지 아니하거나 발부받지 못한 때에는 피의자를 즉시 석방하여야 한다. ③제2항의 규정에 의하여 석방된 자는 영장없이는 동일한 범죄사실에 관하여 체포하지 못한다.",ref:"형사소송법 제200조의4"},
+{id:"ps11",tab:"형소법",cat:"구속",name:"구속영장 청구 · 피의자심문",art:"형사소송법 제201조의2",badges:[["a","다음 날까지 심문"]],sum:"체포된 피의자에 대한 구속영장 청구 시 판사는 지체 없이 심문하고, 특별한 사정이 없으면 청구일 다음 날까지 심문",tip:"심문기일 통지·변호인 참여 보장. 변호인 없으면 판사가 직권 선정(제8항).",text:"제201조의2(구속영장 청구와 피의자 심문) ①제200조의2ㆍ제200조의3 또는 제212조에 따라 체포된 피의자에 대하여 구속영장을 청구받은 판사는 지체 없이 피의자를 심문하여야 한다. 이 경우 특별한 사정이 없는 한 구속영장이 청구된 날의 다음날까지 심문하여야 한다.\n⑧심문할 피의자에게 변호인이 없는 때에는 지방법원판사는 직권으로 변호인을 선정하여야 한다. 이 경우 변호인의 선정은 피의자에 대한 구속영장 청구가 기각되어 효력이 소멸한 경우를 제외하고는 제1심까지 효력이 있다.",ref:"형사소송법 제201조의2"},
+{id:"ps12",tab:"형소법",cat:"구속",name:"사법경찰관 구속기간 (10일)",art:"형사소송법 제202조",badges:[["a","10일"]],sum:"사법경찰관이 피의자를 구속한 때에는 10일 이내에 검사에게 인치하지 않으면 석방",tip:"구속기간 초일 산입·말일 공휴일 특례(제66조). 인치 지연은 곧 위법 구금.",text:"제202조(사법경찰관의 구속기간) 사법경찰관이 피의자를 구속한 때에는 10일 이내에 피의자를 검사에게 인치하지 아니하면 석방하여야 한다.",ref:"형사소송법 제202조"},
+{id:"ps13",tab:"형소법",cat:"구속",name:"체포·구속 통지 (가족·변호인)",art:"형사소송법 제87조 · 제200조의6",badges:[["a","지체 없이 서면"]],sum:"구속(체포) 시 변호인 또는 피의자가 지정한 자에게 사건명·일시·장소·범죄사실 요지·구속 이유·변호인 선임 가능 취지를 알리고 지체 없이 서면 통지",tip:"법문에 ‘24시간’ 특정은 없다 — ‘지체 없이 서면’. 통지 시각·수령인·방법을 기록해 두는 것이 안전. 피의자가 지정한 자 없으면 제30조② 가족에게.",text:"제87조(구속의 통지) ①피고인을 구속한 때에는 변호인이 있는 경우에는 변호인에게, 변호인이 없는 경우에는 제30조제2항에 규정한 자 중 피고인이 지정한 자에게 피고사건명, 구속일시ㆍ장소, 범죄사실의 요지, 구속의 이유와 변호인을 선임할 수 있는 취지를 알려야 한다. ②제1항의 통지는 지체없이 서면으로 하여야 한다.\n\n제200조의6(준용규정) 제75조, 제81조제1항 본문, 같은 조 제3항, 제82조, 제83조, 제85조제1항ㆍ제3항ㆍ제4항, 제86조, 제87조, 제89조부터 제91조까지, 제93조, 제101조제4항 및 제102조제2항 단서는 사법경찰관이 피의자를 체포하는 경우에 이를 준용한다. 이 경우 “구속”은 “체포”로, “구속영장”은 “체포영장”으로 본다.",ref:"형사소송법 제87조·제200조의6"},
+{id:"ps14",tab:"형소법",cat:"압수·수색",name:"체포현장에서의 압수·수색·검증",art:"형사소송법 제216조 제1항 제2호",badges:[["a","영장 불요"]],sum:"체포·구속하는 경우 필요한 때에 영장 없이 체포현장에서 압수·수색·검증 가능",tip:"‘체포현장’의 공간적 범위(체포 장소와 밀접·시간적 접착) 판단이 핵심. 벗어나면 영장 필요.",text:"제216조(영장에 의하지 아니한 강제처분) ①사법경찰관은 제200조의2ㆍ제200조의3ㆍ제201조 또는 제212조에 따라 피의자를 체포 또는 구속하는 경우에 필요한 때에는 영장없이 다음 각 호의 처분을 할 수 있다.\n1. 타인의 주거나 타인이 간수하는 가옥, 건조물, 항공기, 선박, 차량 내에서의 피의자 수색. 다만, 제200조의2 또는 제201조에 따라 피의자를 체포 또는 구속하는 경우의 피의자 수색은 미리 수색영장을 발부받기 어려운 긴급한 사정이 있는 때에 한정한다.\n2. 체포현장에서의 압수, 수색, 검증",ref:"형사소송법 제216조①2"},
+{id:"ps15",tab:"형소법",cat:"압수·수색",name:"긴급체포 후 24시간 압수·수색",art:"형사소송법 제217조 제1항",badges:[["a","24시간 이내"]],sum:"긴급체포된 자가 소유·소지·보관하는 물건을 긴급히 압수할 필요가 있으면 체포한 때부터 24시간 이내에 영장 없이 압수·수색·검증",tip:"24시간은 긴급체포(제200조의3)에만 적용. 계속 압수하려면 지체 없이 압수·수색영장(제2항).",text:"제217조(영장에 의하지 아니하는 강제처분) ①사법경찰관은 제200조의3에 따라 체포된 자가 소유ㆍ소지 또는 보관하는 물건에 대하여 긴급히 압수할 필요가 있는 경우에는 체포한 때부터 24시간 이내에 한하여 영장 없이 압수ㆍ수색 또는 검증을 할 수 있다.",ref:"형사소송법 제217조①"},
+{id:"ps16",tab:"형소법",cat:"압수·수색",name:"사후영장 — 48시간 내 청구",art:"형사소송법 제217조 제2항·제3항",badges:[["x","48시간 내 청구"]],sum:"체포현장·긴급체포로 압수한 물건을 계속 압수하려면 지체 없이 압수·수색영장 청구(체포 시부터 48시간 이내), 못 받으면 즉시 반환",tip:"영장 없는 압수의 적법성은 사후영장으로 완성. 48시간 도과 시 증거능력 다툼.",text:"②사법경찰관은 제1항 또는 제216조제1항제2호에 따라 압수한 물건을 계속 압수할 필요가 있는 경우에는 지체 없이 압수ㆍ수색영장을 검사에게 신청하여 검사의 청구로 관할 지방법원 판사의 압수ㆍ수색영장을 발부받아야 한다. 이 경우 검사의 압수ㆍ수색영장의 청구는 체포한 때부터 48시간 이내에 하여야 한다. ③사법경찰관은 제2항에 따라 검사가 청구한 압수수색영장을 발부받지 못한 때에는 압수한 물건을 즉시 반환하여야 한다.",ref:"형사소송법 제217조②③"},
+{id:"ps17",tab:"형소법",cat:"압수·수색",name:"임의제출물 압수 · 유류물",art:"형사소송법 제218조",badges:[["a","영장 불요"]],sum:"피의자나 그 밖의 사람이 유류한 물건, 소유자·소지자·보관자가 임의로 제출한 물건은 영장 없이 압수",tip:"임의제출은 자발성 확인(강제·동의 유도 금지). 임의제출 조서·영수증 교부, 소유자에게 압수 사실 고지.",text:"제218조(영장에 의하지 아니한 압수) 사법경찰관은 피의자 또는 그 밖의 사람이 유류한 물건이나 소유자, 소지자 또는 보관자가 임의로 제출한 물건을 영장없이 압수할 수 있다.",ref:"형사소송법 제218조"},
+{id:"ps18",tab:"형소법",cat:"압수·수색",name:"범행 중·직후 영장 없는 압수·수색·검증",art:"형사소송법 제216조 제3항",badges:[["x","사후영장 필수"]],sum:"범행 중 또는 직후 범죄 장소에서 긴급해 법원 영장을 받을 수 없으면 영장 없이 압수·수색·검증, 사후에 지체 없이 영장",tip:"긴급성 요건 엄격. 사후영장 없는 압수는 위법수집증거 위험.",text:"③범행 중 또는 범행직후의 범죄 장소에서 긴급을 요하여 법원판사의 영장을 받을 수 없는 때에는 영장없이 압수, 수색 또는 검증을 할 수 있다. 이 경우에는 사후에 지체없이 영장을 받아야 한다.",ref:"형사소송법 제216조③"},
+{id:"ps19",tab:"형소법",cat:"경찰 직무",name:"불심검문 — 정지·질문",art:"경찰관 직무집행법 제3조 제1항",badges:[["a","신분·목적·이유 고지"]],sum:"죄를 범했거나 범하려 한다고 의심할 상당한 이유가 있는 사람, 범죄 사실을 안다고 인정되는 사람을 정지시켜 질문 가능",tip:"질문 전 증표 제시 + 소속·성명 + 목적·이유 설명(제4항). 흉기 소지 조사 가능(제3항). 답변 강요 불가(제7항).",text:"제3조(불심검문) ① 경찰관은 다음 각 호의 어느 하나에 해당하는 사람을 정지시켜 질문할 수 있다.\n1. 수상한 행동이나 그 밖의 주위 사정을 합리적으로 판단하여 볼 때 어떠한 죄를 범하였거나 범하려 하고 있다고 의심할 만한 상당한 이유가 있는 사람\n2. 이미 행하여진 범죄나 행하여지려고 하는 범죄행위에 관한 사실을 안다고 인정되는 사람\n③ 경찰관은 제1항 각 호의 어느 하나에 해당하는 사람에게 질문을 할 때에 그 사람이 흉기를 가지고 있는지를 조사할 수 있다. ④ 경찰관은 제1항이나 제2항에 따라 질문을 하거나 동행을 요구할 경우 자신의 신분을 표시하는 증표를 제시하면서 소속과 성명을 밝히고 질문이나 동행의 목적과 이유를 설명하여야 하며, 동행을 요구하는 경우에는 동행 장소를 밝혀야 한다. ⑦ 제1항부터 제3항까지의 규정에 따라 질문을 받거나 동행을 요구받은 사람은 형사소송에 관한 법률에 따르지 아니하고는 신체를 구속당하지 아니하며, 그 의사에 반하여 답변을 강요당하지 아니한다.",ref:"경찰관 직무집행법 [시행 2026.7.7.] 제3조"},
+{id:"ps20",tab:"형소법",cat:"경찰 직무",name:"임의동행 — 거부권·6시간·연락권",art:"경찰관 직무집행법 제3조 제2항·제5항·제6항",badges:[["x","6시간 초과 금지"],["a","거부권 고지"]],sum:"현장 질문이 불리하거나 교통 방해면 경찰관서 동행 요구 가능, 상대는 거절 가능. 6시간 초과 불가, 가족 연락·변호인 조력 고지",tip:"동행 요구 시 ①거절권 ②동행 장소 ③가족·친지 연락 기회 ④변호인 조력권 반드시 고지. 동행 시각·종료 시각 기록.",text:"② 경찰관은 제1항에 따라 같은 항 각 호의 사람을 정지시킨 장소에서 질문을 하는 것이 그 사람에게 불리하거나 교통에 방해가 된다고 인정될 때에는 질문을 하기 위하여 가까운 경찰서ㆍ지구대ㆍ파출소 또는 출장소(지방해양경찰관서를 포함하며, 이하 “경찰관서”라 한다)로 동행할 것을 요구할 수 있다. 이 경우 동행을 요구받은 사람은 그 요구를 거절할 수 있다.\n⑤ 경찰관은 제2항에 따라 동행한 사람의 가족이나 친지 등에게 동행한 경찰관의 신분, 동행 장소, 동행 목적과 이유를 알리거나 본인으로 하여금 즉시 연락할 수 있는 기회를 주어야 하며, 변호인의 도움을 받을 권리가 있음을 알려야 한다.\n⑥ 경찰관은 제2항에 따라 동행한 사람을 6시간을 초과하여 경찰관서에 머물게 할 수 없다.",ref:"경찰관 직무집행법 제3조②⑤⑥"},
+{id:"ps21",tab:"형소법",cat:"경찰 직무",name:"보호조치 — 주취자·자살시도·미아",art:"경찰관 직무집행법 제4조",badges:[["x","24시간 초과 금지"],["a","영치 10일"]],sum:"주취·정신착란으로 위해 우려, 자살시도, 미아·병자·부상자 등 응급구호가 필요하면 긴급구호 요청·경찰관서 보호 가능. 보호 24시간, 영치 10일 초과 불가",tip:"보호 시 가족·연고자에게 지체 없이 통지, 없으면 공공의료기관 인계·서장 보고. 주취자 보호는 ‘구금’이 아님을 고지.",text:"제4조(보호조치 등) ① 경찰관은 수상한 행동이나 그 밖의 주위 사정을 합리적으로 판단해 볼 때 다음 각 호의 어느 하나에 해당하는 것이 명백하고 응급구호가 필요하다고 믿을 만한 상당한 이유가 있는 사람(이하 “구호대상자”라 한다)을 발견하였을 때에는 보건의료기관이나 공공구호기관에 긴급구호를 요청하거나 경찰관서에 보호하는 등 적절한 조치를 할 수 있다.\n1. 정신착란을 일으키거나 술에 취하여 자신 또는 다른 사람의 생명ㆍ신체ㆍ재산에 위해를 끼칠 우려가 있는 사람\n2. 자살을 시도하는 사람\n3. 미아, 병자, 부상자 등으로서 적당한 보호자가 없으며 응급구호가 필요하다고 인정되는 사람. 다만, 본인이 구호를 거절하는 경우는 제외한다.\n⑦ 제1항에 따라 구호대상자를 경찰관서에서 보호하는 기간은 24시간을 초과할 수 없고, 제3항에 따라 물건을 경찰관서에 임시로 영치하는 기간은 10일을 초과할 수 없다.",ref:"경찰관 직무집행법 제4조"},
+{id:"ps22",tab:"형소법",cat:"경찰 직무",name:"위험 발생의 방지 — 경고·대피·퇴거",art:"경찰관 직무집행법 제5조",badges:[["a","즉시 조치"]],sum:"천재·사변·구조물 붕괴·교통사고·위험물 폭발 등 위험한 사태에서 경고, 이동제한·대피, 퇴거·접근금지, 위해방지 조치 가능",tip:"조치 후 지체 없이 소속 관서장 보고(제3항). 집회 현장은 집시법상 해산 절차와 구분.",text:"제5조(위험 발생의 방지 등) ① 경찰관은 사람의 생명 또는 신체에 위해를 끼치거나 재산에 중대한 손해를 끼칠 우려가 있는 천재(天災), 사변(事變), 인공구조물의 파손이나 붕괴, 교통사고, 위험물의 폭발, 위험한 동물 등의 출현, 극도의 혼잡, 그 밖의 위험한 사태가 있을 때에는 다음 각 호의 조치를 할 수 있다.\n1. 그 장소에 모인 사람, 사물(事物)의 관리자, 그 밖의 관계인에게 필요한 경고를 하는 것\n2. 긴급한 경우에는 위해를 입을 우려가 있는 사람을 필요한 한도에서 이동을 제한하거나 대피시키는 것\n3. 위험한 상황의 원인을 제공한 사람을 그 장소에서 퇴거시키거나 그 장소에의 접근을 금지시키는 것\n4. 그 장소에 있는 사람, 사물의 관리자, 그 밖의 관계인에게 위해를 방지하기 위하여 필요하다고 인정되는 조치를 하게 하거나 직접 그 조치를 하는 것",ref:"경찰관 직무집행법 제5조"},
+{id:"ps23",tab:"형소법",cat:"경찰 직무",name:"경찰장구 사용 (수갑·포승·경찰봉·방패)",art:"경찰관 직무집행법 제10조의2",badges:[["a","필요한 한도"]],sum:"현행범·장기 3년 이상 범죄자 체포·도주방지, 생명·신체 방어, 공무집행 항거 제지에 필요한 한도에서 경찰장구 사용",tip:"사용 이유·정도·상대 저항을 기록. 과도한 사용은 직권남용·폭행가혹행위(형법 제123조·제125조).",text:"제10조의2(경찰장구의 사용) ① 경찰관은 다음 각 호의 직무를 수행하기 위하여 필요하다고 인정되는 상당한 이유가 있을 때에는 그 사태를 합리적으로 판단하여 필요한 한도에서 경찰장구를 사용할 수 있다.\n1. 현행범이나 사형ㆍ무기 또는 장기 3년 이상의 징역이나 금고에 해당하는 죄를 범한 범인의 체포 또는 도주 방지\n2. 자신이나 다른 사람의 생명ㆍ신체의 방어 및 보호\n3. 공무집행에 대한 항거(抗拒) 제지\n② 제1항에서 “경찰장구”란 경찰관이 휴대하여 범인 검거와 범죄 진압 등의 직무 수행에 사용하는 수갑, 포승(捕繩), 경찰봉, 방패 등을 말한다.",ref:"경찰관 직무집행법 제10조의2"},
+{id:"ps24",tab:"형소법",cat:"경찰 직무",name:"무기 사용 — 4대 요건",art:"경찰관 직무집행법 제10조의4",badges:[["x","최후 수단"],["a","3회 이상 경고"]],sum:"체포·도주방지·생명신체 방어·항거 제지에 상당한 이유가 있을 때 필요한 한도에서 무기 사용. 원칙적으로 사람에게 위해 금지",tip:"예외 4사유(정당방위·긴급피난, 중대범죄 항거·도주, 영장집행 항거, 흉기 소지 3회 이상 경고 불응) 확인 후 사용. 사용 즉시 보고·기록.",text:"제10조의4(무기의 사용) ① 경찰관은 범인의 체포, 범인의 도주 방지, 자신이나 다른 사람의 생명ㆍ신체의 방어 및 보호, 공무집행에 대한 항거의 제지를 위하여 필요하다고 인정되는 상당한 이유가 있을 때에는 그 사태를 합리적으로 판단하여 필요한 한도에서 무기를 사용할 수 있다. 다만, 다음 각 호의 어느 하나에 해당할 때를 제외하고는 사람에게 위해를 끼쳐서는 아니 된다.\n1. 「형법」에 규정된 정당방위와 긴급피난에 해당할 때\n2. 다음 각 목의 어느 하나에 해당하는 때에 그 행위를 방지하거나 그 행위자를 체포하기 위하여 무기를 사용하지 아니하고는 다른 수단이 없다고 인정되는 상당한 이유가 있을 때\n가. 사형ㆍ무기 또는 장기 3년 이상의 징역이나 금고에 해당하는 죄를 범하거나 범하였다고 의심할 만한 충분한 이유가 있는 사람이 경찰관의 직무집행에 항거하거나 도주하려고 할 때\n나. 체포ㆍ구속영장과 압수ㆍ수색영장을 집행하는 과정에서 경찰관의 직무집행에 항거하거나 도주하려고 할 때\n다. 제3자가 가목 또는 나목에 해당하는 사람을 도주시키려고 경찰관에게 항거할 때\n라. 범인이나 소요를 일으킨 사람이 무기ㆍ흉기 등 위험한 물건을 지니고 경찰관으로부터 3회 이상 물건을 버리라는 명령이나 항복하라는 명령을 받고도 따르지 아니하면서 계속 항거할 때",ref:"경찰관 직무집행법 제10조의4"},
+{id:"ps25",tab:"형소법",cat:"경찰 직무",name:"경찰착용기록장치(웨어러블) — 사용·고지",art:"경찰관 직무집행법 제10조의5·제10조의6",badges:[["n","현행"],["a","촬영 고지"]],sum:"체포·구속, 범행 중·직전·직후 증거보전 필요, 위험한 사태 등에서 최소 범위로 촬영 가능. 촬영 사실을 불빛·소리·안내판으로 알려야 함",tip:"고지가 곤란하면 촬영 후 고지 못한 사유를 기록으로 대체(제10조의6②). 임의 편집·복사·삭제 금지.",text:"제10조의5(경찰착용기록장치의 사용) ① 경찰관은 다음 각 호의 어느 하나에 해당하는 직무 수행을 위하여 필요한 경우에는 필요한 최소한의 범위에서 경찰착용기록장치를 사용할 수 있다.\n1. 경찰관이 「형사소송법」 제200조의2, 제200조의3, 제201조 또는 제212조에 따라 피의자를 체포 또는 구속하는 경우\n2. 범죄 수사를 위하여 필요한 경우로서 다음 각 목의 요건을 모두 갖춘 경우\n가. 범행 중이거나 범행 직전 또는 직후일 것\n나. 증거보전의 필요성 및 긴급성이 있을 것\n3. 제5조제1항에 따른 인공구조물의 파손이나 붕괴 등의 위험한 사태가 발생한 경우\n4. 기록대상자로부터 그 기록의 요청 또는 동의를 받은 경우\n5. 제4조제1항 각 호에 해당하는 것이 명백하고 응급구호가 필요하다고 믿을 만한 상당한 이유가 있는 경우\n6. 제6조에 따라 사람의 생명ㆍ신체에 위해를 끼치거나 재산에 중대한 손해를 끼칠 우려가 있는 범죄행위를 긴급하게 예방 및 제지하는 경우\n\n제10조의6(경찰착용기록장치의 사용 고지 등) ① 경찰관이 경찰착용기록장치를 사용하여 기록하는 경우로서 이동형 영상정보처리기기로 사람 또는 그 사람과 관련된 사물의 영상을 촬영하는 때에는 불빛, 소리, 안내판 등 대통령령으로 정하는 바에 따라 촬영 사실을 표시하고 알려야 한다.",ref:"경찰관 직무집행법 제10조의5·제10조의6"},
+{id:"ps26",tab:"형소법",cat:"경찰 직무",name:"손실보상",art:"경찰관 직무집행법 제11조의2",badges:[["a","3년 / 5년 시효"]],sum:"적법한 직무집행으로 책임 없는 자가 생명·신체·재산 손실을 입거나, 책임 있는 자가 책임 정도를 초과하는 손실을 입으면 보상",tip:"보상 청구 안내서 교부. 신청은 손실을 안 날 3년, 발생일 5년.",text:"제11조의2(손실보상) ① 국가는 경찰관의 적법한 직무집행으로 인하여 다음 각 호의 어느 하나에 해당하는 손실을 입은 자에 대하여 정당한 보상을 하여야 한다.\n1. 손실발생의 원인에 대하여 책임이 없는 자가 생명ㆍ신체 또는 재산상의 손실을 입은 경우(손실발생의 원인에 대하여 책임이 없는 자가 경찰관의 직무집행에 자발적으로 협조하거나 물건을 제공하여 생명ㆍ신체 또는 재산상의 손실을 입은 경우를 포함한다)\n2. 손실발생의 원인에 대하여 책임이 있는 자가 자신의 책임에 상응하는 정도를 초과하는 생명ㆍ신체 또는 재산상의 손실을 입은 경우\n② 제1항에 따른 보상을 청구할 수 있는 권리는 손실이 있음을 안 날부터 3년, 손실이 발생한 날부터 5년간 행사하지 아니하면 시효의 완성으로 소멸한다.",ref:"경찰관 직무집행법 제11조의2"},
+{id:"ps27",tab:"형소법",cat:"수사 원칙",name:"고소·고발 — 방식과 취소",art:"형사소송법 제237조·제232조",badges:[["a","서면 또는 구술"]],sum:"고소·고발은 서면 또는 구술로 사법경찰관에게, 구술이면 서류 작성. 고소는 1심 판결선고 전까지 취소 가능하고 취소 후 재고소 불가",tip:"반의사불벌죄의 처벌불원 의사 철회도 준용(제232조③). 접수 시 고소인 인적사항·대리권 확인.",text:"제237조(고소, 고발의 방식) ① 고소 또는 고발은 서면 또는 구술로써 사법경찰관에게 하여야 한다. ② 사법경찰관이 구술에 의한 고소 또는 고발을 받은 때에는 서류를 작성하여야 한다.\n\n제232조(고소의 취소) ① 고소는 제1심 판결선고 전까지 취소할 수 있다. ② 고소를 취소한 자는 다시 고소할 수 없다. ③ 피해자의 명시한 의사에 반하여 공소를 제기할 수 없는 사건에서 처벌을 원하는 의사표시를 철회한 경우에도 제1항과 제2항을 준용한다.",ref:"형사소송법 제237조·제232조"},
+
+/* ================= 교통 · PM / 픽시 ================= */
+{id:"tr1",tab:"교통",cat:"PM 기본",name:"개인형 이동장치(PM)의 정의",art:"도로교통법 제2조 제19호의2·제21호의2",badges:[["n","현행"]],sum:"원동기장치자전거 중 ①시속 25km 이상이면 전동기 작동 정지 ②차체 중량 30kg 미만 ③안전확인 신고 제품. 자전거와 함께 ‘자전거등’",tip:"전동킥보드·전동이륜평행차·스로틀 전기자전거가 해당. 전동외륜(원휠)·전동스케이트보드는 PM 아님(자전거도로 통행 불가).",text:"제2조(정의) 19의2. “개인형 이동장치”란 제19호나목의 원동기장치자전거 중 시속 25킬로미터 이상으로 운행할 경우 전동기가 작동하지 아니하고 차체 중량이 30킬로그램 미만인 것으로서 행정안전부령으로 정하는 것을 말한다.\n21의2. “자전거등”이란 자전거와 개인형 이동장치를 말한다.\n\n※ 시행규칙 제2조의3: 전동킥보드, 전동이륜평행차, 전동기의 동력만으로 움직일 수 있는 자전거로서 안전확인 신고된 것.",ref:"도로교통법 [시행 2026.10.13.] 제2조"},
+{id:"tr2",tab:"교통",cat:"PM 기본",name:"PM 무면허 운전",art:"도로교통법 제43조 · 제156조 제13호",badges:[["f","범칙금 10만원"],["p","20만원 이하 벌금·구류·과료"]],sum:"원동기장치자전거 면허 이상 없이(또는 효력정지 중) PM을 운전하면 처벌",tip:"16세 미만은 원동기 면허 자체를 받을 수 없어 무면허. 1·2종 보통면허 소지자는 운전 가능, 연습면허는 불가.",text:"제43조(무면허운전 등의 금지) 누구든지 제80조에 따라 시ㆍ도경찰청장으로부터 운전면허를 받지 아니하거나 운전면허의 효력이 정지된 경우에는 자동차등을 운전하여서는 아니 된다.\n\n제156조(벌칙) 다음 각 호의 어느 하나에 해당하는 사람은 20만원 이하의 벌금이나 구류 또는 과료에 처한다.\n13. 제43조를 위반하여 제80조에 따른 원동기장치자전거를 운전할 수 있는 운전면허를 받지 아니하거나(효력이 정지된 경우를 포함한다) … 개인형 이동장치를 운전한 사람",ref:"도로교통법 제43조·제156조13호 / 시행령 별표 8 제1호의4 10만원"},
+{id:"tr3",tab:"교통",cat:"PM 음주",name:"PM 음주운전 — 범칙금",art:"도로교통법 제44조 제1항·제2항·제5항",badges:[["f","단순음주 10만원"],["f","측정불응·방해 13만원"]],sum:"술에 취한 상태(혈중알코올농도 0.03% 이상)에서 PM 운전 금지. 단순음주 10만원, 측정불응·음주측정방해 13만원 범칙금",tip:"PM은 ‘자전거등’이므로 제148조의2(자동차등 음주) 적용 제외. 형사처벌은 제156조 제11호(20만원 이하 벌금·구류·과료).",text:"제44조(술에 취한 상태에서의 운전 금지) ① 누구든지 술에 취한 상태에서 자동차등(…), 노면전차 또는 자전거를 운전하여서는 아니 된다. ② 경찰공무원은 … 운전자가 술에 취하였는지를 호흡조사로 측정할 수 있다. 이 경우 운전자는 경찰공무원의 측정에 응하여야 한다. ④ 제1항에 따라 운전이 금지되는 술에 취한 상태의 기준은 운전자의 혈중알코올농도가 0.03퍼센트 이상인 경우로 한다. ⑤ 술에 취한 상태에 있다고 인정할 만한 상당한 이유가 있는 사람은 자동차등, 노면전차 또는 자전거를 운전한 후 … 측정을 곤란하게 할 목적으로 추가로 술을 마시거나 … 행위(음주측정방해행위)를 하여서는 아니 된다.",ref:"도로교통법 제44조 / 시행령 별표 8 제64호의2~4"},
+{id:"tr4",tab:"교통",cat:"PM 음주",name:"PM 음주운전 — 형사처벌",art:"도로교통법 제156조 제11호·제12호",badges:[["p","20만원 이하 벌금·구류·과료"],["x","제148조의2 적용 제외"]],sum:"술에 취한 상태로 자전거등(PM 포함)을 운전하면 20만원 이하 벌금·구류·과료. 측정불응·음주측정방해도 같은 조",tip:"자동차 음주운전(제148조의2: 1년 이상 징역 등)과 형량이 크게 다르다. 다만 음주 상태 사고 시 교통사고처리특례법 12대 중과실로 형사처벌.",text:"제156조(벌칙) 다음 각 호의 어느 하나에 해당하는 사람은 20만원 이하의 벌금이나 구류 또는 과료(科料)에 처한다.\n11. 제44조제1항을 위반하여 술에 취한 상태에서 자전거등을 운전한 사람\n12. 술에 취한 상태에 있다고 인정할 만한 상당한 이유가 있는 사람으로서 제44조제2항에 따른 경찰공무원의 측정에 응하지 아니한 사람(자전거등을 운전한 사람으로 한정한다)\n12의2. … 제44조제5항을 위반하여 자전거등을 운전한 후 음주측정방해행위를 한 사람\n\n※ 제148조의2 제1항: “자동차등 또는 노면전차를 운전한 경우로 한정한다. 다만, 개인형 이동장치를 운전한 경우는 제외한다.”",ref:"도로교통법 제156조 / 제148조의2"},
+{id:"tr5",tab:"교통",cat:"PM 안전",name:"PM 안전모 미착용",art:"도로교통법 제50조 제4항",badges:[["f","범칙금 2만원"],["p","20만원 이하 벌금·구류·과료"]],sum:"자전거등 운전자는 자전거도로 및 도로 운전 시 인명보호장구(안전모)를 착용하고 동승자에게도 착용시켜야 함",tip:"운전자 미착용은 범칙금 2만원(별표 8 제38호의2), 동승자 미착용은 과태료 2만원(제160조②3호).",text:"제50조(특정 운전자의 준수사항) ④ 자전거등의 운전자는 자전거도로 및 「도로법」에 따른 도로를 운전할 때에는 행정안전부령으로 정하는 인명보호 장구를 착용하여야 하며, 동승자에게도 이를 착용하도록 하여야 한다.\n\n제160조(과태료) ② 다음 각 호의 어느 하나에 해당하는 사람에게는 20만원 이하의 과태료를 부과한다.\n3. 제50조제3항 및 제4항을 위반하여 동승자에게 인명보호 장구를 착용하도록 하지 아니한 운전자(자전거 운전자는 제외한다)",ref:"도로교통법 제50조④·제160조②3 / 시행령 별표 8 2만원, 별표 6 2만원"},
+{id:"tr6",tab:"교통",cat:"PM 안전",name:"PM 승차정원 초과(2인 탑승)",art:"도로교통법 제50조 제10항",badges:[["f","범칙금 4만원"],["p","20만원 이하 벌금·구류·과료"]],sum:"PM 운전자는 행정안전부령이 정한 승차정원을 초과해 동승자를 태우고 운전하면 안 됨",tip:"시행규칙 제33조의3: 전동킥보드·전동이륜평행차 1명, 스로틀 전기자전거 2명.",text:"⑩ 개인형 이동장치의 운전자는 행정안전부령으로 정하는 승차정원을 초과하여 동승자를 태우고 개인형 이동장치를 운전하여서는 아니 된다.\n\n※ 도로교통법 시행규칙 제33조의3(개인형 이동장치의 승차정원) 1. 전동킥보드 및 전동이륜평행차의 경우: 1명 2. 전동기의 동력만으로 움직일 수 있는 자전거의 경우: 2명",ref:"도로교통법 제50조⑩ / 시행규칙 제33조의3 / 시행령 별표 8 4만원"},
+{id:"tr7",tab:"교통",cat:"PM 통행",name:"PM 보도 통행 금지 · 자전거도로 통행",art:"도로교통법 제13조·제13조의2",badges:[["f","범칙금 3만원"],["p","20만원 이하 벌금·구류·과료"]],sum:"PM은 자전거도로가 있으면 자전거도로, 없으면 도로 우측 가장자리. 보도 통행은 원칙 금지(허용 표지·장애 시 예외, 서행)",tip:"보도 주행은 신호위반·중앙선침범 등과 함께 범칙금 3만원. 보행자 사고 시 12대 중과실로 형사처벌.",text:"제13조(차마의 통행) ① 차마의 운전자는 보도와 차도가 구분된 도로에서는 차도로 통행하여야 한다. 다만, 도로 외의 곳으로 출입할 때에는 보도를 횡단하여 통행할 수 있다.\n\n제13조의2(자전거등의 통행방법의 특례) ① 자전거등의 운전자는 자전거도로가 따로 있는 곳에서는 그 자전거도로로 통행하여야 한다. ② 자전거등의 운전자는 자전거도로가 설치되지 아니한 곳에서는 도로 우측 가장자리에 붙어서 통행하여야 한다. ④ 자전거등의 운전자는 제1항 및 제13조제1항에도 불구하고 다음 각 호의 어느 하나에 해당하는 경우에는 보도를 통행할 수 있다. 이 경우 … 보도 중앙으로부터 차도 쪽 또는 안전표지로 지정된 곳으로 서행하여야 하며, 보행자의 통행에 방해가 될 때에는 일시정지하여야 한다.\n1. 어린이, 노인, 그 밖에 행정안전부령으로 정하는 신체장애인이 자전거를 운전하는 경우\n2. 안전표지로 자전거등의 통행이 허용된 경우\n3. 도로의 파손, 도로공사나 그 밖의 장애 등으로 도로를 통행할 수 없는 경우\n⑥ 자전거등의 운전자가 횡단보도를 이용하여 도로를 횡단할 때에는 자전거등에서 내려서 자전거등을 끌거나 들고 보행하여야 한다.",ref:"도로교통법 제13조·제13조의2 / 시행령 별표 8 3만원"},
+{id:"tr8",tab:"교통",cat:"PM 안전",name:"어린이(13세 미만) PM 운전 — 보호자 과태료",art:"도로교통법 제11조 제4항 · 제160조 제2항 제9호",badges:[["t","과태료 10만원"],["n","현행"]],sum:"어린이의 보호자는 도로에서 어린이가 개인형 이동장치를 운전하게 하면 안 되고, 위반 시 보호자에게 과태료",tip:"어린이 = 13세 미만. 공유킥보드 대여 계정·현장 확인. 반복 시 아동복지법상 방임 검토.",text:"제11조(어린이 등에 대한 보호) ④ 어린이의 보호자는 도로에서 어린이가 개인형 이동장치를 운전하게 하여서는 아니 된다.\n\n제160조(과태료) ② 다음 각 호의 어느 하나에 해당하는 사람에게는 20만원 이하의 과태료를 부과한다.\n9. 제11조제4항을 위반하여 어린이가 개인형 이동장치를 운전하게 한 어린이의 보호자",ref:"도로교통법 제11조④·제160조②9 / 시행령 별표 6 10만원"},
+{id:"tr9",tab:"교통",cat:"PM 안전",name:"PM 야간 등화장치·과로·약물",art:"도로교통법 제50조 제8항·제9항",badges:[["f","등화 1만원"],["f","과로·약물 10만원"]],sum:"밤에 도로 통행 시 전조등·미등을 켜거나 야광띠 등 발광장치 착용. 약물·과로 등 정상 운전 곤란 상태 운전 금지",tip:"PM은 제45조(과로·약물) 적용에서 제외되지만 제50조⑧ 위반으로 제156조 제1호(20만원 이하) 적용. 등화 미작동은 범칙금 1만원.",text:"⑧ 자전거등의 운전자는 약물의 영향과 그 밖의 사유로 정상적으로 운전하지 못할 우려가 있는 상태에서 자전거등을 운전하여서는 아니 된다.\n⑨ 자전거등의 운전자는 밤에 도로를 통행하는 때에는 전조등과 미등을 켜거나 야광띠 등 발광장치를 착용하여야 한다.",ref:"도로교통법 제50조⑧⑨ / 시행령 별표 8"},
+{id:"tr10",tab:"교통",cat:"픽시·자전거",name:"제동장치 없는 픽시 — 현행 단속 근거",art:"도로교통법 제48조 제1항·제50조 제7항",badges:[["n","현행"]],sum:"모든 차의 운전자는 제동장치 등 장치를 정확하게 조작해야 하고, 구조 기준을 갖추지 못해 교통안전에 위험을 초래할 수 있는 자전거등을 운전하면 안 됨",tip:"경찰청(2025.8.17.)은 제동장치 제거 픽시 주행을 제48조① 안전운전의무 위반으로 보고 계도·단속. 적발 시 즉결심판 청구, 18세 미만은 보호자 통보·경고.",text:"제48조(안전운전 및 친환경 경제운전의 의무) ① 모든 차 또는 노면전차의 운전자는 차 또는 노면전차의 조향장치와 제동장치, 그 밖의 장치를 정확하게 조작하여야 하며, 도로의 교통상황과 차 또는 노면전차의 구조 및 성능에 따라 다른 사람에게 위험과 장해를 주는 속도나 방법으로 운전하여서는 아니 된다.\n\n제50조 ⑦ 자전거등의 운전자는 행정안전부령으로 정하는 크기와 구조를 갖추지 아니하여 교통안전에 위험을 초래할 수 있는 자전거등을 운전하여서는 아니 된다.\n\n제156조(벌칙) 1. … 제48조제1항, … 제50조제5항부터 제10항 … 을 위반한 차마 또는 노면전차의 운전자 → 20만원 이하 벌금·구류·과료",ref:"도로교통법 제48조①·제50조⑦·제156조1호 / 경찰청 2025.8.17. 보도자료"},
+{id:"tr11",tab:"교통",cat:"픽시·자전거",name:"자전거법 개정 — 제동장치 의무화",art:"자전거 이용 활성화에 관한 법률 제2조·제20조의2",badges:[["s","2027.1.8. 시행"]],sum:"자전거 정의에서 제동장치 요건을 빼 픽시도 자전거에 포함하고, 앞·뒷바퀴에 각 1개 이상 독립 작동 제동장치 장착 의무를 신설",tip:"공포 2026.7.7.(법률 제21833호), 시행 2027.1.8. 시행 전인 현재는 도로교통법 제48조①로 단속. 개조 금지·자전거도로 운행 금지도 같은 날 시행.",text:"제2조(정의) 1. “자전거”란 사람의 힘으로 페달이나 손페달을 사용하여 움직이는 구동장치와 조향장치가 있는 바퀴가 둘 이상인 차를 말한다. <개정 2026.7.7., 시행 2027.1.8.>\n\n제20조의2(자전거의 안전요건 등) ① 자전거(경륜장 등 행정안전부령으로 정하는 장소에서 이용하는 자전거는 제외한다. 이하 제2항에서 같다)는 구조, 장치와 성능 등이 행정안전부령으로 정하는 안전요건에 적합하여야 한다. 이 경우 자전거는 앞바퀴와 뒷바퀴에 각각 1개 이상의 제동장치를 장착하여야 하며, 각 제동장치는 서로 독립적으로 작동하여야 한다. ② 누구든지 자전거를 안전요건에 적합하지 아니하도록 개조하여서는 아니 된다. ③ 누구든지 안전요건에 적합하지 아니한 자전거를 자전거도로에서 운행하여서는 아니 된다. ④ 도로관리청은 자전거도로에서 … 일정 구간을 지정하여 … 크기를 초과하는 자전거의 통행을 제한할 수 있다. <시행 2027.1.8.>"},
+{id:"tr12",tab:"교통",cat:"픽시·자전거",name:"자전거법 개정 — 벌칙(개조·운행)",art:"자전거법 제24조·제25조",badges:[["s","2027.1.8. 시행"],["p","개조 6개월 이하 징역·500만원 이하 벌금"],["t","운행 과태료 50만원 이하"]],sum:"안전요건에 맞지 않게 자전거를 개조하면 6개월 이하 징역 또는 500만원 이하 벌금, 개조·미달 자전거를 자전거도로에서 운행하면 50만원 이하 과태료",tip:"과태료 부과·징수는 시·도지사, 시장·군수·구청장(제25조②). 2027.1.8. 이후 적용.",text:"제24조(벌칙) 제20조의2제2항을 위반하여 자전거의 안전요건에 적합하지 아니하도록 자전거를 개조한 자는 6개월 이하의 징역 또는 500만원 이하의 벌금에 처한다. <개정 2026.7.7., 시행 2027.1.8.>\n\n제25조(과태료) ① 제20조의2제3항을 위반하여 자전거의 안전요건에 적합하지 아니한 자전거를 자전거도로에서 운행한 자에게는 50만원 이하의 과태료를 부과한다. ② 제1항에 따른 과태료는 대통령령으로 정하는 바에 따라 시ㆍ도지사, 시장ㆍ군수ㆍ구청장이 부과ㆍ징수한다. <시행 2027.1.8.>"},
+{id:"tr13",tab:"교통",cat:"픽시·자전거",name:"자전거 음주운전",art:"도로교통법 제44조 제1항 · 제156조 제11호",badges:[["p","20만원 이하 벌금·구류·과료"],["f","범칙금 10만원"]],sum:"자전거도 술에 취한 상태(0.03% 이상)에서 운전 금지. 단순음주 범칙금 10만원, 형사처벌은 20만원 이하 벌금·구류·과료",tip:"자전거는 제148조의2 적용 제외. 음주 자전거 사고도 12대 중과실로 형사처벌 대상.",text:"제44조 ① 누구든지 술에 취한 상태에서 자동차등(…), 노면전차 또는 자전거를 운전하여서는 아니 된다.\n제156조 11. 제44조제1항을 위반하여 술에 취한 상태에서 자전거등을 운전한 사람 → 20만원 이하의 벌금이나 구류 또는 과료",ref:"도로교통법 제44조①·제156조11호 / 시행령 별표 8 10만원"},
+{id:"tr14",tab:"교통",cat:"픽시·자전거",name:"자전거도로 통행·횡단보도",art:"도로교통법 제13조의2",badges:[["f","통행위반 3만원"],["p","20만원 이하 벌금·구류·과료"]],sum:"자전거도로가 있으면 자전거도로, 없으면 우측 가장자리. 횡단보도에서는 내려서 끌거나 들고 보행",tip:"2대 이상 나란히 차도 통행 금지(제5항). 자전거횡단도가 있으면 자전거횡단도 이용(제15조의2②).",text:"① 자전거등의 운전자는 자전거도로(제15조제1항에 따라 자전거만 통행할 수 있도록 설치된 전용차로를 포함한다)가 따로 있는 곳에서는 그 자전거도로로 통행하여야 한다. ② 자전거등의 운전자는 자전거도로가 설치되지 아니한 곳에서는 도로 우측 가장자리에 붙어서 통행하여야 한다. ⑤ 자전거등의 운전자는 안전표지로 통행이 허용된 경우를 제외하고는 2대 이상이 나란히 차도를 통행하여서는 아니 된다. ⑥ 자전거등의 운전자가 횡단보도를 이용하여 도로를 횡단할 때에는 자전거등에서 내려서 자전거등을 끌거나 들고 보행하여야 한다.",ref:"도로교통법 제13조의2"},
+
+/* ================= 최신 · 개정법 ================= */
+{id:"nw1",tab:"최신",cat:"마약 수사",name:"마약류범죄 신분비공개수사",art:"마약류 관리에 관한 법률 제4조의2 제1항·제4조의3 제1항",badges:[["s","2027.5.27. 시행"]],sum:"사법경찰관이 신분을 밝히지 않거나 부인하며 범죄현장·범인 추정자에게 접근해 증거·자료를 수집. 사전에 수사부서의 장 승인, 기간 3개월",tip:"현재는 시행 전 — 2026.11.24. 기준 적용 불가. 공포 2026.5.26.(법률 제21691호), 시행 2027.5.27.",text:"제4조의2(마약류범죄의 수사 특례) ① 사법경찰관리는 제3조ㆍ제4조 및 제5조의2제5항에 따른 금지행위를 위반하는 범죄(이하 “마약류범죄”라 한다)에 대하여 사법경찰관리임을 밝히지 아니하거나 부인(제2항제1호에 이르지 아니하는 행위로서 사법경찰관리 외의 신분을 고지하는 방식을 포함한다)하는 방법으로 범죄현장(정보통신망을 포함한다) 또는 범인으로 추정되는 자들에게 접근하여 범죄행위의 증거 및 자료 등을 수집(이하 “신분비공개수사”라 한다)할 수 있다.\n\n제4조의3(마약류범죄 수사 특례의 절차) ① 사법경찰관리가 신분비공개수사를 진행하고자 할 때에는 사전에 수사부서의 장의 승인을 받아야 한다. 이 경우 그 수사기간은 3개월을 초과할 수 없다. ② 제1항에 따른 승인의 절차 및 방법 등에 필요한 사항은 대통령령으로 정한다.\n\n제4조의4(긴급 신분비공개수사) ① … 절차를 거칠 수 없는 긴급한 경우에는 수사부서의 장의 승인 없이 신분비공개수사를 할 수 있다. ② … 48시간 이내에 수사부서의 장의 승인을 받지 못한 때에는 즉시 중지하여야 한다.",ref:"마약류 관리에 관한 법률 [법률 제21691호, 2026.5.26. 공포, 2027.5.27. 시행]"},
+{id:"nw2",tab:"최신",cat:"마약 수사",name:"마약류범죄 신분위장수사",art:"마약류 관리에 관한 법률 제4조의2 제2항·제4조의3 제3항~제9항",badges:[["s","2027.5.27. 시행"]],sum:"위장 신분으로 문서 작성·행사, 계약·거래, 마약류 소지·매매·광고·수수·운반·수입. 검사 허가 신청 → 법원 허가, 3개월(총 3년 한도)",tip:"요건 3중: ①의심할 만한 충분한 이유 ②다른 방법으로는 저지·체포·증거수집 곤란 ③수사 목적상 부득이. 긴급 시 법원 허가 없이 개시하되 48시간 내 허가 없으면 즉시 중지(제4조의5).",text:"② 사법경찰관리는 마약류범죄를 계획 또는 실행하고 있거나 실행하였다고 의심할 만한 충분한 이유가 있고, 다른 방법으로는 그 범죄의 실행을 저지하거나 범인의 체포 또는 증거의 수집이 어려운 경우에 한정하여 수사 목적을 달성하기 위하여 부득이한 때에는 다음 각 호의 행위(이하 “신분위장수사”라 한다)를 할 수 있다.\n1. 신분을 위장하기 위한 문서, 도화 및 전자기록 등의 작성, 변경 또는 행사\n2. 위장 신분을 사용한 계약ㆍ거래\n3. 위장 신분을 사용한 마약류ㆍ임시마약류ㆍ예고임시마약류의 소지, 매매, 광고, 수수, 운반 또는 수입\n\n제4조의3 ③ 사법경찰관리가 신분위장수사를 하려는 경우에는 검사에게 신분위장수사에 대한 허가를 신청하고 검사는 법원에 그 허가를 청구한다. ⑦ 신분위장수사의 기간은 3개월을 초과할 수 없으며, 그 수사기간 중 수사의 목적이 달성되었을 경우에는 즉시 종료하여야 한다. ⑧ … 3개월의 범위에서 수사기간의 연장을 검사에게 신청하고, 검사는 법원에 그 연장을 청구한다. 이 경우 신분위장수사의 총 기간은 3년을 초과할 수 없다.\n\n제4조의5(긴급 신분위장수사) ② … 신분위장수사를 개시한 때부터 48시간 이내에 법원의 허가를 받지 못한 때에는 즉시 신분위장수사를 중지하여야 한다.",ref:"마약류 관리에 관한 법률 제4조의2·제4조의3·제4조의5 [2027.5.27. 시행]"},
+{id:"nw3",tab:"최신",cat:"마약 수사",name:"위장수사 증거사용 제한·비밀준수·면책",art:"마약류 관리에 관한 법률 제4조의6~제4조의9",badges:[["s","2027.5.27. 시행"]],sum:"수집 증거는 목적 범죄 수사·소추, 징계, 손해배상 소송 등 정해진 용도로만 사용. 관여 공무원 비밀준수, 고의·중과실 없으면 면책",tip:"증거사용 제한 위반은 증거능력·징계 문제로 직결. 비밀누설은 제61조 제1항 제6호의2(5년 이하 징역·5천만원 이하 벌금).",text:"제4조의6(증거 및 자료 등의 사용제한) 사법경찰관리가 제4조의2부터 제4조의5까지에 따라 수집한 증거 및 자료 등은 다음 각 호의 어느 하나에 해당하는 경우 외에는 사용할 수 없다.\n1. 신분비공개수사 또는 신분위장수사의 목적이 된 마약류범죄나 이와 관련되는 범죄를 수사ㆍ소추하거나 그 범죄를 예방하기 위하여 사용하는 경우\n2. … 징계절차에 사용하는 경우\n3. 증거 및 자료 수집의 대상자가 제기하는 손해배상청구소송에서 사용하는 경우\n4. 그 밖에 다른 법률에 의하여 사용하는 경우\n\n제4조의8(비밀준수의 의무) ① … 승인ㆍ집행ㆍ보고 및 각종 서류작성 등에 관여한 공무원 또는 그 직에 있었던 사람은 직무상 알게 된 … 사항을 외부에 공개하거나 누설하여서는 아니 된다.\n\n제4조의9(면책) ① 사법경찰관리가 신분비공개수사 또는 신분위장수사 중 부득이한 사유로 위법행위를 한 경우 그의 행위에 고의나 중대한 과실이 없는 경우에는 벌하지 아니한다.",ref:"마약류 관리에 관한 법률 제4조의6~제4조의9 [2027.5.27. 시행]"},
+{id:"nw4",tab:"최신",cat:"형법 개정",name:"사기죄 법정형 상향",art:"형법 제347조·제347조의2·제348조",badges:[["n","현행"],["p","20년 이하 징역·5천만원 이하 벌금"]],sum:"2025.12.23. 개정으로 사기·컴퓨터등 사용사기·준사기의 법정형이 10년/2천만원에서 20년/5천만원으로 상향",tip:"개정 전 행위에 대해서는 행위시법 적용(형법 제1조). 사건 접수일 아니라 범행일에 맞춰 법정형 기재.",text:"제347조(사기) ① 사람을 기망하여 재물의 교부를 받거나 재산상의 이익을 취득한 자는 20년 이하의 징역 또는 5천만원 이하의 벌금에 처한다. <개정 2025. 12. 23.>\n제347조의2(컴퓨터등 사용사기) … 20년 이하의 징역 또는 5천만원 이하의 벌금에 처한다. <개정 2025. 12. 23.>\n제348조(준사기) ① … 20년 이하의 징역 또는 5천만원 이하의 벌금에 처한다. <개정 2025. 12. 23.>",ref:"형법 제347조 (2025.12.23. 개정)"},
+{id:"nw5",tab:"최신",cat:"형소법 개정",name:"검사·사법경찰관 관계 재정립",art:"형사소송법 제195조·제197조 (2026.8.4. 개정)",badges:[["n","현행"]],sum:"검사는 공소제기·공소유지, 사법경찰관은 수사를 책임. 검사는 영장청구·보완수사요구 등 인권옹호 직무 수행",tip:"2026.8.4. 개정(시행 2026.10.2.)으로 수사·공소 분리 구조 반영. 영장 청구·보완수사 요구 절차 확인.",text:"제195조(검사와 사법경찰관의 관계 등) ① 검사와 사법경찰관은 수사, 공소제기 및 공소유지에 관하여 서로 협력하여야 한다. 이 경우 검사는 공소제기 및 공소유지를 책임지고, 사법경찰관은 수사를 책임진다. ② 검사는 국민의 인권을 옹호하기 위하여 사법경찰관의 수사에 관한 영장의 청구, 보완수사요구, 재수사요구 등 이 법률에서 정하는 직무를 수행한다.\n\n제197조(사법경찰관리) ① 경위 계급 이상의 경찰공무원은 사법경찰관으로서 범죄의 혐의가 있다고 사료하는 때에는 범인, 범죄사실과 증거를 수사한다.",ref:"형사소송법 [시행 2026.10.2.] 제195조·제197조"},
+{id:"nw6",tab:"최신",cat:"경범죄 개정",name:"지문채취 불응 — 수사기관 명칭 개정",art:"경범죄 처벌법 제3조 제1항 제34호",badges:[["n","2026.10.2. 시행"]],sum:"지문채취 불응 조항에 ‘중대범죄수사청수사관’이 추가됨(2026.9.29. 개정, 2026.10.2. 시행). 범칙금 5만원은 그대로",tip:"개정은 수사기관 명칭 정비에 한정. 현장 통고처분서의 기관명 기재에 유의.",text:"34. (지문채취 불응) 범죄 피의자로 입건된 사람의 신원을 지문조사 외의 다른 방법으로는 확인할 수 없어 중대범죄수사청수사관이나 경찰공무원이 지문을 채취하려고 할 때에 정당한 이유 없이 이를 거부한 사람\n\n※ 위 개정은 「공소청법」 및 「중대범죄수사청 조직 및 운영에 관한 법률」 제정에 따른 126개 법령 정비의 일부(대통령령 제36728호, 2026.9.29., 시행 2026.10.2.).",ref:"경범죄 처벌법 제3조①34 / 경범죄 처벌법 시행령 별표 (2026.9.29. 개정)"},
+{id:"nw7",tab:"최신",cat:"자전거법 개정",name:"픽시자전거 — 자전거법 개정 경과",art:"자전거 이용 활성화에 관한 법률 (법률 제21833호)",badges:[["s","2027.1.8. 시행"]],sum:"2026.6.18. 국회 본회의 의결 → 2026.7.7. 공포 → 2027.1.8. 시행. 제동장치 없는 자전거도 자전거에 포함",tip:"시행 전 공백은 도로교통법 제48조①로 대응. 행안부는 경찰청과 계도·단속 강화 예고.",text:"개정 이유: 제동장치가 없는 자전거도 「자전거 이용 활성화에 관한 법률」상 자전거에 해당하도록 하고, 일반 자전거에 대해서도 안전요건에 적합하지 않게 불법 개조하거나 불법 개조한 자전거를 자전거도로에서 운행하는 경우를 금지하며, 위반 시 처벌할 수 있는 근거를 마련.\n\n주요 내용\n가. 자전거 정의에서 제동장치·행안부령상 크기·구조 요건 삭제(제2조제1호)\n나. 앞바퀴·뒷바퀴 각 1개 이상, 서로 독립적으로 작동하는 제동장치 장착 의무(제20조의2①)\n다. 안전요건 미달 개조 금지(동조②), 미달 자전거 자전거도로 운행 금지(동조③)\n라. 개조 시 6개월 이하 징역·500만원 이하 벌금(제24조), 운행 시 50만원 이하 과태료(제25조)\n마. 자전거도로 일정 구간 통행 제한 근거 신설(제20조의2④)\n\n부칙: 이 법은 공포 후 6개월이 경과한 날(2027.1.8.)부터 시행한다.",ref:"자전거 이용 활성화에 관한 법률 [법률 제21833호, 2026.7.7. 공포, 2027.1.8. 시행]"},
+/* ================= 현장 대응 매뉴얼 ================= */
+{id:"fd1",tab:"현장",cat:"교통 단속",name:"운전자 신분증·면허증 제시 거부",art:"도로교통법 제92조·제155조 / 경직법 제3조",badges:[["p","20만원 이하 벌금 또는 구류"],["a","제시 요구권"]],sum:"운전 중 경찰관의 면허증 제시 요구·신원 질문에 응할 의무가 있고, 불응하면 20만원 이하 벌금 또는 구류",tip:"제시 거부만으로 공무집행방해가 되지는 않는다. 폭행·협박·차량 진행으로 요구를 회피할 때 검토.",text:"제92조(운전면허증 휴대 및 제시 등의 의무) ① 자동차등을 운전할 때에는 다음 각 호의 어느 하나에 해당하는 운전면허증 등을 지니고 있어야 한다. 1. 운전면허증, 제96조제1항에 따른 국제운전면허증 또는 상호인정외국면허증이나 「건설기계관리법」에 따른 건설기계조종사면허증(이하 “운전면허증등”이라 한다) 2. 운전면허증등을 갈음하는 다음 각 목의 증명서 가. 제91조에 따른 임시운전증명서 나. 제138조에 따른 범칙금 납부통고서 또는 출석지시서 다. 제143조제1항에 따른 출석고지서\n② 운전자는 운전 중에 교통안전이나 교통질서 유지를 위하여 경찰공무원이 제1항에 따른 운전면허증등 또는 이를 갈음하는 증명서를 제시할 것을 요구하거나 운전자의 신원 및 운전면허 확인을 위한 질문을 할 때에는 이에 응하여야 한다.\n③ 누구든지 다른 사람 명의의 모바일운전면허증을 부정하게 사용하여서는 아니 된다.\n\n제155조(벌칙) 제92조제2항을 위반하여 경찰공무원의 운전면허증등의 제시 요구나 운전자 확인을 위한 진술 요구에 따르지 아니한 사람은 20만원 이하의 벌금 또는 구류에 처한다.",steps:["안전한 장소로 유도해 정차시키고, 신분 표시 증표를 제시하며 소속·성명·단속 목적을 밝힌다(경직법 제3조④).","운전면허증등 제시를 요구하고, 신원·면허 확인을 위한 질문을 한다. 모바일운전면허증도 인정된다(제92조③은 타인 명의 사용만 금지).","거부 시 불응의 내용(면허증 미제시인지, 신원 질문 거부인지)을 구체적으로 특정해 2회 이상 고지하고, 그래도 불응하면 그 자체로 제92조② 위반임을 알린다.","차량 번호로 차적·면허 조회를 해 운전자 특정을 시도한다. 소유자 불일치·대포차·무면허 정황이면 추가 확인.","불응 사실이 확인되면 즉결심판 청구 대상으로 처리하고(20만원 이하 벌금·구류), 무면허·음주 등 다른 위반이 겹치면 그 부분을 별도 입건한다.","차량을 급출발시키거나 매달려 진행하는 등 폭행·협박·위험 운전이 동반되면 공무집행방해(형법 제136조)·특수공무방해 검토, 현행범 체포 가능."],say:"차량 번호 ○○○○, 운전자 확인을 위해 정차를 요청했습니다. 교통안전과 질서 유지를 위해 운전면허증 제시를 요구합니다. 제시에 응하지 않으면 도로교통법 제92조 제2항 위반으로 20만원 이하의 벌금 또는 구류에 처해질 수 있습니다. 신원과 면허 확인을 위한 질문에 답해 주시기 바랍니다.",caution:"제시 거부 자체는 20만원 이하 벌금·구류(즉결심판)이고 범칙금 통고 대상은 아니다. 공무집행방해는 별도로 ‘직무집행의 적법성 + 폭행·협박’이 있어야 성립하므로, 단순 거부에 방해죄를 얹지 않도록 주의. 차적 조회는 신원 특정 목적 범위에서 하고, 조회 결과를 조서에 남긴다.",ref:"도로교통법 [시행 2026.10.13.] 제92조·제155조 / 경찰관 직무집행법 제3조"},
+{id:"fd2",tab:"현장",cat:"교통 단속",name:"음주측정 거부·채혈 요구",art:"도로교통법 제44조·제148조의2",badges:[["p","1년 이상 5년 이하 징역 또는 500만원 이상 2천만원 이하 벌금"],["x","현행범 체포 가능"]],sum:"술에 취했다고 인정할 만한 상당한 이유가 있는데 측정에 응하지 않으면 음주측정불응죄. 혈중 0.03% 이상이면 음주운전",tip:"혈액 채취는 운전자 동의를 받아 측정 결과에 불복할 때 다시 측정하는 절차(제44조③). 거부 자체를 곧바로 ‘채혈 강제’로 대체할 수는 없다.",text:"제44조(술에 취한 상태에서의 운전 금지) ② 경찰공무원은 교통의 안전과 위험방지를 위하여 필요하다고 인정하거나 제1항을 위반하여 술에 취한 상태에서 자동차등, 노면전차 또는 자전거를 운전하였다고 인정할 만한 상당한 이유가 있는 경우에는 운전자가 술에 취하였는지를 호흡조사로 측정할 수 있다. 이 경우 운전자는 경찰공무원의 측정에 응하여야 한다.\n③ 제2항에 따른 측정 결과에 불복하는 운전자에 대하여는 그 운전자의 동의를 받아 혈액 채취 등의 방법으로 다시 측정할 수 있다.\n④ 제1항에 따라 운전이 금지되는 술에 취한 상태의 기준은 운전자의 혈중알코올농도가 0.03퍼센트 이상인 경우로 한다.\n⑤ … 측정을 곤란하게 할 목적으로 추가로 술을 마시거나 혈중알코올농도에 영향을 줄 수 있는 의약품 등 행정안전부령으로 정하는 물품을 사용하는 행위(음주측정방해행위)를 하여서는 아니 된다.\n\n제148조의2(벌칙) ② 다음 각 호의 어느 하나에 해당하는 사람은 1년 이상 5년 이하의 징역이나 500만원 이상 2천만원 이하의 벌금에 처한다.\n1. 술에 취한 상태에 있다고 인정할 만한 상당한 이유가 있는 사람으로서 제44조제2항에 따른 경찰공무원의 측정에 응하지 아니하는 사람(자동차등 또는 노면전차를 운전한 경우로 한정한다)\n2. … 제44조제5항을 위반하여 자동차등 또는 노면전차를 운전한 후 음주측정방해행위를 한 사람\n③ 제44조제1항을 위반하여 술에 취한 상태에서 자동차등 또는 노면전차를 운전한 사람은 다음 각 호의 구분에 따라 처벌한다.\n1. 혈중알코올농도 0.2퍼센트 이상: 2년 이상 5년 이하 징역 또는 1천만원 이상 2천만원 이하 벌금\n2. 0.08퍼센트 이상 0.2퍼센트 미만: 1년 이상 2년 이하 징역 또는 500만원 이상 1천만원 이하 벌금\n3. 0.03퍼센트 이상 0.08퍼센트 미만: 1년 이하 징역 또는 500만원 이하 벌금\n\n※ 개인형 이동장치는 제148조의2 적용 제외 → 제156조 제11호(20만원 이하 벌금·구류·과료).",steps:["정차 후 시동·열쇠 관리, 운전자 하차 유도. 음주 감지 사유(냄새·발음·안색·흔들림·사고 정황)를 구체적으로 관찰·기록한다.","호흡측정 요구 전에 측정 목적·이유와 응할 의무를 고지하고, 측정 요구 시각을 기록한다.","1차 측정 불응 시 불응 의사를 명확히 재확인하고, 음주측정불응죄(제148조의2②1호, 1년 이상 5년 이하 징역 또는 500만원 이상 2천만원 이하 벌금) 성립을 고지한 뒤 다시 측정을 요구한다. 요구·고지·불응을 회차별로 조서에 남긴다.","측정에 응한 경우 결과를 수치로 기록하고, 운전자가 결과에 불복하면 동의를 받아 혈액 채취 등으로 재측정한다(제44조③). 채혈은 의료기관·의료인을 통해 하고 채혈 시각·용기·봉인을 기록.","불응이 확정되면 현행범인 체포(형소법 제212조)하고, 미란다 고지 후 48시간 내 구속영장 청구 여부를 검토한다. 석방 시에도 불응죄 입건은 유지.","측정 후 추가 음주·구강 세정·구토 유도 등 음주측정방해행위(제44조⑤)가 확인되면 별도로 1년 이상 5년 이하 징역 또는 500만원 이상 2천만원 이하 벌금."],"say":"음주운전이 의심되어 호흡측정을 요구합니다. 도로교통법 제44조에 따라 운전자는 측정에 응할 의무가 있습니다. 측정에 응하지 않으면 제148조의2에 따라 1년 이상 5년 이하의 징역 또는 500만원 이상 2천만원 이하의 벌금에 처해집니다. 측정에 응해 주시기 바랍니다.",caution:"‘3회 고지·시간 간격’ 같은 세부 횟수·간격은 법률이 아니라 소속 청·서의 음주단속 지침에 따른다. 법정 요건은 ①술에 취했다고 인정할 만한 상당한 이유 ②측정 요구 ③불응이다. 채혈은 동의가 전제이고, 거부만으로 강제 채혈할 수 없다. PM·자전거는 제148조의2가 적용되지 않으므로(제156조 제11호) 법정형을 혼동하지 않도록 주의.",ref:"도로교통법 [시행 2026.10.13.] 제44조·제148조의2 / 형사소송법 제212조"},
+{id:"fd3",tab:"현장",cat:"재산·생활",name:"무전취식·무임승차 출동",art:"경범죄 처벌법 제3조 제1항 제39호 / 형법 제347조",badges:[["f","경범죄 범칙금 5만원"],["p","사기 20년 이하 징역·5천만원 이하 벌금"]],sum:"정당한 이유 없이 값을 치르지 않으면 경범죄(5만원). 처음부터 지불할 의사·능력이 없었다면 사기죄",tip:"구분 기준은 ‘처음부터 편취 의사’와 ‘지급 능력’. 단순 분실·착오·분쟁은 경범죄 또는 민사.",text:"경범죄 처벌법 제3조(경범죄의 종류) ① 다음 각 호의 어느 하나에 해당하는 사람은 10만원 이하의 벌금, 구류 또는 과료의 형으로 처벌한다.\n39. (무임승차 및 무전취식) 영업용 차 또는 배 등을 타거나 다른 사람이 파는 음식을 먹고 정당한 이유 없이 제 값을 치르지 아니한 사람\n※ 시행령 별표: 범칙금 5만원\n\n형법 제347조(사기) ① 사람을 기망하여 재물의 교부를 받거나 재산상의 이익을 취득한 자는 20년 이하의 징역 또는 5천만원 이하의 벌금에 처한다. <개정 2025.12.23.>",steps:["현장에서 업주·운전자에게 주문 내역·금액·미납 사실을 확인하고 영수증·메뉴판·CCTV 보존을 요청한다.","당사자에게 지불 능력·의사, 주문 경위(처음부터 지불 불가·타인 계산 기대 등), 동종 전과·상습성을 확인한다.","단순 미납·분쟁이면 경범죄 제3조①39로 처리해 범칙금 5만원 통고처분(피해자 특정·상습이면 즉결심판).","처음부터 지불할 의사·능력이 없었던 정황(신분·소지금 0원·허위 명의·반복 행위)이 명확하면 사기죄로 입건하고 현행범 체포를 검토한다.","현행범 체포 시 미란다 고지, 48시간 내 구속영장 청구 여부 판단. 소액·초범이면 불구속 수사.","업주가 처벌을 원하지 않는 단순 미납은 민사 안내가 적절하며, 합의 여부를 조서에 남긴다."],"say":"주문하신 음식 대금 ○○원을 지급하지 않으셨습니다. 단순 미납이면 경범죄처벌법에 따라 범칙금 5만원이 부과됩니다. 처음부터 지불할 의사나 능력이 없었다면 형법상 사기죄로 처벌될 수 있습니다. 지금 지불 여부와 경위를 확인하겠습니다.",caution:"‘돈이 없다’는 말만으로 사기죄가 되지 않는다. 편취 의사는 주문 당시 상황으로 입증해야 한다. 피해자인 업주가 특정되면 경범죄 제6조 제2항 제3호(피해자가 있는 행위)에 해당해 범칙자에서 제외되고 즉결심판 대상이 된다.",ref:"경범죄 처벌법 제3조①39 / 형법 제347조"},
+{id:"fd4",tab:"현장",cat:"재산·생활",name:"식당·상가 영업방해·퇴거불응",art:"형법 제314조·제319조 제2항",badges:[["p","업무방해 5년 이하 징역·1천500만원 이하 벌금"],["p","퇴거불응 3년 이하 징역·500만원 이하 벌금"]],sum:"위력·위계로 영업을 방해하면 업무방해, 퇴거요구를 받고도 응하지 않으면 퇴거불응",tip:"퇴거불응은 ‘퇴거 요구’가 있어야 성립한다. 요구 시각·장소·방법을 명확히 하고, 요구 후 상당한 시간이 지나도 응하지 않아야 한다.",text:"형법 제314조(업무방해) ①제313조의 방법 또는 위력으로써 사람의 업무를 방해한 자는 5년 이하의 징역 또는 1천500만원 이하의 벌금에 처한다.\n\n형법 제319조(주거침입, 퇴거불응) ①사람의 주거, 관리하는 건조물, 선박이나 항공기 또는 점유하는 방실에 침입한 자는 3년 이하의 징역 또는 500만원 이하의 벌금에 처한다. ②전항의 장소에서 퇴거요구를 받고 응하지 아니한 자도 전항의 형과 같다.",steps:["출입 경위(손님인지, 종업원인지, 이해관계인인지)와 영업 방해 행태(고성·욕설·난동·좌석 점거·손님 차단)를 확인한다.","업주에게 영업권한·퇴거 요구 의사를 확인하고, 업주로 하여금 직접 또는 경찰관이 함께 ‘지금 퇴거’를 명확히 요구하게 한다.","퇴거 요구 시각을 기록하고, 요구 후에도 응하지 않을 때까지 상당한 시간을 둔다. 그 사이 2차 요구·고지.","CCTV·휴대폰 영상·목격자 진술·매출 영향(손님 이탈·영업 중단)을 확보한다. 영업방해 정도가 크면 업무방해로 입건.","계속 불응하면 퇴거불응으로 현행범 체포 검토(3년 이하 → 제214조 50만원 제한 대상 아님). 미란다 고지 후 처리.","주취·정신질환이 원인이면 보호조치(경직법 제4조) 또는 응급입원을 먼저 검토하고, 신체 위협이 있으면 분리·안전 확보를 최우선."],"say":"지금은 영업 중인 장소입니다. 업주께서 퇴거를 요구하셨습니다. 지금 나가주시기 바랍니다. 퇴거 요구에 응하지 않으면 형법 제319조 제2항에 따라 3년 이하의 징역 또는 500만원 이하의 벌금에 처해질 수 있습니다. 영업을 계속 방해하면 업무방해죄로도 처벌될 수 있습니다.",caution:"단순히 손님이 불만을 말하는 정도는 업무방해가 아니다. 위력의 정도·영업 방해의 결과가 필요하다. 퇴거불응은 건조물 관리·점유 권한이 있는 자의 요구가 전제이므로, 임차인·공동점유자 사이 분쟁은 민사로 안내.",ref:"형법 제314조·제319조"},
+{id:"fd5",tab:"현장",cat:"주취·보호",name:"만취자 보호조치·관공서 주취소란",art:"경직법 제4조 / 경범죄 처벌법 제3조 제3항 제1호",badges:[["a","24시간 초과 금지"],["p","관공서 주취소란 60만원 이하"],["x","통고처분 불가"]],sum:"주취로 자신·타인에 위해 우려가 있으면 보호조치 가능(24시간). 관공서에서 주정하면 60만원 이하 벌금·구류·과료",tip:"관공서 주취소란은 현행 경범죄 처벌법(2026.10.2. 시행) 제3조 제3항 제1호에 존속한다. 시행령 별표에 없어 범칙금 통고처분 대상이 아니고 즉결심판으로 처리한다.",text:"경찰관 직무집행법 제4조(보호조치 등) ① 경찰관은 수상한 행동이나 그 밖의 주위 사정을 합리적으로 판단해 볼 때 다음 각 호의 어느 하나에 해당하는 것이 명백하고 응급구호가 필요하다고 믿을 만한 상당한 이유가 있는 사람(이하 “구호대상자”라 한다)을 발견하였을 때에는 보건의료기관이나 공공구호기관에 긴급구호를 요청하거나 경찰관서에 보호하는 등 적절한 조치를 할 수 있다.\n1. 정신착란을 일으키거나 술에 취하여 자신 또는 다른 사람의 생명ㆍ신체ㆍ재산에 위해를 끼칠 우려가 있는 사람\n2. 자살을 시도하는 사람\n3. 미아, 병자, 부상자 등으로서 적당한 보호자가 없으며 응급구호가 필요하다고 인정되는 사람. 다만, 본인이 구호를 거절하는 경우는 제외한다.\n③ 경찰관은 제1항의 조치를 하는 경우에 구호대상자가 휴대하고 있는 무기ㆍ흉기 등 위험을 일으킬 수 있는 것으로 인정되는 물건을 경찰관서에 임시로 영치(領置)하여 놓을 수 있다.\n④ 경찰관은 제1항의 조치를 하였을 때에는 지체 없이 구호대상자의 가족, 친지 또는 그 밖의 연고자에게 그 사실을 알려야 하며, 연고자가 발견되지 아니할 때에는 구호대상자를 적당한 공공보건의료기관이나 공공구호기관에 즉시 인계하여야 한다.\n⑦ 제1항에 따라 구호대상자를 경찰관서에서 보호하는 기간은 24시간을 초과할 수 없고, 제3항에 따라 물건을 경찰관서에 임시로 영치하는 기간은 10일을 초과할 수 없다.\n\n경범죄 처벌법 제3조 ③ 다음 각 호의 어느 하나에 해당하는 사람은 60만원 이하의 벌금, 구류 또는 과료의 형으로 처벌한다.\n1. (관공서에서의 주취소란) 술에 취한 채로 관공서에서 몹시 거친 말과 행동으로 주정하거나 시끄럽게 한 사람",steps:["의식·호흡·외상 확인, 흉기·위험물 소지 여부 확인해 임시 영치. 필요 시 119 구급 요청.","①주취로 자신·타인 위해 우려 ②자살시도 ③미아·병자·부상자 중 어디에 해당하는지 특정해 보호조치 여부 결정.","경찰관서 보호 시 보호 시작 시각을 기록하고, 가족·친지·연고자에게 지체 없이 통지한다. 연고자 없으면 공공의료기관·공공구호기관에 즉시 인계 후 서장 보고.","본인이 구호를 거절하는 경우(제1항 제3호 단서)에는 강제 보호가 아니라 안전 확인·연락처 확보 수준에서 대응.","관공서에서 주정하는 경우 소란 행위를 구체적으로 기록하고 2회 이상 자제 요청. 계속되면 관공서 주취소란(60만원 이하)으로 즉결심판 청구.","보호 24시간·영치 10일을 넘기지 않도록 시간을 관리하고, 연장이 필요하면 의료기관 이송 등 다른 조치로 전환."],"say":"지금 많이 취하셔서 혼자 두면 위험할 수 있습니다. 가족이나 지인에게 연락할 수 있도록 도와드리고, 필요하면 안전한 곳으로 모시겠습니다. 관공서 안에서 계속 소란을 피우시면 경범죄처벌법에 따라 60만원 이하의 벌금·구류 또는 과료로 처벌될 수 있습니다.",caution:"보호조치는 ‘구금’이 아니다. 신체를 묶거나 감금하는 방식은 허용되지 않고, 24시간을 넘길 수 없다. 관공서 주취소란은 통고처분(범칙금) 대상이 아니므로 현장에서 범칙금을 받겠다고 고지하면 안 된다. 주취 상태의 진술만으로 다른 범죄를 단정하지 말고, 필요 시 채혈·진료로 확인.",ref:"경찰관 직무집행법 제4조 / 경범죄 처벌법 제3조③1 (2026.10.2. 시행)"},
+{id:"fd6",tab:"현장",cat:"가정·교제폭력",name:"가정폭력·교제폭력 출동",art:"가정폭력처벌법 제5조·제8조의2·제8조의3·제29조",badges:[["a","즉시 분리·제지"],["a","긴급임시조치 → 48시간 내 임시조치 청구"]],sum:"신고 받으면 즉시 현장 출동해 폭력 제지·당사자 분리, 피해자 의사 확인 후 상담소·보호시설·의료기관 인도, 재발 시 임시조치 안내. 긴급하면 긴급임시조치",tip:"가정폭력범죄는 가정폭력처벌법을 우선 적용하되, 아동학대범죄는 아동학대처벌법이 우선(제3조). 교제폭력은 스토킹처벌법·형법으로 대응.",text:"가정폭력처벌법 제5조(가정폭력범죄에 대한 응급조치) 진행 중인 가정폭력범죄에 대하여 신고를 받은 사법경찰관리는 즉시 현장에 나가서 다음 각 호의 조치를 하여야 한다.\n1. 폭력행위의 제지, 가정폭력행위자ㆍ피해자의 분리\n1의2. 「형사소송법」 제212조에 따른 현행범인의 체포 등 범죄수사\n2. 피해자를 가정폭력 관련 상담소 또는 보호시설로 인도(피해자가 동의한 경우만 해당한다)\n3. 긴급치료가 필요한 피해자를 의료기관으로 인도\n4. 폭력행위 재발 시 제8조에 따라 임시조치를 신청할 수 있음을 통보\n5. 제55조의2에 따른 피해자보호명령 또는 신변안전조치를 청구할 수 있음을 고지\n\n제8조의2(긴급임시조치) ① 사법경찰관은 제5조에 따른 응급조치에도 불구하고 가정폭력범죄가 재발될 우려가 있고, 긴급을 요하여 법원의 임시조치 결정을 받을 수 없을 때에는 직권 또는 피해자나 그 법정대리인의 신청에 의하여 제29조제1항제1호부터 제3호까지의 어느 하나에 해당하는 조치(이하 “긴급임시조치”라 한다)를 할 수 있다.\n② 사법경찰관은 제1항에 따라 긴급임시조치를 한 경우에는 즉시 긴급임시조치결정서를 작성하여야 한다.\n\n제8조의3(긴급임시조치와 임시조치의 청구) ① 사법경찰관이 제8조의2제1항에 따라 긴급임시조치를 한 때에는 지체 없이 검사에게 제8조에 따른 임시조치를 신청하고, 신청받은 검사는 법원에 임시조치를 청구하여야 한다. 이 경우 임시조치의 청구는 긴급임시조치를 한 때부터 48시간 이내에 청구하여야 하며, 긴급임시조치결정서를 첨부하여야 한다. ② 제1항에 따라 임시조치를 청구하지 아니하거나 법원이 임시조치의 결정을 하지 아니한 때에는 즉시 긴급임시조치를 취소하여야 한다.\n\n제29조(임시조치) ① 판사는 … 결정으로 가정폭력행위자에게 다음 각 호의 어느 하나에 해당하는 임시조치를 할 수 있다.\n1. 피해자 또는 가정구성원의 주거 또는 점유하는 방실로부터의 퇴거 등 격리\n2. 피해자 또는 가정구성원이나 그 주거ㆍ직장 등에서 100미터 이내의 접근 금지\n3. 피해자 또는 가정구성원에 대한 전기통신을 이용한 접근 금지\n4. 의료기관이나 그 밖의 요양소에의 위탁\n5. 국가경찰관서의 유치장 또는 구치소에의 유치\n6. 상담소등에의 상담위탁\n⑤ 제1항제1호부터 제3호까지의 임시조치기간은 2개월, 같은 항 제4호부터 제6호까지의 임시조치기간은 1개월을 초과할 수 없다.",steps:["출동 즉시 폭력행위를 제지하고 당사자를 분리한다. 피해자를 가해자와 다른 공간으로 옮기고, 필요 시 다른 경찰관이 가해자를 담당.","피해자 부상·진료 필요 확인, 119·의료기관 연계. 흉기·위험물 확인해 임시 영치.","피해자에게 ①상담소·보호시설 인도(동의 필요) ②임시조치 신청 가능 ③피해자보호명령·신변안전조치 청구 가능을 고지한다.","피해자의 처벌 의사·분리 의사·동거 지속 의사를 개별 확인하고, 가해자 앞에서 캐묻지 않는다(2차 피해 방지). 피해자 진술은 분리된 장소에서.","재발 우려 + 긴급하여 법원 결정을 받을 수 없으면 긴급임시조치(퇴거·격리, 100m 접근금지, 전기통신 접근금지)를 하고 즉시 결정서 작성.","긴급임시조치 후 지체 없이 검사에게 임시조치 신청(48시간 내 법원 청구). 청구되지 않거나 법원이 불허하면 즉시 긴급임시조치 취소.","현행범 체포 요건을 검토해 체포 시 미란다 고지, 48시간 내 구속영장 청구 판단. 아동이 있으면 아동학대처벌법 우선 적용·아동보호기관 연계."],"say":"가정폭력 신고로 출동했습니다. 지금 폭력행위를 멈추시고, 두 분을 분리하겠습니다. 피해자께서는 상담소나 보호시설로 안내해 드릴 수 있고, 폭력이 다시 발생할 우려가 있으면 법원에 임시조치를 신청할 수 있습니다. 긴급한 경우에는 접근금지 등 긴급임시조치를 할 수 있습니다.",caution:"피해자 보호시설 인도는 피해자 동의가 필요하다. ‘처벌하지 않겠다’는 말이 곧 사건 종결은 아니므로 가정폭력처벌법상 보호처분·상담조건부 기소유예 등 절차를 안내. 교제폭력(사실혼·연인)은 가정폭력처벌법의 ‘가정구성원’ 범위와 다르므로 스토킹처벌법·형법 적용을 검토하고, 피해자에게 112 신고·신변보호 절차를 안내.",ref:"가정폭력범죄의 처벌 등에 관한 특례법 [시행 2026.10.2.] 제3조·제5조·제8조의2·제8조의3·제29조·제55조의2"},
+{id:"fd7",tab:"현장",cat:"공무집행",name:"공무집행방해 현장 대응",art:"형법 제136조·제144조",badges:[["p","5년 이하 징역·1천만원 이하 벌금"],["a","현행범 체포"]],sum:"직무를 집행하는 공무원에 대한 폭행·협박은 5년 이하 징역 또는 1천만원 이하 벌금. 단체·다중 위력·위험한 물건 휴대 시 2분의 1까지 가중",tip:"핵심은 ①직무집행의 적법성 ②폭행·협박의 존재. 고지·제지 내용과 영상, 목격자를 확보해야 한다.",text:"형법 제136조(공무집행방해) ①직무를 집행하는 공무원에 대하여 폭행 또는 협박한 자는 5년 이하의 징역 또는 1천만원 이하의 벌금에 처한다. ②공무원에 대하여 그 직무상의 행위를 강요 또는 조지하거나 그 직을 사퇴하게 할 목적으로 폭행 또는 협박한 자도 전항의 형과 같다.\n\n형법 제144조(특수공무방해) ①단체 또는 다중의 위력을 보이거나 위험한 물건을 휴대하여 제136조, 제138조와 제140조 내지 전조의 죄를 범한 때에는 각조에 정한 형의 2분의 1까지 가중한다. ②제1항의 죄를 범하여 공무원을 상해에 이르게 한 때에는 3년 이상의 유기징역에 처한다. 사망에 이르게 한 때에는 무기 또는 5년 이상의 징역에 처한다.",steps:["먼저 거리를 확보하고, 상대를 자극하지 않는 낮고 단호한 어조로 자제를 요청한다. 2인 1조로 접근.","경찰착용기록장치(웨어러블)를 작동하고, 촬영 사실을 고지한다(경직법 제10조의5·제10조의6). 주변 CCTV 위치·목격자 확보.","직무집행의 근거(불심검문·체포·보호조치 등)와 요구 내용을 다시 고지해 적법성을 명확히 한다.","폭행·협박이 있으면 즉시 중단시키고 상대를 제압·분리. 공무원 피해 부위 사진, 진단서, 동료 진술 확보.","현행범 체포 후 미란다 고지(형소법 제200조의5), 체포 이유·일시·장소 기록. 48시간 내 구속영장 청구 판단.","상대가 흉기를 들었거나 다중이면 특수공무방해(제144조)·경찰장구 사용(경직법 제10조의2) 검토, 무기 사용은 최후 수단."],"say":"지금 경찰관의 정당한 직무집행을 방해하고 계십니다. 폭행이나 협박을 계속하시면 형법 제136조에 따라 5년 이하의 징역 또는 1천만원 이하의 벌금에 처해지고 현행범으로 체포될 수 있습니다. 즉시 멈추고 협조해 주시기 바랍니다.",caution:"‘직무집행’이 적법해야 방해죄가 성립한다. 고지 없이 시작한 강제처분이나 권한 없는 요구는 적법성 다툼이 되므로, 요구 근거 조문을 말하고 기록한다. 촬영 고지는 원칙이지만 곤란한 경우 사유를 기록으로 대체할 수 있다(경직법 제10조의6②). 상대의 폭행이 정당방위·과잉방어 영역인지도 확인.",ref:"형법 제136조·제144조 / 경찰관 직무집행법 제10조의2·제10조의5·제10조의6 / 형사소송법 제200조의5"},
+{id:"fd8",tab:"현장",cat:"교통 단속",name:"PM·픽시 청소년·무면허 단속",art:"도로교통법 제43조·제11조·제156조 / 형법 제9조",badges:[["f","PM 무면허 10만원"],["t","13세 미만 보호자 과태료 10만원"],["a","14세 미만 형사미성년"]],sum:"PM은 원동기 면허 이상 필요(16세 미만 불가). 13세 미만 어린이가 PM을 운전하면 보호자 과태료 10만원. 제동장치 없는 픽시는 안전운전의무 위반",tip:"형사미성년자(14세 미만)는 처벌 불가, 10세 이상 14세 미만은 촉법소년으로 소년법 절차. PM 무면허는 제156조 제13호(20만원 이하 벌금·구류·과료).",text:"도로교통법 제43조(무면허운전 등의 금지) 누구든지 제80조에 따라 시ㆍ도경찰청장으로부터 운전면허를 받지 아니하거나 운전면허의 효력이 정지된 경우에는 자동차등을 운전하여서는 아니 된다.\n제156조 13. 제43조를 위반하여 … 원동기장치자전거를 운전할 수 있는 운전면허를 받지 아니하거나 … 개인형 이동장치를 운전한 사람 → 20만원 이하 벌금·구류·과료 (범칙금 10만원)\n제11조 ④ 어린이의 보호자는 도로에서 어린이가 개인형 이동장치를 운전하게 하여서는 아니 된다.\n제160조 ② 9. 제11조제4항을 위반하여 어린이가 개인형 이동장치를 운전하게 한 어린이의 보호자 → 20만원 이하 과태료 (시행령 별표 6: 10만원)\n\n형법 제9조(형사미성년자) 14세되지 아니한 자의 행위는 벌하지 아니한다.\n※ 소년법 제4조: 10세 이상 14세 미만 소년은 촉법소년으로 보호사건 송치 대상.\n\n도로교통법 제48조 ① 모든 차의 운전자는 차의 조향장치와 제동장치, 그 밖의 장치를 정확하게 조작하여야 하며 … 다른 사람에게 위험과 장해를 주는 속도나 방법으로 운전하여서는 아니 된다.",steps:["안전한 장소에서 정지시키고 운전자 나이·면허 유무를 확인한다. 신분증이 없으면 보호자에게 연락.","나이 확인: 13세 미만이면 PM 운전 자체가 보호자 과태료 10만원 사유. 16세 미만은 원동기 면허 취득 불가이므로 무면허.","14세 미만은 형사처벌 불가(형법 제9조). 10세 이상 14세 미만은 촉법소년으로 소년법 보호사건 절차, 10세 미만은 보호자·학교 통보 및 계도.","14세 이상 16세 미만 무면허는 도로교통법 제156조 제13호로 처리(범칙금 10만원 통고 또는 즉결심판).","픽시(제동장치 제거)는 도로교통법 제48조① 안전운전의무 위반으로 계도·단속하고, 즉결심판 청구 대상. 18세 미만은 보호자 통보·경고, 반복 시 아동복지법상 방임 검토.","보호자에게 위반 내용·위험성·재발 시 처분을 설명하고, 안전모·보도주행·2인 탑승 등 동반 위반을 함께 계도한다."],"say":"이 개인형 이동장치는 원동기장치자전거 면허가 있어야 운전할 수 있습니다. 16세 미만은 면허를 받을 수 없어 무면허 운전이 됩니다. 13세 미만 어린이가 운전하면 보호자에게 10만원의 과태료가 부과됩니다. 제동장치를 뺀 자전거는 도로에서 타면 안전운전 의무 위반으로 단속됩니다.",caution:"나이는 생일 기준 만 나이로 확인한다. ‘촉법소년’이라는 말로 처벌 불가를 단정하지 말고, 소년법상 보호사건 송치·보호자 통보 등 실제 절차를 안내. PM 무면허 범칙금(10만원)과 형사처벌(20만원 이하 벌금·구류·과료)을 구분해 고지. 자전거법 개정(2027.1.8. 시행) 전에는 픽시를 자전거법 위반으로 처리할 수 없다.",ref:"도로교통법 제43조·제11조④·제48조①·제156조·제160조②9 / 형법 제9조 / 자전거법 제20조의2(2027.1.8. 시행)"},
+{id:"fd9",tab:"현장",cat:"재산·생활",name:"112 허위신고·거짓신고 처리",art:"경범죄 처벌법 제3조 제3항 제2호 / 형법 제156조",badges:[["p","경범 60만원 이하"],["p","무고 10년 이하 징역·1천500만원 이하 벌금"],["x","통고처분 불가"]],sum:"없는 범죄·재해를 거짓 신고하면 60만원 이하 벌금·구류·과료. 특정인을 범인으로 지목해 처벌받게 할 목적이면 무고죄",tip:"경범죄 거짓신고는 시행령 별표에 없어 범칙금 통고 불가. 반복 허위신고는 즉결심판 청구, 무고 해당 시 정식 수사.",text:"경범죄 처벌법 제3조 ③ 다음 각 호의 어느 하나에 해당하는 사람은 60만원 이하의 벌금, 구류 또는 과료의 형으로 처벌한다.\n2. (거짓신고) 있지 아니한 범죄나 재해 사실을 공무원에게 거짓으로 신고한 사람\n\n형법 제156조(무고) 타인으로 하여금 형사처분 또는 징계처분을 받게 할 목적으로 공무소 또는 공무원에 대하여 허위의 사실을 신고한 자는 10년 이하의 징역 또는 1천500만원 이하의 벌금에 처한다.",steps:["출동 결과 신고 내용이 허위임을 확인하고, 신고 녹취·통화 기록·출동 기록을 확보한다.","허위의 범위(전부 허위인지, 일부 과장인지)와 신고 경위(장난·주취·보복)를 확인한다.","특정인을 범인으로 지목했는지 확인 — 지목했다면 무고죄 검토, 단순 허위 출동 요청이면 경범죄.","반복·상습이면 즉결심판 청구, 무고 해당 시 정식 수사로 전환하고 신고자 신원·진술을 조서로 정리.","신고자에게 허위신고의 처벌 내용을 고지하고 재발 시 처분을 안내. 정신질환·주취가 원인이면 복지·의료 연계를 함께 검토."],"say":"확인 결과 신고하신 범죄나 재해 사실이 실제로 확인되지 않았습니다. 없던 범죄를 거짓 신고하면 경범죄처벌법에 따라 60만원 이하의 벌금·구류 또는 과료로 처벌될 수 있고, 특정인을 범인으로 지목했다면 무고죄로 더 무겁게 처벌될 수 있습니다.",caution:"신고 내용이 사실과 다르더라도 신고자가 착오였던 경우까지 처벌하면 안 된다. ‘허위’임을 알고 신고했는지가 핵심. 무고는 ‘타인에게 형사처분을 받게 할 목적’이 필요하므로, 단순 허위 출동 요청과 구분한다. 통고처분 불가 조문이므로 범칙금 고지는 하지 않는다.",ref:"경범죄 처벌법 제3조③2 / 형법 제156조"},
+/* ================= 체크리스트 ================= */
+{id:"ck1",tab:"현장",cat:"가정폭력 체크",name:"가정폭력 현장 체크리스트",art:"가정폭력처벌법 제5조·제8조의2",kind:"check",keys:"가폭 가정폭력 체크리스트 위험성조사 긴급임시조치 응급조치 분리",badges:[["a","체크 시 조치 안내"]],
+ sum:"신고 출동 후 분리 직후, 위험성을 점검해 응급조치·긴급임시조치·체포 여부를 정한다",
+ tip:"2개 이상 고위험 항목이 체크되면 긴급임시조치·현행범 체포를 우선 검토하고, 피해자 진술은 가해자와 분리된 장소에서 받는다.",
+ when:"사용 시점 — 112 가정폭력 신고로 출동해 폭력행위를 제지하고 피해자·가해자를 분리한 직후. ① 응급조치(제5조) 범위를 정할 때 ② 긴급임시조치(제8조의2) 발동 여부를 판단할 때 ③ 임시조치(제29조) 신청·피해자보호명령 안내 여부를 정할 때.",
+ checks:[
+  {t:"흉기·위험한 물건을 사용했거나 꺼내 위협했다",w:2,a:"즉시 흉기 영치·가해자 격리. 특수협박(형법 제284조)·특수폭행 검토, 긴급임시조치 우선"},
+  {t:"목을 조르거나 질식시키는 행위가 있었다",w:2,a:"치명 위험 신호. 즉시 분리·의료기관 인도, 목 부위 사진 채증, 살인미수·중상해 검토"},
+  {t:"머리·얼굴·배를 반복해서 때렸거나 도구로 폭행했다",w:2,a:"상해진단서·부위 사진 확보, 특수상해(형법 제258조의2) 검토"},
+  {t:"폭행이 상습·반복적이다(신고·출동 이력 다수)",w:2,a:"재발 우려 높음. 긴급임시조치·임시조치 신청, 피해자보호명령 안내"},
+  {t:"가해자가 술·약물 상태로 계속 난동·위협한다",w:2,a:"제지·분리 후 보호조치(경직법 제4조) 검토, 현행범 체포 요건 확인"},
+  {t:"'죽이겠다' 등 살해·보복 위협 발언이 있었다",w:2,a:"협박죄·살인예비 검토, 신변보호·스마트워치 지급 검토"},
+  {t:"아동이 폭력을 목격했거나 함께 맞았다",w:2,a:"아동학대처벌법 검토·아동보호전문기관 연계(정서적 학대: 가정폭력 노출)"},
+  {t:"피해자가 두려움을 호소하며 분리를 원한다",w:1,a:"의사 존중. 상담소·보호시설 인도(동의 필요), 임시조치 신청 안내"},
+  {t:"피해자에게 멍·찰과상·출혈 등 외상이 있다",w:1,a:"의료기관 인도, 상해진단서·부위 사진 채증"},
+  {t:"신분증·휴대폰·현금을 빼앗기는 등 통제를 당했다",w:1,a:"강요(형법 제324조)·체포감금 검토, 보호시설 안내"},
+  {t:"가해자가 현장에 있고 퇴거를 거부한다",w:1,a:"긴급임시조치(퇴거·격리) 요건 검토, 계속 불응 시 퇴거불응 검토"},
+  {t:"피해자가 처벌을 원하지 않는다고 말한다",w:0,a:"의사는 존중하되 사건 종결 아님. 보호처분·상담조건부 기소유예 안내, 위험도 재평가"}
+ ],
+ levels:[{min:2,cls:"warn",title:"고위험 — 즉시 보호조치 필요",text:"긴급임시조치(퇴거·100m 접근금지·전기통신 접근금지)와 현행범 체포를 함께 검토. 피해자 보호시설 인도·신변보호 조치, 48시간 내 임시조치 청구 준비."},{min:1,cls:"soon",title:"위험 — 응급조치 + 사후조치 검토",text:"응급조치(제지·분리·의료기관 인도) 후 임시조치 신청과 피해자보호명령 안내. 재발 시 긴급임시조치 요건 충족 여부 재확인."},{min:0,cls:"info",title:"위험 신호 낮음 — 기록·안내 위주",text:"응급조치 내용과 피해자 의사를 기록하고, 상담소·112 신고·임시조치 신청 절차를 안내. 철수 전 재학대 위험을 다시 확인."}],
+ say:"지금 폭력행위를 멈추시고 두 분을 분리하겠습니다. 피해자께서는 상담소나 보호시설로 안내해 드릴 수 있고, 폭력이 다시 발생할 우려가 있으면 법원에 임시조치를 신청할 수 있습니다. 긴급한 경우에는 접근금지 등 긴급임시조치를 할 수 있습니다.",
+ caution:"체크 결과는 조치 판단의 보조자료다. 고위험 항목이 없어도 피해자가 두려워하면 분리·보호를 우선한다. 보호시설 인도는 피해자 동의가 필요하고, 가해자 앞에서 피해자 의사를 캐묻지 않는다.",
+ text:"가정폭력처벌법 제5조(응급조치): ① 폭력행위의 제지, 가정폭력행위자·피해자의 분리 ② 현행범인 체포 등 범죄수사 ③ 피해자를 상담소·보호시설로 인도(피해자 동의) ④ 긴급치료가 필요한 피해자를 의료기관으로 인도 ⑤ 폭력행위 재발 시 제8조에 따라 임시조치를 신청할 수 있음을 통보 ⑥ 피해자보호명령·신변안전조치를 청구할 수 있음을 고지\n\n제8조의2(긴급임시조치): 응급조치에도 불구하고 재발 우려가 있고 긴급하여 법원의 임시조치 결정을 받을 수 없을 때 직권 또는 피해자·법정대리인 신청으로 제29조제1항제1호(퇴거 등 격리)·제2호(100m 이내 접근금지)·제3호(전기통신 이용 접근금지)를 할 수 있다. 즉시 긴급임시조치결정서 작성.\n제8조의3: 긴급임시조치 후 지체 없이 검사에게 임시조치 신청, 48시간 이내 법원 청구. 청구되지 않거나 불허되면 즉시 취소.",
+ ref:"가정폭력범죄의 처벌 등에 관한 특례법 [시행 2026.10.2.] 제5조·제8조의2·제8조의3·제29조"},
+{id:"ck2",tab:"현장",cat:"아동학대 체크",name:"아동학대 현장 체크리스트",art:"아동학대처벌법 제12조·제13조 / 아동복지법 제15조",kind:"check",keys:"아동학대 체크리스트 즉각분리 응급조치 72시간 아동보호전문기관 방임",badges:[["a","체크 시 조치 안내"]],
+ sum:"아동학대 의심 신고 출동 시 신체·정서·성학대·방임 정황을 점검해 응급조치·즉각분리·긴급임시조치 여부를 정한다",
+ tip:"응급조치(분리·인도)는 72시간을 넘을 수 없고(공휴일·토요일 포함 시 48시간 연장 가능), 임시조치 청구 시 법원 결정까지 연장된다.",
+ when:"사용 시점 — 아동학대 의심 신고·발견으로 출동했을 때. ① 응급조치(제12조) 범위를 정할 때 ② 즉각분리(피해아동등을 보호시설로 인도)·일시보호조치 필요성을 판단할 때 ③ 긴급임시조치(제13조)·임시조치 청구 여부를 정할 때 ④ 아동학대전담공무원·아동보호전문기관에 통보·합동조사할 때.",
+ checks:[
+  {t:"설명되지 않는 멍·찰과상, 모양이 물건과 일치한다(손바닥·끈·벨트)",w:2,a:"부위별 사진·상해진단서 확보, 아동학대처벌법 제12조 응급조치 검토"},
+  {t:"화상(담배·뜨거운 물), 골절, 머리 손상 등 병력과 맞지 않는 부상",w:2,a:"즉시 의료기관 인도(제12조①4호), 정밀검사 요청, 중상해(제5조) 검토"},
+  {t:"계절·날씨와 다른 복장으로 상처를 가린다",w:2,a:"상처 확인·사진 채증, 아동보호전문기관 동행 요청"},
+  {t:"보호자의 진술이 부상·상황과 불일치하거나 계속 바뀐다",w:2,a:"진술 녹취·조서화, 아동학대전담공무원 통보, 아동복지법 제15조⑥3호(답변 방해) 해당 여부 확인"},
+  {t:"1년 이내 아동학대 신고·출동 이력이 2회 이상이다",w:2,a:"아동복지법 제15조⑥1호 일시보호조치 요건 검토 — 지자체·아동보호전문기관 즉시 연계"},
+  {t:"보호자가 술·약물 상태이거나 폭력 성향, 아동에게 욕설·위협을 한다",w:2,a:"가해자 격리(제12조①2호), 아동 분리 후 조사, 재학대 위험 평가"},
+  {t:"성 관련 행동·신체 증상 등 성학대 의심 정황이 있다",w:2,a:"즉시 분리·의료기관 인도, 성폭력 수사 절차·전담기관 연계, 진술 채취 시 전문가 동석"},
+  {t:"가해자가 조사·출입을 거부하거나 아동에게 답변을 강요한다",w:2,a:"현장출동·조사 방해 금지(제11조⑥), 답변 방해는 일시보호조치 사유, 필요 시 현행범 체포"},
+  {t:"아동이 위축되어 보호자 눈치를 보고 신체 접촉을 피한다",w:1,a:"분리된 장소에서 조사(제11조⑤), 정서적 학대·가정폭력 노출 여부 확인"},
+  {t:"위생·영양·주거 상태가 불량하거나 방임 정황이 있다",w:1,a:"아동복지법 제17조 방임 검토, 지자체 보호조치·사례관리 연계"},
+  {t:"부상에 대한 치료를 받지 않았거나 병원 방문을 꺼린다",w:1,a:"의료기관 인도, 치료 지연 경위 확인·기록"},
+  {t:"아동이 학대 사실을 직접 진술하거나 회피·축소한다",w:1,a:"진술을 그대로 기록, 반복 질문·유도 질문 금지, 영상 녹화·전문가 면담 검토"}
+ ],
+ levels:[{min:2,cls:"warn",title:"고위험 — 즉각 분리·응급조치 필요",text:"제12조제1항 응급조치(제지·가해자 격리·보호시설 또는 의료기관 인도)를 즉시 시행하고 응급조치결과보고서 작성. 아동학대전담공무원·아동보호전문기관 통보, 필요 시 현행범 체포. 72시간 내 임시조치 청구 준비."},{min:1,cls:"soon",title:"의심 — 응급조치 + 확인조사 병행",text:"아동을 가해자와 분리해 조사하고, 아동학대전담공무원과 합동조사·사례판단 의뢰. 부상·방임 정황에 따라 의료기관 인도·일시보호조치 검토."},{min:0,cls:"info",title:"신호 낮음 — 기록·연계 위주",text:"현장 상황과 아동 진술을 기록하고, 아동보호전문기관·지자체 연계 및 재신고 시 조치 절차를 안내. 귀가 후 안전 확인 방법을 설명."}],
+ say:"아동학대 신고로 출동했습니다. 지금 아이와 분리해서 이야기를 듣겠습니다. 아이의 안전을 위해 필요하면 보호시설이나 의료기관으로 인도할 수 있고, 학대행위자에 대해서는 접근금지 등 임시조치를 법원에 청구할 수 있습니다.",
+ caution:"즉각분리는 응급조치(제12조①2·3호)와 지자체 일시보호조치(아동복지법 제15조⑥)로 이뤄진다. 응급조치 기간 72시간(공휴일·토요일 포함 시 48시간 연장)을 넘기지 않도록 임시조치 청구 시한을 관리. 아동에게 학대 여부를 반복해 캐묻거나 보호자 앞에서 진술을 요구하지 않는다.",
+ text:"아동학대처벌법 제12조(피해아동 등에 대한 응급조치) ① 현장에 출동하거나 아동학대범죄 현장을 발견한 경우 또는 학대현장 이외의 장소에서 학대피해가 확인되고 재학대의 위험이 급박·현저한 경우, 사법경찰관리 또는 아동학대전담공무원은 피해아동, 피해아동의 형제자매인 아동 및 피해아동과 동거하는 아동(피해아동등)의 보호를 위하여 즉시 다음 각 호의 조치를 하여야 한다.\n1. 아동학대범죄 행위의 제지\n2. 아동학대행위자를 피해아동등으로부터 격리\n3. 피해아동등을 아동학대 관련 보호시설로 인도\n4. 긴급치료가 필요한 피해아동을 의료기관으로 인도\n5. 피해아동등을 연고자 등에게 인도\n③ 제1항제2호부터 제5호까지에 따른 응급조치는 72시간을 넘을 수 없다. 다만, 그 기간에 공휴일이나 토요일이 포함되는 경우로서 피해아동등의 보호를 위하여 필요하다고 인정되는 경우에는 48시간의 범위에서 그 기간을 연장할 수 있다.\n④ 검사가 제15조제2항에 따라 임시조치를 법원에 청구한 경우에는 법원의 임시조치 결정 시까지 응급조치 기간이 연장된다.\n\n제13조(아동학대행위자에 대한 긴급임시조치) ① 응급조치에도 불구하고 아동학대범죄가 재발될 우려가 있고, 긴급을 요하여 제19조제1항에 따른 법원의 임시조치 결정을 받을 수 없을 때에는 직권이나 피해아동등·법정대리인·변호사·시·도지사·시장·군수·구청장 또는 아동보호전문기관의 장의 신청에 따라 제19조제1항제1호부터 제3호까지의 조치를 할 수 있다.\n\n아동복지법 제15조 ⑥ 시·도지사 또는 시장·군수·구청장은 다음 각 호의 어느 하나에 해당하는 경우 … 아동일시보호시설, 학대피해아동쉼터 등에 보호대상아동을 입소시켜 보호하거나 … 일시 위탁하여 보호(일시보호조치)하게 할 수 있다.\n1. 1년 이내에 2회 이상 아동학대 신고가 접수된 아동에 대하여 현장조사 과정에서 학대피해가 강하게 의심되고 재학대가 발생할 우려가 있는 경우\n2. … 응급조치 또는 긴급임시조치가 종료되었으나 임시조치가 청구되지 아니한 경우\n3. 현장조사 과정에서 아동의 보호자가 아동에게 답변을 거부·기피 또는 거짓 답변을 하게 하거나 그 답변을 방해한 경우",
+ ref:"아동학대범죄의 처벌 등에 관한 특례법 [시행 2026.10.2.] 제11조·제12조·제13조·제15조·제19조 / 아동복지법 제15조⑥·제17조"}
+];
+</script>
+<script>
+/* ================= 앱 ================= */
+const TABS=[
+ {k:"경범죄",ic:"🚨",lb:"경범죄"},
+ {k:"현장",ic:"📋",lb:"현장대응"},
+ {k:"형법",ic:"⚖️",lb:"형법"},
+ {k:"형소법",ic:"👮",lb:"형소법"},
+ {k:"교통",ic:"🛴",lb:"교통·PM"},
+ {k:"최신",ic:"📰",lb:"최신법"},
+ {k:"★",ic:"★",lb:"즐겨찾기"}
+];
+const CATS={
+ "경범죄":["전체","제3조 ① (10만원 이하)","제3조 ② (20만원 이하)","제3조 ③ (60만원 이하)","총칙"],
+ "현장":["전체","가정폭력 체크","아동학대 체크","교통 단속","재산·생활","주취·보호","가정·교제폭력","공무집행"],
+ "형법":["전체","폭력·신체","재산","주거·업무·공무","성·명예","공안·교통","총칙"],
+ "형소법":["전체","체포","구속","압수·수색","경찰 직무","수사 원칙"],
+ "교통":["전체","PM 기본","PM 음주","PM 안전","PM 통행","픽시·자전거"],
+ "최신":["전체","마약 수사","형법 개정","형소법 개정","경범죄 개정","자전거법 개정"]
+};
+const S={tab:"경범죄",cat:{"경범죄":"전체"},q:"",fs:"md",theme:"day",fav:[]};
+const $=(s,r)=>(r||document).querySelector(s);
+const $$=(s,r)=>Array.from((r||document).querySelectorAll(s));
+const esc=s=>String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const norm=s=>String(s||"").toLowerCase().replace(/[\s·ㆍ,.\(\)\[\]\-~]/g,"");
+
+/* ---- 저장 ---- */
+function load(){
+  try{
+    const f=JSON.parse(localStorage.getItem("pfl.fav")||"[]"); if(Array.isArray(f)) S.fav=f;
+    const t=localStorage.getItem("pfl.theme"); if(t) S.theme=t;
+    const z=localStorage.getItem("pfl.fs"); if(z) S.fs=z;
+    const c=JSON.parse(localStorage.getItem("pfl.checks")||"{}"); S.checks=c||{};
+  }catch(e){ S.checks={}; }
+  if(!S.checks) S.checks={};
+  document.documentElement.dataset.theme=S.theme;
+  document.documentElement.dataset.fs=S.fs;
+}
+function saveFav(){ try{localStorage.setItem("pfl.fav",JSON.stringify(S.fav))}catch(e){} }
+function saveChecks(){ try{localStorage.setItem("pfl.checks",JSON.stringify(S.checks))}catch(e){} }
+
+/* ---- 검색 ---- */
+function hay(it){
+  const ck=(it.checks||[]).map(c=>c.t+" "+c.a).join(" ");
+  return norm([it.name,it.art,it.sum,it.tip,it.text,it.cat,it.tab,it.keys,ck,it.when].join(" "));
+}
+function matches(it,q){ return hay(it).indexOf(q)>=0; }
+
+/* ---- 렌더 ---- */
+function renderChips(){
+  const box=$("#chips");
+  if(S.q){ box.innerHTML=""; box.style.display="none"; return; }
+  box.style.display="flex";
+  const cats=CATS[S.tab]||["전체"];
+  box.innerHTML=cats.map(c=>`<button class="chip ${S.cat[S.tab]===c?"on":""}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+}
+function score(it,q){
+  let s=0;
+  const n=norm(it.name), a=norm(it.art), k=norm(it.keys||""), su=norm(it.sum||""),
+        tp=norm((it.tip||"")+(it.when||"")), tx=norm(it.text||""), ct=norm(it.cat+" "+(it.tab||""));
+  if(n.indexOf(q)>=0) s+=100;
+  if(a.indexOf(q)>=0) s+=80;
+  if(k.indexOf(q)>=0) s+=65;
+  if(su.indexOf(q)>=0) s+=35;
+  if(ct.indexOf(q)>=0) s+=25;
+  if(tp.indexOf(q)>=0) s+=15;
+  if(tx.indexOf(q)>=0) s+=5;
+  if(it.kind==="check") s+=3;
+  return s;
+}
+function listItems(){
+  const q=norm(S.q);
+  if(q){
+    return DATA.filter(it=>matches(it,q))
+      .map((it,i)=>({it,i,s:score(it,q)}))
+      .sort((x,y)=> y.s-x.s || x.i-y.i)
+      .map(x=>x.it);
+  }
+  if(S.tab==="★") return DATA.filter(it=>S.fav.indexOf(it.id)>=0);
+  const cat=S.cat[S.tab]||"전체";
+  return DATA.filter(it=>it.tab===S.tab && (cat==="전체"||it.cat===cat));
+}
+function badgeHTML(it){
+  return (it.badges||[]).map(b=>`<span class="b ${b[0]}">${esc(b[1])}</span>`).join("");
+}
+function cardHTML(it){
+  const on=S.fav.indexOf(it.id)>=0;
+  const tabTag = S.q ? `<span class="b a" style="font-weight:700">${esc(it.tab)}</span>` : "";
+  return `<article class="card" data-tab="${esc(it.tab)}" data-id="${it.id}">
+    <div class="ctop">
+      <div style="flex:1;min-width:0">
+        <div class="cname">${esc(it.name)}</div>
+        <div class="cart">${esc(it.art)}</div>
+      </div>
+      <button class="star ${on?"on":""}" data-star="${it.id}" aria-label="즐겨찾기">${on?"★":"☆"}</button>
+    </div>
+    <div class="badges">${tabTag}${badgeHTML(it)}</div>
+    <div class="sum">${esc(it.sum)}</div>
+    ${it.kind==="check"?`<div class="tagline">☑ 체크리스트 · 항목을 눌러 조치 판단</div>`:""}
+  </article>`;
+}
+function render(){
+  load2set();
+  renderChips();
+  const items=listItems();
+  const q=norm(S.q);
+  const list=$("#list");
+  let head="";
+  if(q){
+    head=`<div class="sechead"><h2>통합검색 “${esc(S.q)}”</h2><span class="cnt">${items.length}건 · 전 탭</span></div>`;
+  }else if(S.tab==="★"){
+    head=`<div class="sechead"><h2>★ 즐겨찾기</h2><span class="cnt">${items.length}건</span></div>`;
+  }else{
+    head=`<div class="sechead"><h2>${esc(S.tab)}</h2><span class="cnt">${items.length}건</span></div>`;
+  }
+  let body="";
+  if(!items.length){
+    body = q
+      ? `<div class="empty"><b>검색 결과가 없습니다</b>“${esc(S.q)}”에 해당하는 조문이 없습니다.<br>다른 키워드(예: 노상방뇨, 미란다, 50만원, 임의동행, 킥보드, 가폭, 아동학대)로 검색해 보세요.</div>`
+      : (S.tab==="★" ? `<div class="empty"><b>즐겨찾기가 비어 있습니다</b>조문 카드의 ☆를 눌러 자주 쓰는 항목을 고정하세요.</div>`
+        : `<div class="empty"><b>항목이 없습니다</b>다른 카테고리를 선택하세요.</div>`);
+  }else{
+    body = items.map(cardHTML).join("");
+  }
+  list.innerHTML = head + (S.tab==="경범죄"&&!q?`<div class="note"><b>경범죄 처벌법 기준</b> 법정형(10만·20만·60만원 이하 벌금)과 통고처분 범칙금(시행령 별표)은 다릅니다. 피해자가 있는 행위·상습범·18세 미만은 범칙금 통고 대상에서 제외됩니다.</div>`:"")
+   + (S.tab==="최신"&&!q?`<div class="note"><b>[현행] / [개정·시행예정] 구분</b> 기준일 2026-11-24. 시행 전 조문은 현장 적용이 불가하므로 배지를 확인하세요.</div>`:"")
+   + body
+   + `<div class="foot">법령 기준일 2026-11-24 · 국가법령정보센터(law.go.kr) 현행 조문 확인<br>본 앱은 현장 참고용이며, 최종 판단은 소속 지침·판례·검사 지휘에 따릅니다.</div>`;
+  renderTabs();
+}
+function load2set(){
+  document.documentElement.dataset.theme=S.theme;
+  document.documentElement.dataset.fs=S.fs;
+  $("#themeBtn").textContent = S.theme==="night" ? "☀️ 주간" : "🌙 야간";
+  $("#fsBtn").textContent = S.fs==="md"?"가":S.fs==="lg"?"가+":"가++";
+  const b=$("#basis"); if(b) b.textContent="기준일 2026-11-24 · 국가법령정보센터 확인";
+}
+function renderTabs(){
+  $("#tabbar").innerHTML=TABS.map(t=>{
+    const on=(S.tab===t.k && !S.q);
+    return `<button class="tabbtn ${on?"on":""}" data-tab="${t.k}"><span class="ic">${t.ic}</span><span class="lb">${t.lb}</span></button>`;
+  }).join("");
+}
+
+/* ---- 상세 시트 ---- */
+let CUR=null;
+function openSheet(id){
+  const it=DATA.find(x=>x.id===id); if(!it) return;
+  CUR=it;
+  const on=S.fav.indexOf(it.id)>=0;
+  let html=`<button class="closer" data-close="1">✕</button>
+  <div class="handle"><i></i></div><div class="inner">
+  <h3>${esc(it.name)}</h3>
+  <div class="meta">${esc(it.art)}${it.tab?" · "+esc(it.tab):""}</div>
+  <div class="badges">${badgeHTML(it)}</div>`;
+  if(it.kind==="miranda"){
+    const L=(it.text||"").split("\n").map(s=>s.trim()).filter(Boolean).filter(s=>s.indexOf("【")!==0);
+    const head=L.shift()||"";
+    html+=`<div class="miranda"><div class="who">현장 고지 — 그대로 읽어주기</div>
+      <div class="big">${esc(head)}</div>
+      <div class="mitems">${L.map(s=>`<p>${esc(s)}</p>`).join("")}</div>
+      <div class="sub">한 문장씩 읽고, 이해 여부와 변호인 선임·통지받을 사람·진술 여부를 확인한 뒤 조서에 적으세요.</div></div>`;
+  } 
+  else if(it.kind==="check"){
+    html+=`<div class="block"><h4>언제 쓰나요</h4><p>${esc((it.when||"").replace(/^사용 시점\s*[—-]\s*/,""))}</p></div>`;
+    html+=`<div class="block tip"><h4>체크리스트 — 해당 항목을 누르세요</h4><div id="chk">`+
+      (it.checks||[]).map((c,i)=>`<label class="ckrow"><input type="checkbox" data-ck="${i}" ${((S.checks[it.id]||[]).indexOf(i)>=0)?"checked":""}><span class="ckbox"></span><span class="cklabel">${esc(c.t)}${c.w===2?' <em class="hi">고위험</em>':''}</span></label><div class="ckadv" data-adv="${i}"></div>`).join("")+
+      `</div></div>`;
+    html+=`<div id="result"></div>`;
+  }
+  else{
+    if(it.sum) html+=`<div class="block"><h4>요약</h4><p>${esc(it.sum)}</p></div>`;
+    if(it.steps) html+=`<div class="block"><h4>단계별 현장 대응</h4><p>`+it.steps.map((s,i)=>`${i+1}. ${esc(s)}`).join("\n")+`</p></div>`;
+    if(it.say) html+=`<div class="block tip"><h4>현장 고지 멘트</h4><p>${esc(it.say)}</p></div>`;
+    if(it.tip) html+=`<div class="block tip"><h4>현장 포인트</h4><p>${esc(it.tip)}</p></div>`;
+    if(it.caution) html+=`<div class="block warn"><h4>주의사항</h4><p>${esc(it.caution)}</p></div>`;
+    if(it.text) html+=`<div class="block quote"><h4>법조문</h4><p>${esc(it.text)}</p></div>`;
+  }
+  html+=`<div class="btnrow"><button class="pri" data-copy="quote">조문 복사</button><button data-copy="say">멘트 복사</button></div>`;
+  html+=`<div class="btnrow"><button data-fav="${it.id}">${on?"★ 즐겨찾기 해제":"☆ 즐겨찾기 추가"}</button><button data-close="1">닫기</button></div>`;
+  if(it.ref) html+=`<div class="foot">출처: ${esc(it.ref)}<br>기준일 2026-11-24 · 본 내용은 현장 참고용입니다.</div>`;
+  html+=`</div>`;
+  $("#sheetbody").innerHTML=html;
+  $("#sheet").classList.add("on");
+  document.body.style.overflow="hidden";
+  if(it.kind==="check") updateCheckUI();
+}
+function closeSheet(){
+  $("#sheet").classList.remove("on");
+  document.body.style.overflow="";
+  CUR=null;
+}
+function updateCheckUI(){
+  if(!CUR||CUR.kind!=="check") return;
+  const it=CUR, sel=S.checks[it.id]||[];
+  (it.checks||[]).forEach((c,i)=>{
+    const adv=$(`[data-adv="${i}"]`,$("#chk"));
+    if(adv) adv.innerHTML = sel.indexOf(i)>=0 ? `<div class="ckadvbox">→ ${esc(c.a)}</div>` : "";
+  });
+  let score=0; (it.checks||[]).forEach((c,i)=>{ if(sel.indexOf(i)>=0) score+=(c.w||0); });
+  let lv=it.levels[it.levels.length-1];
+  for(const l of it.levels){ if(score>=l.min){ lv=l; break; } }
+  const n=sel.length;
+  const acts=(it.checks||[]).filter((c,i)=>sel.indexOf(i)>=0).map(c=>c.a);
+  $("#result").innerHTML=`<div class="block ${lv.cls==="warn"?"warn":"tip"}">
+    <h4>판단 결과 — 체크 ${n}개 · 위험도 점수 ${score}</h4>
+    <p><b>${esc(lv.title)}</b>
+${esc(lv.text)}</p>
+  </div>
+  ${acts.length?`<div class="block"><h4>체크 항목별 권장 조치</h4><p>${acts.map((a,i)=>`• ${esc(a)}`).join("\n")}</p></div>`:""}
+  <div class="block tip"><h4>현장 고지 멘트</h4><p>${esc(it.say||"")}</p></div>
+  <div class="block warn"><h4>주의사항</h4><p>${esc(it.caution||"")}</p></div>
+  <div class="block quote"><h4>근거 법조문</h4><p>${esc(it.text||"")}</p></div>`;
+  const b=$("[data-refresh]");
+}
+function toggleCheck(idx){
+  if(!CUR) return;
+  const arr=S.checks[CUR.id]||[];
+  const p=arr.indexOf(idx);
+  if(p>=0) arr.splice(p,1); else arr.push(idx);
+  S.checks[CUR.id]=arr; saveChecks(); updateCheckUI();
+}
+function toast(msg){
+  const t=$("#toast"); t.textContent=msg; t.classList.add("on");
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("on"),1600);
+}
+function manualCopy(txt){
+  $(".sheetbody")||null;
+  const sb=$("#sheetbody");
+  sb.innerHTML=`<button class="closer" data-close="1">✕</button><div class="handle"><i></i></div><div class="inner">
+    <h3>직접 복사</h3>
+    <div class="meta">아래 글을 길게 눌러 전체 선택 후 복사하세요</div>
+    <textarea id="copybox" readonly style="width:100%;height:46dvh;font-family:inherit;font-size:var(--fs-s);line-height:1.55;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--ink)"></textarea>
+    <div class="btnrow"><button class="pri" data-close="1">닫기</button></div></div>`;
+  const ta=$("#copybox"); ta.value=txt; ta.focus(); ta.select();
+  $(".sheet").classList.add("on"); document.body.style.overflow="hidden";
+}
+async function copyText(txt,label){
+  try{
+    if(navigator.clipboard&&navigator.clipboard.writeText&&window.isSecureContext){
+      await navigator.clipboard.writeText(txt); toast(label+" 복사되었습니다"); return;
+    }
+  }catch(e){}
+  try{
+    const ta=document.createElement("textarea");
+    ta.value=txt; ta.setAttribute("readonly","");
+    ta.style.cssText="position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;opacity:0;";
+    document.body.appendChild(ta); ta.focus(); ta.select(); ta.setSelectionRange(0,txt.length);
+    const ok=document.execCommand("copy"); ta.remove();
+    if(ok){ toast(label+" 복사되었습니다"); return; }
+  }catch(e){}
+  toast("자동 복사가 차단되어 직접 복사 창을 엽니다");
+  manualCopy(txt);
+}
+
+/* ---- 이벤트 ---- */
+$("#tabbar").addEventListener("click",e=>{
+  const b=e.target.closest("[data-tab]"); if(!b) return;
+  S.tab=b.dataset.tab; S.q=""; $("#q").value=""; $("#clearQ").classList.remove("on");
+  window.scrollTo(0,0); render();
+});
+$("#chips").addEventListener("click",e=>{
+  const b=e.target.closest("[data-cat]"); if(!b) return;
+  S.cat[S.tab]=b.dataset.cat; render();
+});
+$("#list").addEventListener("click",e=>{
+  const st=e.target.closest("[data-star]");
+  if(st){ e.stopPropagation(); toggleFav(st.dataset.star); return; }
+  const c=e.target.closest(".card"); if(c) openSheet(c.dataset.id);
+});
+function toggleFav(id){
+  const i=S.fav.indexOf(id);
+  if(i>=0) S.fav.splice(i,1); else S.fav.push(id);
+  saveFav(); render();
+  if(CUR&&CUR.id===id){ const b=$(`[data-fav="${id}"]`); if(b) b.textContent = S.fav.indexOf(id)>=0?"★ 즐겨찾기 해제":"☆ 즐겨찾기 추가"; }
+  toast(S.fav.indexOf(id)>=0?"즐겨찾기에 추가했습니다":"즐겨찾기에서 제거했습니다");
+}
+$("#sheet").addEventListener("change",e=>{
+  const inp=e.target.closest("input[data-ck]");
+  if(!inp||!CUR) return;
+  const i=parseInt(inp.dataset.ck,10);
+  const arr=(S.checks[CUR.id]||[]).slice();
+  const p=arr.indexOf(i);
+  if(inp.checked){ if(p<0) arr.push(i); } else { if(p>=0) arr.splice(p,1); }
+  S.checks[CUR.id]=arr; saveChecks(); updateCheckUI();
+});
+$("#sheet").addEventListener("click",e=>{
+  if(e.target.id==="sheet"){ closeSheet(); return; }
+  if(e.target.closest("[data-close]")){ closeSheet(); return; }
+  const cp=e.target.closest("[data-copy]");
+  if(cp&&CUR){ copyText(cp.dataset.copy==="say"?(CUR.say||CUR.text):(CUR.text||CUR.sum), cp.dataset.copy==="say"?"고지 멘트가":"조문이"); return; }
+  const fv=e.target.closest("[data-fav]");
+  if(fv){ toggleFav(fv.dataset.fav); return; }
+});
+let qt=null;
+$("#q").addEventListener("input",e=>{
+  const v=e.target.value;
+  $("#clearQ").classList.toggle("on",!!v);
+  clearTimeout(qt); qt=setTimeout(()=>{ S.q=v; render(); },90);
+});
+$("#clearQ").addEventListener("click",()=>{ $("#q").value=""; S.q=""; $("#clearQ").classList.remove("on"); render(); $("#q").focus(); });
+$("#themeBtn").addEventListener("click",()=>{ S.theme=S.theme==="night"?"day":"night"; localStorage.setItem("pfl.theme",S.theme); load2set(); });
+$("#fsBtn").addEventListener("click",()=>{ S.fs=S.fs==="md"?"lg":S.fs==="lg"?"xl":"md"; localStorage.setItem("pfl.fs",S.fs); load2set(); toast(S.fs==="md"?"글자 보통":S.fs==="lg"?"글자 크게":"글자 아주 크게"); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeSheet(); });
+
+load(); render();
+</script>
+</body>
+</html>

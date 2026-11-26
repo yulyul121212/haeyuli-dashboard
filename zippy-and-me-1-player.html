@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1f4b">
+<title>Zippy and Me · Watch &amp; Answer</title>
+<style>
+  :root{
+    --sky:#2f6bff; --deep:#071634; --deep2:#122f6e;
+    --yellow:#ffcc33; --red:#ff4d5e; --green:#28c76f;
+    --ink:#0d1f3c; --line:rgba(255,255,255,.16); --card:rgba(255,255,255,.09);
+    --r:16px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    margin:0; color:#fff; overflow:hidden;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR","Noto Sans CJK KR","DejaVu Sans",Arial,system-ui,sans-serif;
+    background:radial-gradient(1100px 700px at 20% -10%, #2f6bff 0%, #16357e 45%, #06112c 100%);
+    -webkit-user-select:none; user-select:none;
+  }
+  button{font-family:inherit; cursor:pointer; color:inherit}
+  #app{height:100dvh; display:flex; flex-direction:column; overflow:hidden;
+       padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+
+  /* ---------- top bar ---------- */
+  .topbar{display:flex; align-items:center; gap:6px; padding:8px 10px 6px; min-width:0; overflow:hidden; flex:0 0 auto}
+  .brand{display:flex; align-items:center; gap:6px; min-width:0; flex:0 1 auto; overflow:hidden}
+  .brand .ico{font-size:18px; flex:0 0 auto}
+  .brand b{font-size:15px; font-weight:900; letter-spacing:-.2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .brand small{font-size:11px; font-weight:800; opacity:.7; padding:2px 7px; border:1px solid var(--line); border-radius:999px; white-space:nowrap}
+  .spacer{flex:1 1 auto}
+  .stars{display:inline-flex; align-items:center; gap:4px; background:rgba(255,204,51,.14); border:1px solid rgba(255,204,51,.45);
+         color:#ffe89a; font-weight:900; font-size:13px; padding:5px 9px; border-radius:999px; white-space:nowrap; flex:0 0 auto}
+  .stars b{color:#fff; font-size:14px}
+  .stars.pop{animation:pop .35s ease-out}
+  .tb{height:34px; min-width:34px; padding:0 8px; border-radius:11px; border:1px solid var(--line);
+      background:var(--card); font-size:12.5px; font-weight:800; display:inline-flex; align-items:center;
+      justify-content:center; white-space:nowrap; flex:0 0 auto}
+  .tb:active{transform:scale(.95)}
+  .tb.on{background:rgba(255,204,51,.24); border-color:var(--yellow)}
+  .tb .wide{display:none}
+  .tb .narrow{display:inline}
+  @media (min-width:560px){ .tb .wide{display:inline} .tb .narrow{display:none} .brand small{display:inline} }
+  @media (max-width:559px){ .brand small{display:none} .brand b{max-width:38vw} }
+
+  /* ---------- episode bar ---------- */
+  .epbar{display:flex; gap:6px; padding:0 10px 6px; overflow-x:auto; overflow-y:hidden; flex:0 0 auto; scrollbar-width:none}
+  .epbar::-webkit-scrollbar{display:none}
+  .epchip{flex:0 0 auto; height:32px; padding:0 12px; border-radius:999px; border:1px solid var(--line);
+          background:rgba(255,255,255,.06); font-size:12.5px; font-weight:800; display:inline-flex; align-items:center; gap:6px}
+  .epchip .tick{font-size:10px; opacity:.35}
+  .epchip.has .tick{opacity:1; color:var(--green)}
+  .epchip.now{background:#fff; color:#0b1f4b; border-color:#fff}
+
+  /* ---------- main ---------- */
+  main{flex:1 1 auto; min-height:0; display:flex; flex-direction:column; padding:0 10px 8px; gap:8px}
+  .stage{position:relative; flex:1 1 auto; min-height:110px; border-radius:var(--r); overflow:hidden;
+         background:#04070f; border:1px solid var(--line); display:flex}
+  .stage video{width:100%; height:100%; object-fit:contain; background:#04070f; display:block}
+  .stage.empty video{display:none}
+  .hud{position:absolute; inset:0; padding:8px; display:flex; flex-direction:column; justify-content:space-between; pointer-events:none}
+  .hud .row{display:flex; gap:6px; align-items:center; justify-content:space-between}
+  .chip{font-size:11px; font-weight:800; padding:4px 9px; border-radius:999px; background:rgba(4,10,26,.62);
+        border:1px solid var(--line); backdrop-filter:blur(4px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:62%}
+  .chip.ghost{opacity:.85}
+  .mini{pointer-events:auto; width:30px; height:30px; border-radius:9px; border:1px solid var(--line);
+        background:rgba(4,10,26,.62); font-size:13px; display:inline-flex; align-items:center; justify-content:center}
+
+  .cover{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+         gap:10px; padding:18px; text-align:center; background:linear-gradient(180deg, rgba(7,20,48,.92), rgba(4,10,26,.97)); z-index:5}
+  .cover.hide{display:none}
+  .cover h2{margin:0; font-size:19px; letter-spacing:-.3px}
+  .cover p{margin:0; font-size:12.5px; line-height:1.45; opacity:.82; max-width:34em}
+  .cover .pickrow{display:flex; flex-wrap:wrap; gap:8px; justify-content:center}
+  .pick{position:relative; overflow:hidden; display:inline-flex; align-items:center; gap:7px; height:44px; padding:0 16px;
+        border-radius:14px; background:var(--yellow); color:#231a00; font-weight:900; font-size:14px; border:none}
+  .pick.alt{background:rgba(255,255,255,.14); color:#fff; border:1px solid var(--line)}
+  .pick input{position:absolute; inset:0; opacity:0; cursor:pointer}
+  .cover .note{font-size:11.5px; opacity:.72; line-height:1.5}
+  .cover .note b{color:#ffd76a}
+
+  /* ---------- quiz ---------- */
+  .quizwrap{flex:0 0 auto; min-height:0; display:flex; justify-content:stretch}
+  .quiz{display:none; width:100%; flex-direction:column; gap:7px; padding:10px 12px; border-radius:var(--r);
+        background:linear-gradient(180deg, rgba(28,52,120,.95), rgba(10,26,64,.96)); border:1px solid rgba(255,255,255,.22);
+        box-shadow:0 12px 30px rgba(0,0,0,.35); max-height:46dvh; overflow-y:auto}
+  .quiz.show{display:flex; animation:pop .2s ease-out}
+  .qhead{display:flex; align-items:center; justify-content:space-between; gap:8px}
+  .qno{font-size:11px; font-weight:900; letter-spacing:.4px; padding:3px 9px; border-radius:999px;
+       background:rgba(255,255,255,.16); border:1px solid var(--line)}
+  .qresume{font-size:10.5px; opacity:.6; font-weight:800; white-space:nowrap}
+  .q-en{font-size:19px; font-weight:900; line-height:1.22; letter-spacing:-.2px}
+  .q-kr{display:none; font-size:12.5px; opacity:.75; line-height:1.35; margin-top:-2px}
+  body.kr .q-kr{display:block}
+  .opts{display:grid; grid-template-columns:1fr; gap:6px}
+  @media (min-width:420px){ .opts{grid-template-columns:1fr 1fr} .opts.three .opt:first-child{grid-column:1 / -1} }
+  .opt{display:flex; align-items:center; gap:9px; min-height:46px; padding:7px 11px; border-radius:13px;
+       border:1.5px solid rgba(255,255,255,.2); background:rgba(255,255,255,.08); text-align:left; font-size:15px; font-weight:800}
+  .opt:active{transform:scale(.985)}
+  .opt .num{flex:0 0 auto; width:24px; height:24px; border-radius:8px; background:rgba(255,255,255,.16);
+            display:inline-flex; align-items:center; justify-content:center; font-size:12px; font-weight:900}
+  .opt .txt{display:flex; flex-direction:column; gap:1px; min-width:0}
+  .opt .txt b{font-size:15px; line-height:1.2; font-weight:800}
+  .opt.ok{background:rgba(40,199,111,.28); border-color:var(--green)}
+  .opt.no{background:rgba(255,77,94,.24); border-color:var(--red); animation:shake .3s}
+  .opt[disabled]{opacity:.55}
+  .fb{min-height:0; font-size:12.5px; font-weight:800; color:#ffe89a}
+  .fb:empty{display:none}
+  .qfoot{display:flex; align-items:center; gap:6px; flex-wrap:wrap}
+  .btn{height:36px; padding:0 13px; border-radius:11px; border:1px solid var(--line); background:var(--card);
+       font-size:12.5px; font-weight:800; display:inline-flex; align-items:center; justify-content:center; gap:5px; white-space:nowrap}
+  .btn:active{transform:scale(.96)}
+  .btn.tiny{height:30px; padding:0 9px; font-size:11.5px; border-radius:9px}
+  .btn.play{width:50px; background:#fff; color:#0b1f4b; border-color:#fff}
+  .btn.solid{background:var(--yellow); color:#231a00; border-color:var(--yellow)}
+
+  /* ---------- controls ---------- */
+  .controls{flex:0 0 auto; display:flex; flex-direction:column; gap:5px; padding-top:2px}
+  .seekrow{display:flex; align-items:center; gap:8px}
+  .seekrow .time{font-size:11px; font-weight:800; opacity:.75; min-width:36px; text-align:center; font-variant-numeric:tabular-nums}
+  .seekwrap{position:relative; flex:1 1 auto; height:22px; display:flex; align-items:center}
+  .ticks{position:absolute; left:0; right:0; top:50%; height:6px; transform:translateY(-50%); pointer-events:none}
+  .ticks i{position:absolute; top:0; width:2px; height:6px; border-radius:1px; background:rgba(255,204,51,.75); transform:translateX(-1px)}
+  .ticks i.done{background:rgba(40,199,111,.95)}
+  input.seek{-webkit-appearance:none; appearance:none; width:100%; height:6px; border-radius:999px; margin:0;
+             background:rgba(255,255,255,.22); outline:none}
+  input.seek::-webkit-slider-thumb{-webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+             background:#fff; border:2px solid var(--sky); box-shadow:0 1px 4px rgba(0,0,0,.4)}
+  input.seek::-moz-range-thumb{width:16px; height:16px; border-radius:50%; background:#fff; border:2px solid var(--sky)}
+  .btnrow{display:flex; align-items:center; justify-content:center; gap:8px}
+  .btnrow .btn{height:38px; min-width:44px}
+
+  /* ---------- drawer ---------- */
+  .veil{position:fixed; inset:0; background:rgba(2,6,16,.62); opacity:0; pointer-events:none; transition:opacity .18s; z-index:40}
+  .veil.show{opacity:1; pointer-events:auto}
+  .drawer{position:fixed; top:0; bottom:0; right:0; width:min(86vw, 340px); z-index:50; transform:translateX(102%);
+          transition:transform .22s ease; background:linear-gradient(180deg,#132a63,#081632); border-left:1px solid var(--line);
+          display:flex; flex-direction:column; padding:14px 12px calc(14px + env(safe-area-inset-bottom))}
+  .drawer.open{transform:none}
+  .drawer h3{margin:0 0 8px; font-size:15px; letter-spacing:-.2px}
+  .drawer .list{flex:1 1 auto; overflow-y:auto; display:flex; flex-direction:column; gap:6px}
+  .chap{display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:11px; border:1px solid transparent;
+        background:rgba(255,255,255,.06); font-size:13px; font-weight:700; text-align:left}
+  .chap .ct{font-size:11px; opacity:.6; font-variant-numeric:tabular-nums}
+  .chap.now{background:rgba(255,204,51,.2); border-color:rgba(255,204,51,.5)}
+  .drawer .close{margin-top:10px}
+
+  .toast{position:fixed; left:50%; top:calc(env(safe-area-inset-top) + 100px); transform:translate(-50%, -10px); background:rgba(6,16,38,.94);
+         border:1px solid var(--line); padding:9px 15px; border-radius:12px; font-size:12.5px; font-weight:800;
+         opacity:0; pointer-events:none; transition:opacity .18s, transform .18s; z-index:60; max-width:86vw; text-align:center}
+  .toast.show{opacity:1; transform:translate(-50%, 0)}
+
+  @keyframes pop{0%{transform:scale(.96); opacity:.4} 100%{transform:scale(1); opacity:1}}
+  @keyframes shake{0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)} 75%{transform:translateX(5px)}}
+
+  /* landscape phone / tablet: quiz on the right */
+  @media (min-aspect-ratio: 3/2) and (min-width:640px){
+    main{display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
+         grid-template-rows:minmax(0,1fr) auto; grid-template-areas:"stage quiz" "controls controls"; gap:10px}
+    .stage{grid-area:stage}
+    .quizwrap{grid-area:quiz; min-height:0}
+    .quiz{max-height:none; height:100%}
+    .controls{grid-area:controls}
+    .q-en{font-size:17px}
+    .opts{grid-template-columns:1fr}
+    .opts.three .opt:first-child{grid-column:auto}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand"><span class="ico">🎬</span><b>Zippy and Me</b><small id="epTag">1</small></div>
+    <div class="spacer"></div>
+    <div class="stars" id="starBox" title="Stars">⭐ <b id="starCount">0</b><span style="opacity:.65">/<span id="starMax">38</span></span></div>
+    <button class="tb" id="btnKr" title="Show Korean meaning"><span class="wide" id="krWide">한글 뜻 보기</span><span class="narrow" id="krNarrow">한글</span></button>
+    <button class="tb" id="btnMenu" title="Chapters">☰<span class="wide">&nbsp;Chapters</span></button>
+  </header>
+
+  <div class="epbar" id="epBar"></div>
+
+  <main>
+    <div class="stage empty" id="stage">
+      <video id="video" playsinline webkit-playsinline preload="metadata" controlslist="nodownload"></video>
+      <div class="hud">
+        <div class="row">
+          <span class="chip" id="chipCh">1 · Hello, Zippy!</span>
+          <button class="mini" id="btnFull" title="Full screen">⛶</button>
+        </div>
+        <div class="row">
+          <span class="chip ghost" id="chipTime">0:00 / 0:00</span>
+          <span></span>
+        </div>
+      </div>
+      <div class="cover" id="cover">
+        <h2>Let's watch Zippy and Me</h2>
+        <p id="coverHint">Pick the video for this episode. If the file names have 1, 2 or 3 in them, they will match by themselves.</p>
+        <div class="pickrow">
+          <label class="pick">📁 Choose folder<input type="file" id="folderInput" webkitdirectory multiple></label>
+          <label class="pick alt">🎥 Choose files<input type="file" id="fileInput" multiple accept="video/*,.mp4,.m4v,.avi,.mkv,.mov"></label>
+        </div>
+        <p class="note" id="coverNote">Use the <b>MP4</b> files (zippy1.mp4, zippy2.mp4, zippy3.mp4). AVI files cannot play in the browser.</p>
+      </div>
+    </div>
+
+    <section class="quizwrap">
+      <div class="quiz" id="quiz">
+        <div class="qhead">
+          <span class="qno" id="qNo">Q 1</span>
+          <span class="qresume" id="qResume"></span>
+        </div>
+        <div class="q-en" id="qEn"></div>
+        <div class="q-kr" id="qKr"></div>
+        <div class="opts three" id="qOpts"></div>
+        <div class="fb" id="qFb"></div>
+        <div class="qfoot">
+          <button class="btn tiny" id="btnHint">💡 Hint</button>
+          <button class="btn tiny" id="btnReplay">🔁 Watch again</button>
+          <div class="spacer"></div>
+          <button class="btn tiny" id="btnSkip">Skip →</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="controls">
+      <div class="seekrow">
+        <span class="time" id="tCur">0:00</span>
+        <div class="seekwrap">
+          <div class="ticks" id="ticks"></div>
+          <input class="seek" id="seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Seek">
+        </div>
+        <span class="time" id="tDur">0:00</span>
+      </div>
+      <div class="btnrow">
+        <button class="btn" id="btnBack" title="Back 10 seconds">−10</button>
+        <button class="btn play" id="btnPlay" title="Play / Pause">▶</button>
+        <button class="btn" id="btnFwd" title="Forward 10 seconds">+10</button>
+        <button class="btn" id="btnSpeed" title="Speed">1×</button>
+        <button class="btn" id="btnFull2" title="Full screen">⛶</button>
+      </div>
+    </div>
+  </main>
+
+  <div class="veil" id="veil"></div>
+  <aside class="drawer" id="drawer">
+    <h3 id="drawerTitle">Chapters</h3>
+    <div class="list" id="chapList"></div>
+    <button class="btn solid close" id="btnCloseDrawer">Close</button>
+  </aside>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* =========================================================
+   Zippy and Me — watch & answer player
+   Quiz points are measured from the real videos (frames checked).
+   All on-screen text is English. Korean appears only with 한글.
+   ========================================================= */
+
+const EPISODES = {
+  1: {
+    n: 1, name: 'Zippy and Me 1', dur: 2308.35,
+    chapters: [
+      { t: 45,   name: 'Hello, Zippy!' },
+      { t: 360,  name: "Zippy's Question Box" },
+      { t: 465,  name: 'Zippy Reads the News' },
+      { t: 540,  name: 'Wake Up and Stretch' },
+      { t: 690,  name: 'Dance Party' },
+      { t: 840,  name: 'Snack Time' },
+      { t: 1020, name: 'Head and Shoulders' },
+      { t: 1260, name: 'Peekaboo!' },
+      { t: 1425, name: 'Wiggly Me!' },
+      { t: 1605, name: 'What Is It?' },
+      { t: 1725, name: 'Bounce With Me!' },
+      { t: 1890, name: 'I Like to Laugh' },
+      { t: 2160, name: 'Goodbye!' }
+    ],
+    stops: [
+      { at: 64, ch: 1, qEn: 'Look up! What is in the sky?', qKr: '하늘을 봐요! 하늘에 무엇이 있나요?',
+        opts: [{en:'A rainbow', kr:'무지개'}, {en:'The moon', kr:'달'}, {en:'A star', kr:'별'}], correct: 0,
+        hintEn: 'You can see it after the rain.', hintKr: '비가 그친 뒤에 보여요.' },
+      { at: 145, ch: 1, qEn: 'Who is standing with the girl?', qKr: '여자아이와 함께 있는 동물은 무엇인가요?',
+        opts: [{en:'A squirrel', kr:'다람쥐'}, {en:'A duck', kr:'오리'}, {en:'A cat', kr:'고양이'}], correct: 0,
+        hintEn: 'It has a big bushy tail.', hintKr: '꼬리가 크고 풍성해요.' },
+      { at: 400, ch: 2, qEn: 'What is on the box?', qKr: '상자에 무엇이 그려져 있나요?',
+        opts: [{en:'Question marks', kr:'물음표'}, {en:'Stars', kr:'별'}, {en:'Hearts', kr:'하트'}], correct: 0,
+        hintEn: 'Zippy is asking you something.', hintKr: '지피가 무엇인가 물어보고 있어요.' },
+      { at: 510, ch: 3, qEn: 'What is Zippy reading?', qKr: '지피가 무엇을 읽고 있나요?',
+        opts: [{en:'A newspaper', kr:'신문'}, {en:'A picture book', kr:'그림책'}, {en:'A letter', kr:'편지'}], correct: 0,
+        hintEn: 'It is big and full of small letters.', hintKr: '커다랗고 작은 글자가 가득해요.' },
+      { at: 1026, ch: 7, qEn: 'Head and shoulders, knees and ___!', qKr: '머리와 어깨, 무릎 그리고 ___!',
+        opts: [{en:'toes', kr:'발가락'}, {en:'nose', kr:'코'}, {en:'hands', kr:'손'}], correct: 0,
+        hintEn: 'They are at the end of your feet.', hintKr: '발끝에 있어요.' },
+      { at: 1145, ch: 7, qEn: 'Where are her hands?', qKr: '여자아이의 손은 어디에 있나요?',
+        opts: [{en:'On her toes', kr:'발끝'}, {en:'On her head', kr:'머리 위'}, {en:'On her shoulders', kr:'어깨'}], correct: 0,
+        hintEn: 'She is bending down low.', hintKr: '몸을 아래로 굽히고 있어요.' },
+      { at: 1235, ch: 7, qEn: 'How many children are standing?', qKr: '서 있는 어린이는 몇 명인가요?',
+        opts: [{en:'Four', kr:'넷'}, {en:'Two', kr:'둘'}, {en:'Six', kr:'여섯'}], correct: 0,
+        hintEn: 'Count them one by one.', hintKr: '하나씩 세어 보세요.' },
+      { at: 1432, ch: 9, qEn: 'Who is wiggly?', qKr: '무엇이 꿈틀꿈틀 움직이나요?',
+        opts: [{en:'A worm', kr:'지렁이'}, {en:'A cat', kr:'고양이'}, {en:'A girl', kr:'여자아이'}], correct: 0,
+        hintEn: 'It is long and orange.', hintKr: '길쭉하고 주황색이에요.' },
+      { at: 1630, ch: 10, qEn: 'What animal is this?', qKr: '이 그림자 속 동물은 무엇인가요?',
+        opts: [{en:'A rabbit', kr:'토끼'}, {en:'A bird', kr:'새'}, {en:'A fish', kr:'물고기'}], correct: 0,
+        hintEn: 'It has two long ears.', hintKr: '귀가 두 개 길게 있어요.' },
+      { at: 1728, ch: 11, qEn: 'The song says: Bounce with ___!', qKr: '노래에서 "Bounce with ___!"라고 해요.',
+        opts: [{en:'me', kr:'나'}, {en:'you', kr:'너'}, {en:'Mom', kr:'엄마'}], correct: 0,
+        hintEn: 'The song asks you to bounce too.', hintKr: '같이 통통 뛰자고 해요.' },
+      { at: 1898, ch: 12, qEn: 'I like to ___!', qKr: '"I like to ___!" 무엇일까요?',
+        opts: [{en:'laugh', kr:'웃다'}, {en:'cry', kr:'울다'}, {en:'sleep', kr:'자다'}], correct: 0,
+        hintEn: 'You make a happy sound with your mouth.', hintKr: '입을 크게 벌리고 기분 좋은 소리를 내요.' },
+      { at: 2120, ch: 12, qEn: 'What number is at the top of the clock?', qKr: '시계 맨 위에 있는 숫자는 무엇인가요?',
+        opts: [{en:'12', kr:'열둘'}, {en:'8', kr:'여덟'}, {en:'6', kr:'여섯'}], correct: 0,
+        hintEn: 'It is the last number before the hour starts again.', hintKr: '한 시간이 다시 시작되기 전 마지막 숫자예요.' },
+      { at: 2157, ch: 13, qEn: 'What is Zippy doing?', qKr: '지피가 무엇을 하고 있나요?',
+        opts: [{en:'Covering his eyes', kr:'눈을 가리고 있어요'}, {en:'Eating a snack', kr:'간식을 먹고 있어요'}, {en:'Sleeping', kr:'자고 있어요'}], correct: 0,
+        hintEn: 'He is playing peekaboo.', hintKr: '까꿍 놀이를 하고 있어요.' }
+    ]
+  },
+  2: {
+    n: 2, name: 'Zippy and Me 2', dur: 2195.40,
+    chapters: [
+      { t: 45,   name: 'Hello Again!' },
+      { t: 120,  name: 'Look at the Window' },
+      { t: 270,  name: 'In the Flower Garden' },
+      { t: 405,  name: "Let's Play Outside" },
+      { t: 900,  name: 'Keep On Trying!' },
+      { t: 1230, name: 'Where Is Bunny?' },
+      { t: 1560, name: 'Give a Little Wiggle' },
+      { t: 1845, name: 'A Present for Zippy' },
+      { t: 1890, name: "This Is 'Hello!'" },
+      { t: 2100, name: 'Goodbye!' }
+    ],
+    stops: [
+      { at: 105, ch: 1, qEn: 'How many children are there?', qKr: '어린이가 몇 명 있나요?',
+        opts: [{en:'Four', kr:'넷'}, {en:'Three', kr:'셋'}, {en:'Five', kr:'다섯'}], correct: 0,
+        hintEn: 'Two boys and two girls.', hintKr: '남자아이 둘, 여자아이 둘이에요.' },
+      { at: 300, ch: 3, qEn: 'Who is next to Zippy?', qKr: '지피 옆에 있는 친구는 누구인가요?',
+        opts: [{en:'Bunny', kr:'바니'}, {en:'A worm', kr:'지렁이'}, {en:'A duck', kr:'오리'}], correct: 0,
+        hintEn: 'It has long ears and a pink bow.', hintKr: '귀가 길고 분홍 리본을 했어요.' },
+      { at: 420, ch: 4, qEn: 'What animal is this?', qKr: '이 동물은 무엇인가요?',
+        opts: [{en:'A squirrel', kr:'다람쥐'}, {en:'A horse', kr:'말'}, {en:'A cow', kr:'소'}], correct: 0,
+        hintEn: 'It is orange and loves nuts.', hintKr: '주황색이고 도토리를 좋아해요.' },
+      { at: 515, ch: 4, qEn: 'What is on the floor?', qKr: '바닥에 무엇이 있나요?',
+        opts: [{en:'A pink cushion', kr:'분홍 쿠션'}, {en:'A ball', kr:'공'}, {en:'A book', kr:'책'}], correct: 0,
+        hintEn: 'It is soft, and you can sit on it.', hintKr: '푹신해서 앉을 수 있어요.' },
+      { at: 925, ch: 5, qEn: 'What is she riding?', qKr: '여자아이가 무엇을 타고 있나요?',
+        opts: [{en:'A bicycle', kr:'자전거'}, {en:'A car', kr:'자동차'}, {en:'A horse', kr:'말'}], correct: 0,
+        hintEn: 'It has two wheels and pedals.', hintKr: '바퀴 둘과 페달이 있어요.' },
+      { at: 1215, ch: 6, qEn: 'Where are Zippy and Bunny?', qKr: '지피와 바니는 어디에 있나요?',
+        opts: [{en:'In the kitchen', kr:'부엌'}, {en:'In the garden', kr:'정원'}, {en:'In the car', kr:'자동차 안'}], correct: 0,
+        hintEn: 'There is a fridge and fruit on the table.', hintKr: '냉장고와 과일이 있는 탁자가 있어요.' },
+      { at: 1265, ch: 6, qEn: 'Where is Bunny?', qKr: '바니는 어디에 있나요?',
+        opts: [{en:'She is hiding', kr:'숨었어요'}, {en:'She is sleeping', kr:'자고 있어요'}, {en:'She is eating', kr:'먹고 있어요'}], correct: 0,
+        hintEn: 'Zippy is looking for her everywhere.', hintKr: '지피가 바니를 찾아다니고 있어요.' },
+      { at: 1455, ch: 6, qEn: 'Where is Bunny now?', qKr: '이번에는 바니가 어디에 있나요?',
+        opts: [{en:'On the stairs', kr:'계단'}, {en:'In the box', kr:'상자 안'}, {en:'On the bed', kr:'침대 위'}], correct: 0,
+        hintEn: 'There are yellow steps going up.', hintKr: '노란 층계가 위로 올라가요.' },
+      { at: 1650, ch: 7, qEn: 'Where are his hands?', qKr: '남자아이의 손은 어디에 있나요?',
+        opts: [{en:'On his hips', kr:'허리'}, {en:'On his head', kr:'머리 위'}, {en:'On the floor', kr:'바닥'}], correct: 0,
+        hintEn: 'They are on the sides of his body.', hintKr: '몸 옆쪽에 있어요.' },
+      { at: 1770, ch: 7, qEn: 'What is he doing?', qKr: '남자아이는 무엇을 하고 있나요?',
+        opts: [{en:'Counting', kr:'숫자를 세고 있어요'}, {en:'Sleeping', kr:'자고 있어요'}, {en:'Reading', kr:'책을 읽고 있어요'}], correct: 0,
+        hintEn: 'One, two, three… with his fingers.', hintKr: '손가락으로 하나, 둘, 셋…' },
+      { at: 1890, ch: 8, qEn: 'What is in front of Zippy?', qKr: '지피 앞에 있는 것은 무엇인가요?',
+        opts: [{en:'A present', kr:'선물 상자'}, {en:'A cake', kr:'케이크'}, {en:'A ball', kr:'공'}], correct: 0,
+        hintEn: 'It has a ribbon on it.', hintKr: '리본이 달려 있어요.' },
+      { at: 1945, ch: 9, qEn: 'What color is her hat?', qKr: '여자아이의 모자 색은 무엇인가요?',
+        opts: [{en:'Black', kr:'검정'}, {en:'Red', kr:'빨강'}, {en:'White', kr:'하양'}], correct: 0,
+        hintEn: 'It is as dark as the night sky.', hintKr: '밤하늘처럼 어두운 색이에요.' }
+    ]
+  },
+  3: {
+    n: 3, name: 'Zippy and Me 3', dur: 2864.90,
+    chapters: [
+      { t: 45,   name: 'Hello!' },
+      { t: 90,   name: "Zippy's Red Cap" },
+      { t: 240,  name: "Let's Go for a Ride" },
+      { t: 510,  name: 'Ducks This Way' },
+      { t: 660,  name: 'Yellow Caps' },
+      { t: 825,  name: 'A Crayon and a Cat' },
+      { t: 960,  name: 'Does a Cat Say Meow?' },
+      { t: 1200, name: "I'm Hungry!" },
+      { t: 1800, name: 'Count With Me' },
+      { t: 2115, name: 'On the Fence' },
+      { t: 2400, name: 'Rock and Roll' },
+      { t: 2760, name: 'Goodbye!' }
+    ],
+    stops: [
+      { at: 110, ch: 2, qEn: "What color is Zippy's cap?", qKr: '지피가 쓴 모자 색은 무엇인가요?',
+        opts: [{en:'Red', kr:'빨강'}, {en:'Blue', kr:'파랑'}, {en:'Green', kr:'초록'}], correct: 0,
+        hintEn: 'It has a little propeller on top.', hintKr: '위에 작은 프로펠러가 달려 있어요.' },
+      { at: 520, ch: 3, qEn: 'What color is the car?', qKr: '자동차 색은 무엇인가요?',
+        opts: [{en:'Yellow', kr:'노랑'}, {en:'Red', kr:'빨강'}, {en:'Blue', kr:'파랑'}], correct: 0,
+        hintEn: 'It is the same color as the sun.', hintKr: '해와 같은 색이에요.' },
+      { at: 590, ch: 4, qEn: 'Where are the ducks?', qKr: '오리들은 어디에 있나요?',
+        opts: [{en:'In the water', kr:'물속'}, {en:'In the tree', kr:'나무 위'}, {en:'On the road', kr:'길 위'}], correct: 0,
+        hintEn: 'They are swimming.', hintKr: '수영하고 있어요.' },
+      { at: 720, ch: 5, qEn: 'How many children are sitting?', qKr: '앉아 있는 어린이는 몇 명인가요?',
+        opts: [{en:'Three', kr:'셋'}, {en:'Two', kr:'둘'}, {en:'Four', kr:'넷'}], correct: 0,
+        hintEn: 'One, two, three.', hintKr: '하나, 둘, 셋.' },
+      { at: 930, ch: 6, qEn: 'Where is Bunny?', qKr: '바니는 어디에 있나요?',
+        opts: [{en:'Behind the box', kr:'상자 뒤'}, {en:'Under the bed', kr:'침대 밑'}, {en:'On the table', kr:'탁자 위'}], correct: 0,
+        hintEn: 'You can see her ears over the box.', hintKr: '상자 위로 귀가 보여요.' },
+      { at: 970, ch: 7, qEn: 'Does a cat say meow?', qKr: '고양이는 "야옹" 하고 우나요?',
+        opts: [{en:'Yes!', kr:'네!'}, {en:'No, it says woof', kr:'아니요, 멍멍'}, {en:'No, it says moo', kr:'아니요, 음매'}], correct: 0,
+        hintEn: 'Listen to the song.', hintKr: '노래를 들어 보세요.' },
+      { at: 1035, ch: 7, qEn: 'What animal is this?', qKr: '이 동물은 무엇인가요?',
+        opts: [{en:'A rooster', kr:'수탉'}, {en:'A duck', kr:'오리'}, {en:'A cow', kr:'소'}], correct: 0,
+        hintEn: 'It has a red comb on its head.', hintKr: '머리에 빨간 볏이 있어요.' },
+      { at: 1095, ch: 7, qEn: 'How many animals can you see?', qKr: '동물이 몇 마리 보이나요?',
+        opts: [{en:'Four', kr:'네'}, {en:'Three', kr:'세'}, {en:'Five', kr:'다섯'}], correct: 0,
+        hintEn: 'Look at the four pictures.', hintKr: '네 칸 그림을 보세요.' },
+      { at: 1425, ch: 8, qEn: 'What is in the green bowl?', qKr: '초록 그릇 안에 있는 것은 무엇인가요?',
+        opts: [{en:'Popcorn', kr:'팝콘'}, {en:'Apples', kr:'사과'}, {en:'Juice', kr:'주스'}], correct: 0,
+        hintEn: 'It is white and puffy.', hintKr: '하얗고 폭신폭신해요.' },
+      { at: 1770, ch: 8, qEn: 'Where is Zippy?', qKr: '지피는 어디에 있나요?',
+        opts: [{en:'In bed', kr:'침대 위'}, {en:'On the sofa', kr:'소파'}, {en:'In the car', kr:'자동차'}], correct: 0,
+        hintEn: 'He has a yellow blanket.', hintKr: '노란 담요를 덮고 있어요.' },
+      { at: 1890, ch: 9, qEn: 'How many oranges are in the bowl?', qKr: '그릇에 오렌지가 몇 개 있나요?',
+        opts: [{en:'Four', kr:'네'}, {en:'Three', kr:'세'}, {en:'Five', kr:'다섯'}], correct: 0,
+        hintEn: 'Count them one by one.', hintKr: '하나씩 세어 보세요.' },
+      { at: 1940, ch: 9, qEn: 'What color is the vase?', qKr: '꽃병 색은 무엇인가요?',
+        opts: [{en:'Red', kr:'빨강'}, {en:'Yellow', kr:'노랑'}, {en:'Blue', kr:'파랑'}], correct: 0,
+        hintEn: 'It is a strong, warm color.', hintKr: '따뜻하고 힘 있는 색이에요.' },
+      { at: 2430, ch: 11, qEn: 'What are these?', qKr: '이것들은 무엇인가요?',
+        opts: [{en:'Balloons', kr:'풍선'}, {en:'Balls', kr:'공'}, {en:'Apples', kr:'사과'}], correct: 0,
+        hintEn: 'They float up at a party.', hintKr: '파티에서 둥둥 떠 있어요.' }
+    ]
+  }
+};
+
+/* ---------------- state ---------------- */
+const KEY = 'zippy-and-me-player-v1';
+const store = { eps:{}, files:{}, kr:false, lastEp:1 };
+try {
+  const raw = localStorage.getItem(KEY);
+  if (raw) {
+    const o = JSON.parse(raw) || {};
+    if (o.eps) store.eps = o.eps;
+    if (o.files) store.files = o.files;
+    if (typeof o.kr === 'boolean') store.kr = o.kr;
+    if (o.lastEp && EPISODES[o.lastEp]) store.lastEp = o.lastEp;
+  }
+} catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} };
+const $ = id => document.getElementById(id);
+const fmt = s => { if (!isFinite(s)) return '0:00'; s = Math.max(0, Math.floor(s)); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); };
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const TOTAL_STOPS = Object.values(EPISODES).reduce((n,e) => n + e.stops.length, 0);
+
+function epStore(n){
+  if (!store.eps[n]) store.eps[n] = { stars:[], lastTime:0, cleared:[] };
+  const e = store.eps[n];
+  if (!Array.isArray(e.stars)) e.stars = [];
+  if (!Array.isArray(e.cleared)) e.cleared = [];
+  if (typeof e.lastTime !== 'number') e.lastTime = 0;
+  return e;
+}
+
+const S = { ep: store.lastEp, loaded:{}, stop:null, cleared:new Set(), tries:0, resumePoint:0 };
+
+/* ---------------- sound ---------------- */
+let actx = null;
+const audio = () => {
+  if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+  if (actx && actx.state === 'suspended') actx.resume().catch(()=>{});
+  return actx;
+};
+function tone(f, at, dur, type, vol){
+  const ctx = audio(); if (!ctx) return;
+  const t = ctx.currentTime + at, o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol || .2, t + .02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + dur + .02);
+}
+const sfx = {
+  ding(){ tone(880,0,.15,'sine',.22); tone(1318.5,.12,.26,'sine',.2); tone(1760,.24,.4,'sine',.14); },
+  wrong(){ tone(233,0,.18,'triangle',.16); tone(196,.16,.22,'triangle',.13); },
+  tap(){ tone(660,0,.07,'sine',.09); }
+};
+
+/* ---------------- toast ---------------- */
+let toastTimer = 0;
+function toast(msg){
+  const el = $('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+/* ---------------- Korean toggle ---------------- */
+function paintKr(){
+  document.body.classList.toggle('kr', store.kr);
+  const b = $('btnKr');
+  b.classList.toggle('on', store.kr);
+  $('krWide').textContent = store.kr ? '한글 뜻 가리기' : '한글 뜻 보기';
+  $('krNarrow').textContent = store.kr ? '가리기' : '한글';
+  b.title = store.kr ? 'Hide Korean' : 'Show Korean meaning';
+  $('coverNote').innerHTML = store.kr
+    ? 'MP4 파일(<b>지피앤미1.mp4</b>, <b>지피앤미2.mp4</b>, <b>지피앤미3.mp4</b>)을 골라 주세요. AVI 파일은 브라우저에서 재생되지 않아요.'
+    : 'Use the <b>MP4</b> files for Book 1, Book 2 and Book 3. AVI files cannot play in the browser.';
+  $('coverHint').textContent = store.kr
+    ? '이 회차의 영상을 골라 주세요. 파일 이름에 1, 2, 3이 있으면 회차를 알아서 맞춰요.'
+    : 'Pick the video for this episode. If the file names have 1, 2 or 3 in them, they will match by themselves.';
+}
+$('btnKr').onclick = () => { store.kr = !store.kr; save(); paintKr(); paintQuiz(); sfx.tap(); };
+
+/* ---------------- file name → episode ---------------- */
+function mapFile(name){
+  const base = String(name || '').split(/[\\/]/).pop().replace(/\.[a-z0-9]{2,5}$/i, '');
+  if (!base) return null;
+  const s = base.replace(/\s+/g, ' ');
+  let m;
+  if ((m = s.match(/(?:지피\s*앤\s*미|지피앤미|zippy\s*and\s*me|zippy)\s*[-_ ]?0*([1-9])(?![0-9])/i))) return +m[1];
+  if ((m = s.match(/(?:book|vol|volume|편|회)\s*[-_ ]?0*([1-9])(?![0-9])/i))) return +m[1];
+  if ((m = s.match(/^\s*0*([1-9])(?![0-9])/))) return +m[1];
+  if ((m = s.match(/(?:^|[^0-9])0*([1-9])(?![0-9])\s*$/))) return +m[1];
+  const toks = s.match(/\d{1,2}/g);
+  if (toks) { const n = +toks[toks.length - 1]; if (n >= 1 && n <= 9) return n; }
+  return null;
+}
+
+/* ---------------- attach files ---------------- */
+const video = $('video'), stage = $('stage');
+function attachFiles(list){
+  const files = Array.from(list || []).filter(f => /^video\//.test(f.type) || /\.(mp4|m4v|mov|webm|mkv|avi)$/i.test(f.name));
+  if (!files.length) { toast(store.kr ? '영상 파일을 찾지 못했어요' : 'No video file was found'); return 0; }
+  let n = 0;
+  files.forEach(f => {
+    const ep = mapFile(f.name);
+    if (!ep || !EPISODES[ep]) return;
+    const prev = S.loaded[ep];
+    if (prev && prev.url) { try { URL.revokeObjectURL(prev.url); } catch (e) {} }
+    S.loaded[ep] = { url: URL.createObjectURL(f), name: f.name, file: f };
+    store.files[ep] = f.name; n++;
+  });
+  save();
+  renderEpBar();
+  if (n) {
+    const first = files.map(f => mapFile(f.name)).filter(e => e && EPISODES[e])[0];
+    toast((store.kr ? '영상 연결 완료: ' : 'Video linked: ') + n + (store.kr ? '개' : ' file(s)'));
+    if (first && first !== S.ep) selectEp(first, {});
+    else loadEpisodeMedia(true);
+  } else {
+    toast(store.kr ? '파일 이름에서 회차를 찾지 못했어요' : 'Could not tell the episode from the file name');
+  }
+  return n;
+}
+$('fileInput').onchange = e => { attachFiles(e.target.files); e.target.value = ''; };
+$('folderInput').onchange = e => { attachFiles(e.target.files); e.target.value = ''; };
+$('cover').addEventListener('click', e => { if (e.target.closest('.pick')) sfx.tap(); });
+
+/* ---------------- episodes ---------------- */
+function renderEpBar(){
+  const bar = $('epBar');
+  bar.innerHTML = '';
+  Object.keys(EPISODES).forEach(k => {
+    const n = +k, ep = EPISODES[n], es = epStore(n);
+    const b = document.createElement('button');
+    b.className = 'epchip' + (S.ep === n ? ' now' : '') + ((S.loaded[n] || es.lastTime > 0) ? ' has' : '');
+    b.dataset.ep = n;
+    b.innerHTML = 'Book ' + n + ' <span class="tick">●</span> <span style="opacity:.6">' + es.stars.length + '/' + ep.stops.length + '</span>';
+    b.onclick = () => selectEp(n, { wantPlay: false });
+    bar.appendChild(b);
+  });
+}
+
+function selectEp(n, opts){
+  opts = opts || {};
+  if (!EPISODES[n]) return;
+  closeQuiz();
+  S.ep = n; store.lastEp = n; save();
+  $('epTag').textContent = String(n);
+  renderEpBar(); buildTicks(); buildDrawer(); paintStars();
+  loadEpisodeMedia(!!opts.wantPlay);
+}
+
+function loadEpisodeMedia(autoplay){
+  const rec = S.loaded[S.ep];
+  closeQuiz();
+  S.stop = null;
+  $('chipCh').textContent = '1 · ' + EPISODES[S.ep].chapters[0].name;
+  if (!rec) {
+    try { video.pause(); } catch (e) {}
+    video.removeAttribute('src'); video.load();
+    stage.classList.add('empty');
+    $('cover').classList.remove('hide');
+    paintTime();
+    return;
+  }
+  stage.classList.remove('empty');
+  $('cover').classList.add('hide');
+  video.src = rec.url;
+  video.load();
+  const es = epStore(S.ep);
+  const last = es.lastTime;
+  if (last > 25) {
+    S.resumePoint = last;
+    toast((store.kr ? '지난번 본 곳부터 이어 볼 수 있어요 · ' : 'Resume from ') + fmt(last));
+  } else S.resumePoint = 0;
+  if (autoplay) video.play().catch(()=>{});
+}
+
+/* ---------------- stars ---------------- */
+function paintStars(){
+  let got = 0;
+  Object.keys(EPISODES).forEach(k => got += epStore(+k).stars.length);
+  $('starCount').textContent = String(got);
+  $('starMax').textContent = String(TOTAL_STOPS);
+}
+function addStar(id){
+  const es = epStore(S.ep);
+  if (es.stars.indexOf(id) >= 0) return false;
+  es.stars.push(id); save();
+  paintStars(); renderEpBar();
+  const box = $('starBox'); box.classList.remove('pop');
+  void box.offsetWidth; box.classList.add('pop');
+  return true;
+}
+
+/* ---------------- ticks ---------------- */
+function buildTicks(){
+  const box = $('ticks');
+  box.innerHTML = '';
+  const dur = EPISODES[S.ep].dur || video.duration || 1;
+  EPISODES[S.ep].stops.forEach((s, i) => {
+    const t = document.createElement('i');
+    t.style.left = (s.at / dur * 100) + '%';
+    t.dataset.id = sid(i);
+    if (epStore(S.ep).cleared.indexOf(sid(i)) >= 0) t.classList.add('done');
+    box.appendChild(t);
+  });
+}
+const sid = i => 'ep' + S.ep + '-' + (i + 1);
+
+/* ---------------- quiz ---------------- */
+function paintQuiz(){
+  if (!S.stop) return;
+  const s = S.stop.stop, idx = S.stop.index;
+  $('qNo').textContent = (store.kr ? '문제 ' : 'Q ') + (idx + 1) + ' / ' + EPISODES[S.ep].stops.length;
+  $('qResume').textContent = fmt(s.at + 1.1);
+  $('qEn').textContent = s.qEn;
+  $('qKr').textContent = s.qKr || '';
+  const opts = $('qOpts');
+  opts.innerHTML = '';
+  s.opts.forEach((o, i) => {
+    const b = document.createElement('button');
+    b.className = 'opt'; b.dataset.i = i;
+    b.innerHTML = '<span class="num">' + (i + 1) + '</span><span class="txt"><b></b></span>';
+    b.querySelector('b').textContent = o.en;
+    b.onclick = () => answer(i);
+    opts.appendChild(b);
+  });
+  $('qFb').textContent = '';
+}
+
+function openQuiz(stopObj){
+  S.stop = stopObj; S.tries = 0;
+  try { video.pause(); } catch (e) {}
+  $('quiz').classList.add('show');
+  document.body.classList.add('quizzing');
+  paintQuiz();
+  sfx.tap();
+  setTimeout(() => { const o = document.querySelector('.opt'); if (o) o.focus(); }, 60);
+}
+function closeQuiz(){
+  S.stop = null;
+  $('quiz').classList.remove('show');
+  document.body.classList.remove('quizzing');
+}
+
+function answer(i){
+  if (!S.stop) return;
+  const s = S.stop.stop, opts = $('qOpts');
+  if (i === s.correct) {
+    const nodes = opts.querySelectorAll('.opt');
+    nodes[i].classList.add('ok');
+    nodes.forEach(n => n.disabled = true);
+    $('qFb').textContent = store.kr ? '정답이에요! ⭐' : 'That’s right! ⭐';
+    sfx.ding();
+    const id = sid(S.stop.index);
+    addStar(id);
+    const es = epStore(S.ep);
+    if (es.cleared.indexOf(id) < 0) { es.cleared.push(id); save(); }
+    const t = document.querySelector('.ticks i[data-id="' + id + '"]'); if (t) t.classList.add('done');
+    const resume = s.at + 1.1;
+    setTimeout(() => { closeQuiz(); S.stop = null; seekTo(resume); video.play().catch(()=>{}); }, 900);
+  } else {
+    S.tries++;
+    const nodes = opts.querySelectorAll('.opt');
+    nodes[i].classList.add('no');
+    setTimeout(() => nodes[i].classList.remove('no'), 450);
+    sfx.wrong();
+    if (S.tries >= 2) {
+      $('qFb').textContent = (store.kr ? '정답은 ' : 'The answer is ') + s.opts[s.correct].en + (store.kr ? ' 예요.' : '.');
+      nodes[s.correct].classList.add('ok');
+    } else {
+      $('qFb').textContent = store.kr ? '한 번 더 들어 볼까요?' : 'Not quite — try again!';
+    }
+  }
+}
+
+$('btnHint').onclick = () => {
+  if (!S.stop) return;
+  const s = S.stop.stop;
+  $('qFb').textContent = store.kr ? (s.hintKr || '') : (s.hintEn || '');
+};
+$('btnReplay').onclick = () => {
+  if (!S.stop) return;
+  const at = S.stop.stop.at;
+  closeQuiz();
+  seekTo(Math.max(0, at - 6));
+  video.play().catch(()=>{});
+};
+$('btnSkip').onclick = () => {
+  if (!S.stop) return;
+  const s = S.stop.stop, id = sid(S.stop.index);
+  const es = epStore(S.ep);
+  if (es.cleared.indexOf(id) < 0) { es.cleared.push(id); save(); }
+  const t = document.querySelector('.ticks i[data-id="' + id + '"]'); if (t) t.classList.add('done');
+  closeQuiz();
+  seekTo(s.at + 1.1);
+  video.play().catch(()=>{});
+};
+
+/* ---------------- playback watcher ---------------- */
+function watch(){
+  const t = video.currentTime, es = epStore(S.ep);
+  const stops = EPISODES[S.ep].stops;
+  for (let i = 0; i < stops.length; i++) {
+    const s = stops[i];
+    if (t >= s.at && t < s.at + 2.2 && es.cleared.indexOf(sid(i)) < 0 && !S.stop) {
+      openQuiz({ index: i, stop: s });
+      break;
+    }
+  }
+  paintTime();
+}
+video.addEventListener('timeupdate', watch);
+video.addEventListener('seeked', () => { if (!S.stop) watch(); });
+
+function seekTo(t){
+  try { video.currentTime = Math.max(0, t); } catch (e) {}
+  paintTime();
+}
+
+/* ---------------- controls ---------------- */
+const seek = $('seek');
+seek.addEventListener('input', () => {
+  const dur = video.duration || EPISODES[S.ep].dur;
+  if (!isFinite(dur) || dur <= 0) return;
+  seekTo(seek.value / 1000 * dur);
+});
+$('btnPlay').onclick = () => {
+  if (!S.loaded[S.ep]) { $('cover').classList.remove('hide'); stage.classList.add('empty'); toast(store.kr ? '먼저 영상을 골라 주세요' : 'Pick a video first'); return; }
+  if (video.paused) {
+    if (S.resumePoint && video.currentTime < 1) { seekTo(S.resumePoint); S.resumePoint = 0; }
+    video.play().catch(()=>{}); sfx.tap();
+  } else { video.pause(); }
+};
+$('btnBack').onclick = () => { seekTo((video.currentTime || 0) - 10); sfx.tap(); };
+$('btnFwd').onclick = () => { seekTo((video.currentTime || 0) + 10); sfx.tap(); };
+const SPEEDS = [1, 1.25, 0.75, 1.5];
+let speedIdx = 0;
+$('btnSpeed').onclick = () => {
+  speedIdx = (speedIdx + 1) % SPEEDS.length;
+  video.playbackRate = SPEEDS[speedIdx];
+  $('btnSpeed').textContent = SPEEDS[speedIdx] + '×';
+  sfx.tap();
+};
+function fullscreen(){
+  const el = stage;
+  if (document.fullscreenElement) { document.exitFullscreen().catch(()=>{}); }
+  else if (el.requestFullscreen) { el.requestFullscreen().catch(()=>{}); }
+  else if (video.webkitEnterFullscreen) { video.webkitEnterFullscreen(); }
+}
+$('btnFull').onclick = fullscreen;
+$('btnFull2').onclick = fullscreen;
+
+video.addEventListener('play', () => { $('btnPlay').textContent = '❚❚'; });
+video.addEventListener('pause', () => { $('btnPlay').textContent = '▶'; });
+video.addEventListener('loadedmetadata', () => { buildTicks(); paintTime(); });
+video.addEventListener('error', () => {
+  if (!video.src) return;
+  const rec = S.loaded[S.ep];
+  const avi = rec && /\.avi$/i.test(rec.name);
+  $('cover').classList.remove('hide');
+  stage.classList.add('empty');
+  $('cover').querySelector('h2').textContent = avi ? 'This file cannot play here' : 'This video did not open';
+  toast(store.kr ? 'AVI 파일은 브라우저에서 재생되지 않아요. MP4 파일을 골라 주세요.'
+                 : 'AVI files do not play in the browser. Please pick the MP4 file.');
+});
+video.addEventListener('timeupdate', () => {
+  const es = epStore(S.ep);
+  if (video.currentTime > 3) { es.lastTime = video.currentTime; }
+});
+
+function paintTime(){
+  const dur = isFinite(video.duration) && video.duration > 0 ? video.duration : (EPISODES[S.ep].dur || 0);
+  const t = video.currentTime || 0;
+  $('tCur').textContent = fmt(t);
+  $('tDur').textContent = fmt(dur);
+  $('chipTime').textContent = fmt(t) + ' / ' + fmt(dur);
+  if (dur > 0) seek.value = String(Math.round(clamp(t / dur, 0, 1) * 1000));
+  const ch = chapterAt(t);
+  $('chipCh').textContent = ch.i + ' · ' + ch.name;
+}
+function chapterAt(t){
+  const chs = EPISODES[S.ep].chapters;
+  let idx = 0;
+  chs.forEach((c, i) => { if (t >= c.t) idx = i; });
+  return { i: idx + 1, name: chs[idx].name, t: chs[idx].t };
+}
+
+/* ---------------- drawer ---------------- */
+function buildDrawer(){
+  $('drawerTitle').textContent = 'Book ' + S.ep + ' · Chapters';
+  const list = $('chapList');
+  list.innerHTML = '';
+  const es = epStore(S.ep);
+  EPISODES[S.ep].chapters.forEach((c, i) => {
+    const b = document.createElement('button');
+    b.className = 'chap';
+    b.innerHTML = '<span class="ct">' + fmt(c.t) + '</span><span class="cn"></span>';
+    b.querySelector('.cn').textContent = c.name;
+    b.onclick = () => { toggleDrawer(false); seekTo(c.t); video.play().catch(()=>{}); };
+    list.appendChild(b);
+  });
+  markChapter();
+}
+function markChapter(){
+  const cur = chapterAt(video.currentTime || 0);
+  document.querySelectorAll('.chap').forEach((el, i) => el.classList.toggle('now', i === cur.i - 1));
+}
+function toggleDrawer(open){
+  $('drawer').classList.toggle('open', open);
+  $('veil').classList.toggle('show', open);
+  if (open) { buildDrawer(); }
+}
+$('btnMenu').onclick = () => toggleDrawer(true);
+$('btnCloseDrawer').onclick = () => toggleDrawer(false);
+$('veil').onclick = () => toggleDrawer(false);
+setInterval(markChapter, 2000);
+
+/* ---------------- boot ---------------- */
+paintKr();
+renderEpBar();
+buildTicks();
+buildDrawer();
+paintStars();
+selectEp(S.ep, {});
+window.__zippy = { S, EPISODES, store, mapFile, attachFiles, TOTAL_STOPS };
+</script>
+</body>
+</html>
