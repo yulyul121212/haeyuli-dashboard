@@ -295,10 +295,10 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
     <div id="callBody">
       <div id="videos">
         <div id="stage">
-          <img class="stage-img" id="picSmile" src="" alt="Pickle 선생님">
-          <img class="stage-img" id="picTalk" src="" alt="Pickle 선생님">
+          <img class="stage-img" id="picSmile" src="" alt="Emma 선생님">
+          <img class="stage-img" id="picTalk" src="" alt="Emma 선생님">
           <div class="stage-badge" id="stageStatus">연결 중…</div>
-          <div class="win-tag">Pickle · Teacher</div>
+          <div class="win-tag">Teacher Emma</div>
         </div>
         <div id="pip" class="noCam" role="button" tabindex="0" aria-label="내 카메라">
           <video id="selfVideo" playsinline muted autoplay></video>
@@ -323,8 +323,8 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 
       <div id="talk">
         <div class="bubble-row">
-          <div class="pickle-av">🐣</div>
-          <div class="bubble" id="teacherBubble">Hi! I'm Pickle.</div>
+          <div class="pickle-av">👩‍🏫</div>
+          <div class="bubble" id="teacherBubble">Hi! I'm Emma.</div>
         </div>
         <div class="child-line" id="childLine"></div>
         <div class="answer-row" id="answerRow"></div>
@@ -453,7 +453,7 @@ const ASSETS = {"pickle": {"smile": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAA
       id: 'colors', emoji: '🎨', name: 'Colors', ko: '색깔 이야기', cards: ['red', 'blue', 'yellow', 'green', 'rainbow'],
       words: ['red', 'blue', 'yellow', 'green', 'rainbow'],
       turns: [
-        T('red', 'Red', '빨간색', [L("Hi Haeyul! I'm Pickle. Let's talk about colors!", '안녕 해율! 나는 피클이야. 색깔 이야기 하자!'), L('Look at the picture. What color is it?', '그림을 봐. 무슨 색이야?')],
+        T('red', 'Red', '빨간색', [L("Hi Haeyul! I'm Emma. Let's talk about colors!", '안녕 해율! 나는 엠마야. 색깔 이야기 하자!'), L('Look at the picture. What color is it?', '그림을 봐. 무슨 색이야?')],
           [A("It's red!", '빨간색이야!', ['red', '빨간', '빨강']), A('I see red.', '빨간색이 보여.', ['see red', 'red one']), A('Red, like an apple.', '사과처럼 빨강!', ['like an apple', 'apple'])],
           "빨간색은 영어로 'red'! 'It's red!'라고 말해 봐.", "It's red!"),
         T('blue', 'Blue', '파란색', [L('Yes, red!', '맞아, 빨강!'), L('Now, what color is this one?', '이번엔 무슨 색일까?')],
@@ -549,7 +549,7 @@ const ASSETS = {"pickle": {"smile": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAA
       id: 'self', emoji: '👋', name: 'Hello, Me!', ko: '자기소개', cards: ['hello', 'namecard', 'seven', 'house', 'school'],
       words: ['My name is Haeyul', 'I am seven', 'I am happy', 'I live in Korea', 'school'],
       turns: [
-        T('hello', 'Hello!', '안녕!', [L("Hi! I'm Pickle. Nice to meet you!", '안녕! 나는 피클이야. 만나서 반가워!'), L("What's your name?", '이름이 뭐야?')],
+        T('hello', 'Hello!', '안녕!', [L("Hi! I'm Emma. Nice to meet you!", '안녕! 나는 엠마야. 만나서 반가워!'), L("What's your name?", '이름이 뭐야?')],
           [A('My name is Haeyul.', '내 이름은 해율이야.', ['my name is', 'haeyul', '해율']), A("I'm Haeyul.", '나는 해율이야.', ['haeyul', '해율']), A('Haeyul!', '해율!', ['haeyul', '해율'])],
           "'내 이름은 ~'는 'My name is Haeyul.'이라고 해.", 'My name is Haeyul.'),
         T('seven', 'I am seven', '나는 7살', [L('Nice to meet you, Haeyul!', '만나서 반가워, 해율!'), L('How old are you?', '몇 살이야?')],
@@ -1377,7 +1377,7 @@ const ASSETS = {"pickle": {"smile": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAA
     applyTurnCard(turn);
     renderChips(turn.answers);
     updateCallSub();
-    setStatus('Pickle가 말하는 중 🗣️');
+    setStatus('Emma 선생님이 말하는 중 🗣️');
 
     var parts = turn.say || [];
     for (var i = 0; i < parts.length; i++) {
