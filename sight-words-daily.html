@@ -205,6 +205,19 @@
     display:flex;align-items:center;justify-content:center;padding:10px 14px;
     transition:transform .1s ease, background .15s ease, border-color .15s ease;
   }
+  .opt.sent{
+    flex-direction:column;align-items:flex-start;text-align:left;
+    font-size:clamp(15px,4.3vw,19px);font-weight:800;line-height:1.4;min-height:58px;
+  }
+  .optsent{display:block}
+  .optko{display:block;font-size:clamp(12px,3.4vw,13.5px);font-weight:700;color:var(--ink-soft);margin-top:3px}
+  .qword-row{display:flex;align-items:center;justify-content:center;gap:10px;margin:10px 0 2px}
+  .qword{font-size:clamp(32px,9vw,44px);font-weight:800;letter-spacing:-.5px}
+  .mini-speak{
+    width:44px;height:44px;border-radius:50%;border:0;background:var(--blue-soft);color:var(--blue-dark);
+    font-size:19px;display:grid;place-items:center;
+  }
+  .mini-speak:active{transform:scale(.96)}
   .opt:active{transform:scale(.99)}
   .opt.right{background:var(--green-soft);border-color:var(--green);color:#0b6b3c}
   .opt.wrong{background:var(--red-soft);border-color:var(--red);color:#a52929;text-decoration:line-through}
@@ -350,8 +363,8 @@
     <section id="view-quiz" role="tabpanel" aria-labelledby="tab-quiz" hidden>
       <div id="quizStage" hidden>
         <div class="qhead">
-          <span class="qcount" id="qCount">1 / 5</span>
-          <div class="bar" aria-hidden="true"><span id="qBar" style="width:20%"></span></div>
+          <span class="qcount" id="qCount">1 / 10</span>
+          <div class="bar" aria-hidden="true"><span id="qBar" style="width:10%"></span></div>
         </div>
         <article class="qcard">
           <span class="qtype" id="qType">듣고 고르기</span>
@@ -364,8 +377,8 @@
 
       <div id="quizIntro" class="card">
         <h2 class="word" style="font-size:clamp(30px,8vw,44px)" id="quizIntroTitle">Day 1</h2>
-        <p class="sentence">5단어 퀴즈를 시작해 볼까요?</p>
-        <p class="meaning-hint">듣고 고르기 3문제 · 문장 빈칸 2문제</p>
+        <p class="sentence">10문제 퀴즈를 시작해 볼까요?</p>
+        <p class="meaning-hint">듣고 고르기 4문제 · 문장 빈칸 3문제 · 알맞은 문장 3문제</p>
         <div class="nav-row" style="width:100%">
           <button class="btn btn-primary btn-wide btn-big" id="startQuiz" type="button">퀴즈 시작 🎯</button>
         </div>
@@ -374,7 +387,7 @@
       <div id="quizResult" class="result" hidden>
         <div class="star" aria-hidden="true">⭐</div>
         <h2 id="resTitle">Day 1 완료!</h2>
-        <div class="score" id="resScore">5 / 5</div>
+        <div class="score" id="resScore">10 / 10</div>
         <p id="resNote"></p>
         <div class="acts">
           <button class="btn btn-primary btn-big" id="resNextDay" type="button">다음 Day 배우기 →</button>
@@ -631,7 +644,9 @@
   /* ======================= speech ======================= */
   var synth = window.speechSynthesis || null;
   var speechOK = !!synth && typeof window.SpeechSynthesisUtterance === "function";
-  var voices = [];
+  /* 목소리 톤 — 해율 스터디보드와 같은 밝고 또렷한 영어 톤 */
+  var TONE = { en: { pitch: 1.4, rate: 1.02, slow: 0.6 } };
+  var voices = [], enVoice = null;
   var toastTimer = null;
 
   function toast(msg){
@@ -642,42 +657,61 @@
     toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 2400);
   }
 
-  function refreshVoices(){
-    if(!speechOK) return;
-    try{ voices = synth.getVoices() || []; }catch(e){ voices = []; }
-  }
-  refreshVoices();
-  if(speechOK && typeof synth.addEventListener === "function"){
-    synth.addEventListener("voiceschanged", refreshVoices);
+  function isIOSDevice(){
+    try{
+      var ua = navigator.userAgent || "";
+      if(/iPad|iPhone|iPod/.test(ua)) return true;
+      return navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+    }catch(e){ return false; }
   }
 
-  function pickVoice(){
-    if(!voices.length) refreshVoices();
-    if(!voices.length) return null;
-    var pref = [
-      /google us english/i, /samantha/i, /aria/i, /jenny/i, /ava/i,
-      /microsoft (aria|jenny|zira|michelle)/i
-    ];
-    for(var p = 0; p < pref.length; p++){
-      for(var v = 0; v < voices.length; v++){
-        if(/^en[-_]US/i.test(voices[v].lang) && pref[p].test(voices[v].name)) return voices[v];
-      }
+  function pickVoices(){
+    if(!speechOK) return;
+    try{ voices = synth.getVoices() || []; }catch(e){ voices = []; }
+    function score(v){
+      var s = 0;
+      if(/^en[-_]US/i.test(v.lang)) s += 4; else if(/^en[-_]/i.test(v.lang)) s += 1;
+      if(v.localService) s += 3;   /* 기기 안 목소리 — 태블릿·폰에서 실제로 소리가 나는 쪽 */
+      if(/samantha|google|zira|aria|jenny|natural|karen|moira|daniel/i.test(v.name)) s += 1;
+      return s;
     }
-    for(var a = 0; a < voices.length; a++) if(/^en[-_]US/i.test(voices[a].lang)) return voices[a];
-    for(var b = 0; b < voices.length; b++) if(/^en/i.test(voices[b].lang)) return voices[b];
-    return null;
+    var ens = voices.filter(function(v){ return /^en[-_]/i.test(v.lang); });
+    ens.sort(function(a, b){ return score(b) - score(a); });
+    enVoice = ens[0] || null;
+    if(isIOSDevice()){
+      var loc = ens.filter(function(v){ return v.localService; });
+      if(loc.length) enVoice = loc[0];
+    }
+  }
+  pickVoices();
+  if(speechOK){
+    try{ synth.onvoiceschanged = pickVoices; }catch(e){}
+    try{ synth.addEventListener("voiceschanged", pickVoices); }catch(e){}
+  }
+
+  /* 발음 보정 — 사이트워드 'a'는 알파벳 이름('에이')이 아니라 약한 '어' 소리로 읽어요.
+     화면에는 그대로 'a'가 보이고, 단어 하나만 읽을 때만 바꿔요(문장 읽기는 그대로). */
+  var SAY_AS = { "a": "uh" };
+  function sayable(text, kind){
+    var t = String(text == null ? "" : text).trim();
+    if(kind !== "word") return t;
+    var key = t.toLowerCase();
+    return SAY_AS[key] || t;
   }
 
   function speak(text, kind){
     if(!speechOK){ toast("이 브라우저에서는 소리가 나오지 않아요"); return; }
+    var said = sayable(text, kind);
+    if(!said) return;
     var slow = (S.speed === "slow");
     try{ synth.cancel(); }catch(e){}
-    var u = new SpeechSynthesisUtterance(text);
+    var u = new SpeechSynthesisUtterance(said);
     u.lang = "en-US";
-    u.rate = kind === "word" ? (slow ? 0.62 : 0.88) : (slow ? 0.62 : 0.85);
-    u.pitch = 1.02;
-    var v = pickVoice();
-    if(v) u.voice = v;
+    var tone = TONE.en;
+    u.rate = slow ? tone.slow : tone.rate;
+    u.pitch = tone.pitch;
+    if(!enVoice){ try{ pickVoices(); }catch(e){} }
+    try{ if(enVoice) u.voice = enVoice; }catch(e){}
     u.onstart = function(){ var b = $("bigSpeak"); if(b) b.classList.add("playing"); };
     u.onend = u.onerror = function(){ var b = $("bigSpeak"); if(b) b.classList.remove("playing"); };
     try{ synth.speak(u); }catch(e){ toast("소리를 재생하지 못했어요"); }
@@ -763,6 +797,7 @@
     koBtn.setAttribute("aria-pressed", S.ko ? "true" : "false");
     renderLearn();
     if(S.tab === "book") renderBook();
+    if(S.tab === "quiz") applyQuizKo();
   }
 
   function setSpeed(slow){
@@ -811,13 +846,59 @@
     return out;
   }
 
-  function buildQuiz(day, variant){
-    var list = dayWords(day);
-    return list.map(function(w, i){
-      var isListen = (variant === "b") ? (i % 2 === 1) : (i % 2 === 0);
-      var opts = shuffle([w.w].concat(pickDistractors(w, day, 2)));
-      return { word: w, type: isListen ? "listen" : "blank", opts: opts };
+  // 문장 보기: 정답 단어의 예문 + 다른 단어의 예문 2개 (보기는 영어만)
+  // 오답 문장에 정답 단어가 들어 있으면 두 개가 정답처럼 보이므로 그런 문장은 뺀다.
+  function pickSentences(answer, day, need){
+    var out = [];
+    var seen = {};
+    seen[answer.s] = 1;
+    var hit = wordRe(answer.w);
+    function take(list){
+      for(var i = 0; i < list.length && out.length < need; i++){
+        var x = list[i];
+        if(seen[x.s] || hit.test(x.s)) continue;
+        seen[x.s] = 1;
+        out.push(x.s);
+      }
+    }
+    take(shuffle(dayWords(day).filter(function(x){ return x.w !== answer.w; })));
+    var near = [];
+    [day + 1, day - 1, day + 2, day - 2].forEach(function(d){
+      if(d >= 1 && d <= TOTAL_DAYS) near = near.concat(dayWords(d));
     });
+    take(shuffle(near));
+    take(shuffle(WORDS.filter(function(x){ return x.day !== day; })));
+    return out;
+  }
+
+  function wordBySentence(s){
+    for(var i = 0; i < WORDS.length; i++) if(WORDS[i].s === s) return WORDS[i];
+    return null;
+  }
+
+  /* 하루 10문제 — 듣고 고르기 4 · 문장 빈칸 3 · 알맞은 문장 3.
+     Day의 단어 5개가 각각 두 번씩, 서로 다른 유형으로 나와요. */
+  var QUIZ_TYPES = ["listen", "blank", "listen", "sentence", "blank",
+                    "sentence", "listen", "sentence", "blank", "listen"];
+
+  function buildQuiz(day, variant){
+    var rot = shuffle(dayWords(day).slice());
+    var pattern = QUIZ_TYPES.slice();
+    // '한 번 더'는 앞뒤 절반의 유형 순서를 바꿔 새 조합으로 (단어 순서·보기 순서도 매번 새로)
+    if(variant === "b") pattern = pattern.slice(5).concat(pattern.slice(0, 5));
+    return pattern.map(function(type, i){
+      var w = rot[i % rot.length];
+      if(type === "sentence"){
+        return { word: w, type: type, answer: w.s, opts: shuffle([w.s].concat(pickSentences(w, day, 2))) };
+      }
+      return { word: w, type: type, answer: w.w, opts: shuffle([w.w].concat(pickDistractors(w, day, 2))) };
+    });
+  }
+
+  function typeLabel(type){
+    if(type === "listen") return "🔊 듣고 고르기";
+    if(type === "blank") return "✏️ 문장 빈칸";
+    return "📖 알맞은 문장";
   }
 
   function renderQuizTab(){
@@ -853,7 +934,7 @@
     var q = Q.qs[Q.i];
     $("qCount").textContent = (Q.i + 1) + " / " + Q.qs.length;
     $("qBar").style.width = Math.round(((Q.i + 1) / Q.qs.length) * 100) + "%";
-    $("qType").textContent = q.type === "listen" ? "🔊 듣고 고르기" : "✏️ 문장 빈칸";
+    $("qType").textContent = typeLabel(q.type);
     $("qFeed").textContent = "";
     $("qFeed").className = "feedback";
     $("qNext").hidden = true;
@@ -865,10 +946,18 @@
         '<p class="qprompt">단어를 듣고 골라 보세요</p>' +
         '<button class="big-speak" id="bigSpeak" type="button" aria-label="단어 다시 듣기">🔊</button>';
       $("bigSpeak").addEventListener("click", function(){ speak(q.word.w, "word"); });
-    }else{
+    }else if(q.type === "blank"){
       body.innerHTML =
         '<p class="qprompt">빈칸에 들어갈 단어를 골라 보세요</p>' +
         '<p class="qsentence">' + blankHtml(q.word.w, q.word.s) + '</p>';
+    }else{
+      body.innerHTML =
+        '<p class="qprompt">이 단어가 들어 있는 문장을 골라 보세요</p>' +
+        '<div class="qword-row">' +
+          '<span class="qword">' + esc(q.word.w) + '</span>' +
+          '<button class="mini-speak" id="bigSpeak" type="button" aria-label="단어 듣기">🔊</button>' +
+        '</div>';
+      $("bigSpeak").addEventListener("click", function(){ speak(q.word.w, "word"); });
     }
 
     var opts = $("qOpts");
@@ -876,11 +965,39 @@
     q.opts.forEach(function(text){
       var b = document.createElement("button");
       b.type = "button";
-      b.className = "opt";
-      b.textContent = text;
+      b.className = "opt" + (q.type === "sentence" ? " sent" : "");
+      if(q.type === "sentence"){
+        b.innerHTML = '<span class="optsent">' + esc(text) + '</span>';
+      }else{
+        b.textContent = text;
+      }
       b.setAttribute("data-w", text);
       b.addEventListener("click", function(){ answer(b, text); });
       opts.appendChild(b);
+    });
+    applyQuizKo();
+  }
+
+  /* 한글 뜻 토글 — 퀴즈에서는 정답을 지우지 않고 보기 아래 뜻만 붙였다 떼요 */
+  function applyQuizKo(){
+    if(!Q || Q.finished) return;
+    var q = Q.qs[Q.i];
+    if(!q || q.type !== "sentence") return;
+    var opts = $("qOpts");
+    if(!opts) return;
+    Array.prototype.forEach.call(opts.children, function(el){
+      var old = el.querySelector(".optko");
+      if(S.ko){
+        if(old) return;
+        var w = wordBySentence(el.getAttribute("data-w") || "");
+        if(!w) return;
+        var sp = document.createElement("span");
+        sp.className = "optko";
+        sp.textContent = w.k;
+        el.appendChild(sp);
+      }else if(old){
+        el.removeChild(old);
+      }
     });
   }
 
@@ -888,7 +1005,7 @@
     var q = Q.qs[Q.i];
     if(btn.disabled) return;
 
-    if(text === q.word.w){
+    if(text === q.answer){
       btn.classList.add("right");
       Array.prototype.forEach.call($("qOpts").children, function(el){ el.disabled = true; });
       $("qFeed").className = "feedback ok";
@@ -902,6 +1019,8 @@
         $("qBody").innerHTML =
           '<p class="qprompt">빈칸에 들어갈 단어를 골라 보세요</p>' +
           '<p class="qsentence">' + highlightHtml(q.word.w, q.word.s) + '</p>';
+      }else if(q.type === "sentence"){
+        btn.innerHTML = '<span class="optsent">' + highlightHtml(q.word.w, q.answer) + '</span>';
       }
       speak(q.word.s, "sentence");
       $("qNext").hidden = false;
@@ -914,7 +1033,7 @@
       $("qFeed").className = "feedback no";
       $("qFeed").textContent = q.type === "listen"
         ? "다시 들어 보고 골라 볼까요?"
-        : "다시 한 번 생각해 볼까요?";
+        : (q.type === "sentence" ? "다시 한 번 읽어 보고 골라 볼까요?" : "다시 한 번 생각해 볼까요?");
     }
   }
 

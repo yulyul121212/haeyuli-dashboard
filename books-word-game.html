@@ -1098,31 +1098,43 @@
   var TTS = {
     supported: (typeof window.speechSynthesis !== 'undefined' && typeof window.SpeechSynthesisUtterance !== 'undefined'),
     voice: null,
+    /* 목소리 톤 — 해율 스터디보드와 같은 밝고 또렷한 영어 톤 */
+    tone: { pitch: 1.4, rate: 1.02, slow: 0.6 },
+    isIOS: function(){
+      try {
+        var ua = navigator.userAgent || '';
+        if (/iPad|iPhone|iPod/.test(ua)) return true;
+        return navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+      } catch (e) { return false; }
+    },
+    /* 발음 보정 — 사이트워드 'a'는 알파벳 이름('에이')이 아니라 약한 '어' 소리로 읽어요.
+       화면에는 그대로 'a'가 보이고, 한 단어만 읽을 때만 바꿔요(문장 읽기는 그대로). */
+    sayAs: { 'a': 'uh' },
+    said: function(text){
+      var t = String(text == null ? '' : text).trim();
+      return this.sayAs[t.toLowerCase()] || t;
+    },
     init: function(){
       if (!this.supported) return;
       var self = this;
       var load = function(){
         var vs = [];
         try { vs = window.speechSynthesis.getVoices() || []; } catch (e) {}
-        if (!vs.length) return;
-        var prefer = ['Google US English', 'Samantha', 'Ava', 'Allison', 'Alex', 'Microsoft Aria', 'Microsoft Zira', 'Microsoft Jenny', 'Karen', 'Daniel', 'Moira'];
-        var pick = null;
-        for (var i = 0; i < prefer.length && !pick; i++) {
-          for (var j = 0; j < vs.length; j++) {
-            if (vs[j].name && vs[j].name.indexOf(prefer[i]) === 0) { pick = vs[j]; break; }
-          }
+        function score(v){
+          var s = 0;
+          var lang = v.lang || '';
+          if (/^en[-_]US/i.test(lang)) s += 4; else if (/^en[-_]/i.test(lang)) s += 1;
+          if (v.localService) s += 3;   /* 기기 안 목소리 — 태블릿·폰에서 실제로 소리가 나는 쪽 */
+          if (/samantha|google|zira|aria|jenny|natural|karen|moira|daniel/i.test(v.name || '')) s += 1;
+          return s;
         }
-        if (!pick) {
-          for (var k = 0; k < vs.length; k++) {
-            if ((vs[k].lang || '').toLowerCase() === 'en-us') { pick = vs[k]; break; }
-          }
+        var ens = vs.filter(function(v){ return /^en[-_]/i.test(v.lang || ''); });
+        ens.sort(function(a, b){ return score(b) - score(a); });
+        self.voice = ens[0] || null;
+        if (self.isIOS()) {
+          var loc = ens.filter(function(v){ return v.localService; });
+          if (loc.length) self.voice = loc[0];
         }
-        if (!pick) {
-          for (var m = 0; m < vs.length; m++) {
-            if ((vs[m].lang || '').toLowerCase().indexOf('en') === 0) { pick = vs[m]; break; }
-          }
-        }
-        self.voice = pick || null;
       };
       load();
       if (window.speechSynthesis.addEventListener) {
@@ -1132,17 +1144,20 @@
       }
       setTimeout(load, 400);
     },
-    rate: function(){ return DB.slow ? 0.62 : 0.9; },
+    rate: function(){ return DB.slow ? this.tone.slow : this.tone.rate; },
     say: function(text, rate){
       if (!this.supported || !text) return;
+      var said = this.said(text);
+      if (!said) return;
       try {
         window.speechSynthesis.cancel();
-        var u = new SpeechSynthesisUtterance(String(text));
+        var u = new SpeechSynthesisUtterance(said);
         u.lang = 'en-US';
         u.rate = rate || this.rate();
-        u.pitch = 1.05;
+        u.pitch = this.tone.pitch;
         u.volume = 1;
-        if (this.voice) u.voice = this.voice;
+        if (!this.voice) this.init();
+        try { if (this.voice) u.voice = this.voice; } catch (e) {}
         window.speechSynthesis.speak(u);
       } catch (e) {}
     },
@@ -1153,12 +1168,12 @@
         var self = this;
         parts.forEach(function(txt){
           if (!txt || !String(txt).trim()) return;
-          var u = new SpeechSynthesisUtterance(String(txt).trim());
+          var u = new SpeechSynthesisUtterance(self.said(txt));
           u.lang = 'en-US';
           u.rate = rate || self.rate();
-          u.pitch = 1.05;
+          u.pitch = self.tone.pitch;
           u.volume = 1;
-          if (self.voice) u.voice = self.voice;
+          try { if (self.voice) u.voice = self.voice; } catch (e) {}
           window.speechSynthesis.speak(u);
         });
       } catch (e) {}
