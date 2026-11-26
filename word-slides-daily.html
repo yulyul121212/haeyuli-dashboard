@@ -185,13 +185,14 @@
       var o = JSON.parse(raw);
       if(o && typeof o === "object"){
         if(o.done && typeof o.done === "object") S.done = o.done;
+        if(o.viewed && typeof o.viewed === "object") S.viewed = o.viewed;
         if(typeof o.day === "number" && o.day >= 1 && o.day <= 5) S.day = o.day;
         if(typeof o.ko === "boolean") S.ko = o.ko;
       }
     }catch(e){}
   }
   function save(){
-    try{ localStorage.setItem(STORE_KEY, JSON.stringify({ done: S.done, day: S.day, ko: S.ko })); }catch(e){}
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify({ done: S.done, day: S.day, ko: S.ko, viewed: S.viewed })); }catch(e){}
   }
 
   function list(){ return DATA.filter(function(w){ return w.day === S.day; }); }
@@ -329,6 +330,7 @@
   function markViewed(){
     S.viewed[S.day] = S.viewed[S.day] || {};
     S.viewed[S.day][S.idx] = 1;
+    save();
     var seen = Object.keys(S.viewed[S.day]).length;
     if(seen >= 10 && !S.done[S.day]){
       S.done[S.day] = true; save();
